@@ -75,7 +75,7 @@ COMMENT ON TABLE case_insights IS 'AI-generated case/matter insights and risk as
 CREATE TABLE IF NOT EXISTS ai_usage (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES users(id),
-    organization_id UUID REFERENCES organizations(id),
+    organization_id UUID,
     provider TEXT NOT NULL CHECK (provider IN ('openai', 'anthropic', 'local')),
     model TEXT NOT NULL,
     feature TEXT NOT NULL, -- 'document_analysis', 'case_insights', 'semantic_search', 'chat'
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS ai_usage (
 );
 
 CREATE INDEX idx_ai_usage_user_id ON ai_usage(user_id);
-CREATE INDEX idx_ai_usage_organization_id ON ai_usage(organization_id);
+
 CREATE INDEX idx_ai_usage_provider ON ai_usage(provider);
 CREATE INDEX idx_ai_usage_created_at ON ai_usage(created_at DESC);
 CREATE INDEX idx_ai_usage_feature ON ai_usage(feature);
@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXISTS ai_settings (
     UNIQUE(organization_id, user_id)
 );
 
-CREATE INDEX idx_ai_settings_organization_id ON ai_settings(organization_id);
+
 CREATE INDEX idx_ai_settings_user_id ON ai_settings(user_id);
 
 COMMENT ON TABLE ai_settings IS 'AI provider configuration per organization/user';
