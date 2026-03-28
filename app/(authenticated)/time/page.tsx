@@ -23,7 +23,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import type { CaseSummary, TimeEntryTemplate } from "@/types";
+import type { CaseSummary, TimeEntryTemplate } from "@/types/domain";
 import { format } from "date-fns";
 
 const manualEntrySchema = z.object({
@@ -218,7 +218,7 @@ const TimeTrackingPage = () => {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <Timer matters={matters} onSubmit={saveTimerEntry} saving={createEntry.isLoading} />
+        <Timer matters={matters} onSubmit={saveTimerEntry} saving={createEntry.isPending} />
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>Manual entry</CardTitle>
@@ -266,7 +266,7 @@ const TimeTrackingPage = () => {
                 <Label>Billable</Label>
               </div>
               <div className="md:col-span-2 flex gap-3">
-                <Button type="submit" disabled={createEntry.isLoading}>Log time</Button>
+                <Button type="submit" disabled={createEntry.isPending}>Log time</Button>
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button type="button" variant="outline">

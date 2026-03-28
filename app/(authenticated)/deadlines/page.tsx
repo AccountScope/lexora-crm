@@ -17,7 +17,7 @@ import {
   useDeadlines,
   useUpcomingDeadlines,
 } from "@/lib/hooks/use-deadlines";
-import type { DeadlineRecord } from "@/types";
+import type { DeadlineRecord } from "@/types/domain";
 
 const priorityColors: Record<string, string> = {
   HIGH: "bg-destructive/15 text-destructive border-destructive/40",

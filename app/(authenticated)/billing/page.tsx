@@ -25,8 +25,8 @@ const BillingPage = () => {
   const metrics = invoiceResponse?.data.metrics;
 
   const revenueChart = useMemo(() => {
-    const labels = metrics?.monthlyRevenue.map((item) => item.month) ?? [];
-    const data = metrics?.monthlyRevenue.map((item) => item.total) ?? [];
+    const labels = metrics?.monthlyRevenue.map((item: any) => item.month) ?? [];
+    const data = metrics?.monthlyRevenue.map((item: any) => item.total) ?? [];
     return {
       labels,
       datasets: [
@@ -53,7 +53,7 @@ const BillingPage = () => {
     };
   }, [metrics]);
 
-  const totalUnbilled = metrics?.unbilledTimeByClient.reduce((sum, row) => sum + row.amount, 0) ?? 0;
+  const totalUnbilled = metrics?.unbilledTimeByClient.reduce((sum: number, row: any) => sum + row.amount, 0) ?? 0;
 
   const handleInvoiceGenerate = async (payload: any) => {
     await createInvoice.mutateAsync(payload);
@@ -142,7 +142,7 @@ const BillingPage = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {(metrics?.unbilledTimeByClient ?? []).map((row) => (
+                {(metrics?.unbilledTimeByClient ?? []).map((row: any) => (
                   <TableRow key={`${row.clientId}-${row.matterId ?? "all"}`}>
                     <TableCell>{row.clientName}</TableCell>
                     <TableCell>{row.hours.toFixed(1)}</TableCell>
@@ -175,7 +175,7 @@ const BillingPage = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {(metrics?.payments ?? []).map((payment) => (
+                {(metrics?.payments ?? []).map((payment: any) => (
                   <TableRow key={payment.id}>
                     <TableCell>{format(new Date(payment.paidOn), "dd MMM")}</TableCell>
                     <TableCell>{payment.invoiceId.slice(0, 8)}</TableCell>
@@ -241,7 +241,7 @@ const BillingPage = () => {
         timeEntries={unbilledEntries}
         matters={matters}
         onGenerate={handleInvoiceGenerate}
-        generating={createInvoice.isLoading}
+        generating={createInvoice.isPending}
       />
     </div>
   );
