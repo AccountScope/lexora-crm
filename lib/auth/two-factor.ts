@@ -25,7 +25,6 @@ const lockMinutes = Math.max(1, Number(process.env.TWO_FACTOR_LOCK_MINUTES ?? 15
 const recoveryLinkTtlMinutes = Math.max(1, Number(process.env.TWO_FACTOR_RECOVERY_TTL_MINUTES ?? 60));
 const graceDays = Math.max(1, Number(process.env.TWO_FACTOR_GRACE_DAYS ?? 7));
 const forceTwoFactorForAll = (process.env.LEXORA_FORCE_2FA_FOR_ALL ?? "").toLowerCase() === "true";
-const recoveryThrottleMinutes = Math.max(5, Number(process.env.TWO_FACTOR_RECOVERY_INTERVAL_MINUTES ?? 15));
 const backupCodeRounds = Math.max(10, Number(process.env.TWO_FACTOR_BACKUP_ROUNDS ?? 12));
 const appBaseUrl = getAppBaseUrl();
 
@@ -360,6 +359,11 @@ const resetAttempts = async (record: SecurityUserRecord) => {
 };
 
 const clearTwoFactorState = async (userId: string, options: { restartForceWindow?: boolean }) => {
+  const revokedAt = new Date();
+  const forceStarted = options.restartForceWindow ? revokedAt.toISOString() : null;
+  const forceDeadline = options.restartForceWindow
+    ? new Date(revokedAt.getTime() + graceDays * 24 * 60 * 60 * 1000).toISOString()
+    : null;
   await withDb(async (client) => {
     await client.query(
       `UPDATE users
@@ -370,11 +374,11 @@ const clearTwoFactorState = async (userId: string, options: { restartForceWindow
            two_factor_recovery_token = NULL,
            two_factor_recovery_expires = NULL,
            two_factor_session_revoked_at = $2,
-           two_factor_force_started_at = CASE WHEN $3 THEN NOW() ELSE NULL END,
-           two_factor_force_deadline = CASE WHEN $3 THEN NOW() + ($4 * INTERVAL '1 day') ELSE NULL END,
+           two_factor_force_started_at = $3,
+           two_factor_force_deadline = $4,
            updated_at = NOW()
        WHERE id = $1`,
-      [userId, new Date().toISOString(), options.restartForceWindow ? graceDays : null, graceDays]
+      [userId, revokedAt.toISOString(), forceStarted, forceDeadline]
     );
     await client.query(`DELETE FROM backup_codes WHERE user_id = $1`, [userId]);
   });
