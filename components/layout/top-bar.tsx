@@ -1,6 +1,7 @@
 "use client";
 
-import { Bell, Shield } from "lucide-react";
+import { Shield } from "lucide-react";
+import { NotificationBell } from "@/components/notifications/notification-bell";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { GlobalSearch } from "@/components/search/global-search";
