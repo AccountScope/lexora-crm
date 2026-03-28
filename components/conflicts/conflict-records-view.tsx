@@ -173,7 +173,7 @@ export const ConflictRecordsView = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={statusBadge[conflict.status] ?? "outline"}>{conflict.status}</Badge>
+                        <Badge variant={(statusBadge[conflict.status] ?? "outline") as any}>{conflict.status}</Badge>
                       </TableCell>
                       <TableCell>
                         <Button variant="link" className="p-0" asChild>

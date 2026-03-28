@@ -47,8 +47,8 @@ export const ConflictCheckForm = () => {
     },
   });
 
-  const opposingFieldArray = useFieldArray({ control: form.control, name: "opposingParties" });
-  const otherFieldArray = useFieldArray({ control: form.control, name: "otherParties" });
+  const opposingFieldArray = useFieldArray({ control: form.control as any, name: "opposingParties" });
+  const otherFieldArray = useFieldArray({ control: form.control as any, name: "otherParties" });
   const mutation = useRunConflictCheck();
   const [result, setResult] = useState<ConflictRunData | null>(null);
 

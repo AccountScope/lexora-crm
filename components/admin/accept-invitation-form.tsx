@@ -18,7 +18,7 @@ const hints = ["Weak", "Fair", "Good", "Strong", "Excellent"];
 const strengthColors = ["bg-red-500", "bg-orange-500", "bg-yellow-500", "bg-emerald-500", "bg-green-600"];
 
 export const AcceptInvitationForm = ({ invitation, token }: Props) => {
-  const [state, formAction] = useFormState(acceptInvitationAction, { error: null });
+  const [state, formAction] = useFormState(acceptInvitationAction as any, { error: null });
   const [password, setPassword] = useState("");
   const score = password ? ((zxcvbn as any)(password))?.score ?? 0 : 0;
   return (

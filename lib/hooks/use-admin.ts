@@ -48,7 +48,6 @@ export const useAdminUsers = (params: Record<string, any>) => {
       const res = await fetcher<{ data?: AdminUserListResponse }>(`/api/admin/users${query}`);
       return res.data ?? (res as any);
     },
-// @ts-expect-error - no overload
     placeholderData: (prev: any) => prev,
   });
 };

@@ -290,7 +290,7 @@ export const updateAdminUserProfile = async (
     if (payload.roleId) {
       updates.push((async () => {
         await client.query(`DELETE FROM user_roles WHERE user_id = $1`, [userId]);
-        await client.query(`INSERT INTO user_roles (user_id, role_id) VALUES ($1, $2)`, [userId, payload.roleId]);
+        return await client.query(`INSERT INTO user_roles (user_id, role_id) VALUES ($1, $2)`, [userId, payload.roleId]);
       })());
     }
 

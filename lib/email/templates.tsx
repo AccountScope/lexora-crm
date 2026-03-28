@@ -399,6 +399,6 @@ const textBody = (template: EmailTemplateType, data: any) => {
 export const renderEmailTemplate = <T extends EmailTemplateType>(template: T, data: EmailTemplatePayloadMap[T]) => {
   const subject = SUBJECTS[template](data);
   const Component = COMPONENTS[template];
-  const html = render(<Component {...data} />);
+  const html = render(<Component {...(data as any)} />);
   return { subject, html, text: textBody(template, data) };
 };

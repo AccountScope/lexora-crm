@@ -38,7 +38,7 @@ export const ClientPortal = () => {
   const selected = cases.find((item) => item.id === activeCase) ?? cases[0];
   const messages = usePortalMessages({
     matterId: selected?.id,
-    clientId: selected?.clientId ?? selected?.permittedDocuments[0]?.clientId,
+    clientId: (selected?.clientId ?? selected?.permittedDocuments[0]?.clientId) || undefined,
   });
   const [message, setMessage] = useState("");
   const sender = useSendPortalMessage({
