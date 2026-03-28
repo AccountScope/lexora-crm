@@ -133,7 +133,7 @@ export const UserTable = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All roles</SelectItem>
-              {roleOptions.map((role) => (
+              {roleOptions.map((role: any) => (
                 <SelectItem key={role.id} value={role.id}>
                   {role.name}
                 </SelectItem>
@@ -229,7 +229,7 @@ export const UserTable = () => {
                   <TableCell>
                     {user.roles?.length ? (
                       <div className="flex flex-wrap gap-1">
-                        {user.roles.map((role) => (
+                        {user.roles.map((role: any) => (
                           <Badge key={role.id} variant="outline">
                             {role.name}
                           </Badge>

@@ -5,7 +5,7 @@ import { Calendar, dateFnsLocalizer, type Event as CalendarEvent, type View } fr
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import { rrulestr } from "rrule";
-import enUS from "date-fns/locale/en-US";
+import { enUS } from "date-fns/locale/en-US";
 import type { DeadlineRecord } from "@/types";
 import { cn } from "@/lib/utils/cn";
 

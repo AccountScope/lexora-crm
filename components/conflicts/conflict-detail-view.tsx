@@ -35,7 +35,7 @@ export const ConflictDetailView = ({ conflictId }: { conflictId: string }) => {
     }
   }, [detail]);
 
-  const parties = useMemo(() => Array.from(new Set(detail?.conflicts.map((conflict) => conflict.partyName) ?? [])), [
+  const parties = useMemo(() => Array.from(new Set(detail?.conflicts.map((conflict: any) => conflict.partyName) ?? [])), [
     detail,
   ]);
 
@@ -85,7 +85,7 @@ export const ConflictDetailView = ({ conflictId }: { conflictId: string }) => {
               <CardTitle>Audit trail</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {detail.auditTrail.map((entry) => (
+              {detail.auditTrail.map((entry: any) => (
                 <div key={entry.id} className="border-l-2 border-border pl-4 text-sm">
                   <p className="font-medium text-foreground">{entry.action.replace(/_/g, " ")}</p>
                   <p className="text-xs text-muted-foreground">

@@ -51,7 +51,7 @@ export const CaseNotes = ({ matterId, notes }: { matterId: string; notes?: CaseN
           </div>
         </div>
         <div className="space-y-3">
-          {(notes ?? []).map((entry) => (
+          {(notes ?? []).map((entry: any) => (
             <div key={entry.id} className="rounded-lg border p-3">
               <div className="flex items-center justify-between text-sm">
                 <p className="font-medium">{entry.authorName}</p>

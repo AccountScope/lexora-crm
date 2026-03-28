@@ -72,8 +72,8 @@ export const DeadlineForm = ({ templates = [], onSuccess }: Props) => {
   const onSubmit = handleSubmit(async (values) => {
     const reminderOffsets = values.reminderString
       .split(",")
-      .map((entry) => Number(entry.trim()))
-      .filter((entry) => !Number.isNaN(entry));
+      .map((entry: any) => Number(entry.trim()))
+      .filter((entry: any) => !Number.isNaN(entry));
     const payload = {
       title: values.title,
       caseId: values.caseId || undefined,

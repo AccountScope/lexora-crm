@@ -72,7 +72,7 @@ export const ConflictResults = ({ summary, conflicts, decisions, onAction }: Con
             </CardContent>
           </Card>
         )}
-        {conflicts.map((conflict) => (
+        {conflicts.map((conflict: any) => (
           <ConflictCard key={conflict.id} conflict={conflict} onAction={onAction} />
         ))}
       </div>

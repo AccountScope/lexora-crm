@@ -63,9 +63,9 @@ export const InvoiceGenerator = ({ timeEntries, matters, onGenerate, generating 
     return Array.from(map.values());
   }, [matters]);
 
-  const selectedTimeEntries = timeEntries.filter((entry) => selectedEntries[entry.id]);
+  const selectedTimeEntries = timeEntries.filter((entry: any) => selectedEntries[entry.id]);
   const combinedLineItems: LineItemState[] = [
-    ...selectedTimeEntries.map((entry) => ({
+    ...selectedTimeEntries.map((entry: any) => ({
       id: entry.id,
       description: entry.description,
       quantity: Number(entry.hours ?? 1),
@@ -235,7 +235,7 @@ export const InvoiceGenerator = ({ timeEntries, matters, onGenerate, generating 
         <div>
           <Label className="mb-2 block">Include unbilled time</Label>
           <div className="space-y-2 max-h-80 overflow-y-auto pr-2">
-            {timeEntries.map((entry) => (
+            {timeEntries.map((entry: any) => (
               <div key={entry.id} className="flex items-center justify-between rounded-md border p-3">
                 <div>
                   <p className="font-medium">{entry.matter.title}</p>

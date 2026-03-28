@@ -144,7 +144,7 @@ export const GlobalSearch = () => {
     (value: string) => {
       const trimmed = value.trim();
       if (!trimmed) return;
-      const next = [trimmed, ...recentSearches.filter((entry) => entry !== trimmed)].slice(0, 8);
+      const next = [trimmed, ...recentSearches.filter((entry: any) => entry !== trimmed)].slice(0, 8);
       setRecentSearches(next);
       localStorage.setItem("lexora:recent-searches", JSON.stringify(next));
     },
@@ -311,7 +311,7 @@ export const GlobalSearch = () => {
             {renderGroups()}
             {!enabled && recentSearches.length > 0 && (
               <Command.Group heading="Recent searches">
-                {recentSearches.map((entry) => (
+                {recentSearches.map((entry: any) => (
                   <Command.Item key={entry} onSelect={() => setTerm(entry)} value={entry} className="flex items-center gap-2 px-3 py-2">
                     <History className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm">{entry}</span>

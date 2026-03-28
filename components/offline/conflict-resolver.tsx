@@ -76,7 +76,7 @@ export function ConflictResolver({ conflicts, onResolve, onResolveAll }: Conflic
 
         {/* Conflicts list */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          {conflicts.map((conflict) => (
+          {conflicts.map((conflict: any) => (
             <div key={conflict.id} className="border rounded-lg overflow-hidden">
               {/* Conflict header */}
               <div className="bg-gray-50 px-4 py-2 border-b">
