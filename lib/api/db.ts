@@ -57,3 +57,8 @@ export const healthCheck = async () => {
 export const createClient = () => ({
   query: pool.query.bind(pool),
 });
+
+// Export db object for email/trust APIs
+export const db = {
+  query: pool.query.bind(pool),
+};

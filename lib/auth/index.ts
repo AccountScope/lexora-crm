@@ -24,3 +24,6 @@ export const requireUser = async (request: Request) => {
   }
   return context.user;
 };
+
+// Alias for compatibility with trust accounting APIs
+export const getCurrentUser = requireUser;
