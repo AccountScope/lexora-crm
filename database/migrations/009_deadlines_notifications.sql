@@ -55,7 +55,7 @@ CREATE INDEX deadlines_status_idx ON deadlines(status);
 CREATE TABLE notification_preferences (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
-    channels notification_channel[] NOT NULL DEFAULT ARRAY['EMAIL','IN_APP'],
+    channels notification_channel[] NOT NULL DEFAULT ARRAY['EMAIL','IN_APP']::notification_channel[],
     email_frequency notification_frequency NOT NULL DEFAULT 'INSTANT',
     quiet_hours_start TIME,
     quiet_hours_end TIME,
