@@ -58,7 +58,69 @@ export const createClient = () => ({
   query: pool.query.bind(pool),
 });
 
-// Export db object for email/trust APIs
+// Export db object for email/trust APIs with compatibility methods
 export const db = {
   query: pool.query.bind(pool),
+  
+  // Compatibility methods for Phase 3A code
+  // TODO: Refactor Phase 3A code to use withDb/query directly
+  async queryOne<T = any>(sql: string, params: any[] = []): Promise<T | null> {
+    const result = await pool.query<T>(sql, params);
+    return result.rows[0] || null;
+  },
+  
+  // Query builder compatibility (minimal implementation)
+  from(table: string) {
+    return {
+      select: (columns: string = '*') => ({
+        eq: (column: string, value: any) => ({
+          single: async () => {
+            const result = await pool.query(
+              `SELECT ${columns} FROM ${table} WHERE ${column} = $1 LIMIT 1`,
+              [value]
+            );
+            return { data: result.rows[0] || null, error: null };
+          },
+        }),
+        async execute() {
+          const result = await pool.query(`SELECT ${columns} FROM ${table}`);
+          return { data: result.rows, error: null };
+        },
+      }),
+      insert: (values: any) => ({
+        async execute() {
+          const keys = Object.keys(values);
+          const vals = Object.values(values);
+          const placeholders = keys.map((_, i) => `$${i + 1}`).join(', ');
+          const result = await pool.query(
+            `INSERT INTO ${table} (${keys.join(', ')}) VALUES (${placeholders}) RETURNING *`,
+            vals
+          );
+          return { data: result.rows[0], error: null };
+        },
+      }),
+      update: (values: any) => ({
+        eq: (column: string, value: any) => ({
+          async execute() {
+            const keys = Object.keys(values);
+            const vals = Object.values(values);
+            const sets = keys.map((k, i) => `${k} = $${i + 1}`).join(', ');
+            const result = await pool.query(
+              `UPDATE ${table} SET ${sets} WHERE ${column} = $${vals.length + 1} RETURNING *`,
+              [...vals, value]
+            );
+            return { data: result.rows[0], error: null };
+          },
+        }),
+      }),
+      delete: () => ({
+        eq: (column: string, value: any) => ({
+          async execute() {
+            await pool.query(`DELETE FROM ${table} WHERE ${column} = $1`, [value]);
+            return { error: null };
+          },
+        }),
+      }),
+    };
+  },
 };

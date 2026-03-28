@@ -5,26 +5,25 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/api/db';
+import { withDb, query } from '@/lib/api/db';
 import { getCurrentUser } from '@/lib/auth';
+import { ApiError } from '@/lib/api/errors';
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await getCurrentUser();
+    const user = await getCurrentUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const supabase = createClient();
+    const result = await query(
+      `SELECT * FROM trust_accounts 
+       WHERE user_id = $1 
+       ORDER BY created_at DESC`,
+      [user.id]
+    );
 
-    const { data: accounts, error } = await supabase
-      .from('trust_accounts')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-
-    return NextResponse.json({ accounts });
+    return NextResponse.json({ accounts: result.rows });
   } catch (error) {
     console.error('[TRUST_ACCOUNTS_GET]', error);
     return NextResponse.json(
@@ -36,7 +35,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await getCurrentUser();
+    const user = await getCurrentUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -48,55 +47,33 @@ export async function POST(request: NextRequest) {
       account_number_last4,
       routing_number,
       account_type,
-      opening_balance,
-      opening_date
+      currency = 'GBP',
+      is_iolta = true,
     } = body;
 
-    // Validation
-    if (!name || !bank_name || !account_number_last4 || !account_type || !opening_date) {
+    // Validate required fields
+    if (!name || !bank_name || !account_number_last4) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Missing required fields: name, bank_name, account_number_last4' },
         { status: 400 }
       );
     }
 
-    if (!['checking', 'savings'].includes(account_type)) {
-      return NextResponse.json(
-        { error: 'Invalid account type' },
-        { status: 400 }
+    const result = await withDb(async (client) => {
+      // Create trust account
+      const accountResult = await client.query(
+        `INSERT INTO trust_accounts (
+          user_id, name, bank_name, account_number_last4,
+          routing_number, account_type, currency, is_iolta
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        RETURNING *`,
+        [user.id, name, bank_name, account_number_last4, routing_number, account_type, currency, is_iolta]
       );
-    }
 
-    const supabase = createClient();
-
-    const { data: account, error } = await supabase
-      .from('trust_accounts')
-      .insert({
-        name,
-        bank_name,
-        account_number_last4,
-        routing_number,
-        account_type,
-        opening_balance: opening_balance || 0,
-        opening_date,
-        current_balance: opening_balance || 0,
-        created_by: user.id,
-        updated_by: user.id
-      })
-      .select()
-      .single();
-
-    if (error) throw error;
-
-    // Audit log
-    await supabase.from('trust_audit_log').insert({
-      trust_account_id: account.id,
-      action: 'created_account',
-      new_values: account,
-      performed_by: user.id
+      return accountResult.rows[0];
     });
 
-    return NextResponse.json({ account }, { status: 201 });
+    return NextResponse.json({ account: result }, { status: 201 });
   } catch (error) {
     console.error('[TRUST_ACCOUNTS_POST]', error);
     return NextResponse.json(
