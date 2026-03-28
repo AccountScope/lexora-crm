@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
         firstName: result.user?.firstName || undefined,
         changedAt: result.passwordChangedAt ?? new Date().toISOString(),
         device: describeDeviceFromUserAgent(userAgent || undefined),
-        location: resolveLocationFromIp(ipAddress),
+        location: await resolveLocationFromIp(ipAddress),
         ipAddress: ipAddress || undefined,
         nextStepsUrl: `${APP_URL.replace(/\/$/, "")}/settings/password`,
       },

@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
     await revokeAllSessions(userId);
 
     const device = describeDeviceFromUserAgent(userAgent || undefined);
-    const location = resolveLocationFromIp(ipAddress);
+    const location = await resolveLocationFromIp(ipAddress);
     const meta = await getPasswordMetadata(userId);
     const secureUrl = `${APP_URL.replace(/\/$/, "")}/settings/password`;
 
