@@ -82,7 +82,7 @@ export async function generateThreeWayReport(
 
     // Calculate ledger total
     const ledgerTotal = (ledgers || []).reduce(
-      (sum, ledger) => sum.plus(new Decimal(ledger.current_balance)),
+      (sum: Decimal, ledger: any) => sum.plus(new Decimal(ledger.current_balance)),
       new Decimal(0)
     );
 
@@ -117,7 +117,7 @@ export async function generateClientLedgerReport(): Promise<ClientLedgerReport[]
   try {
     const supabase = createClient();
 
-    const { data: ledgers, error } = await supabase
+    const { data: ledgers, error } = await (supabase as any)
       .from('client_ledgers')
       .select(`
         client_id,
@@ -254,7 +254,7 @@ export async function generateZeroBalanceLedgersReport(): Promise<ClientLedgerRe
   try {
     const supabase = createClient();
 
-    const { data: ledgers, error } = await supabase
+    const { data: ledgers, error } = await (supabase as any)
       .from('client_ledgers')
       .select(`
         client_id,

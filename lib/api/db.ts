@@ -54,9 +54,8 @@ export const healthCheck = async () => {
 };
 
 // Create a simple client wrapper for compatibility
-export const createClient = () => ({
-  query: pool.query.bind(pool),
-});
+// Returns db object with query builder for Phase 3A code
+export const createClient = () => db;
 
 // Export db object for email/trust APIs with compatibility methods
 export const db = {
@@ -71,22 +70,86 @@ export const db = {
   
   // Query builder compatibility (minimal implementation)
   from(table: string) {
+    let selectCols = '*';
+    let whereClauses: string[] = [];
+    let whereValues: any[] = [];
+    let orderClause = '';
+    
     return {
-      select: (columns: string = '*') => ({
-        eq: (column: string, value: any) => ({
-          single: async () => {
-            const result = await pool.query(
-              `SELECT ${columns} FROM ${table} WHERE ${column} = $1 LIMIT 1`,
-              [value]
-            );
-            return { data: result.rows[0] || null, error: null };
+      select: (columns: string = '*') => {
+        selectCols = columns;
+        return {
+          eq: (column: string, value: any) => {
+            whereClauses.push(`${column} = $${whereValues.length + 1}`);
+            whereValues.push(value);
+            return {
+              order: (col: string, opts?: { ascending?: boolean }) => {
+                orderClause = `ORDER BY ${col} ${opts?.ascending ? 'ASC' : 'DESC'}`;
+                return {
+                  async execute() {
+                    const where = whereClauses.length ? `WHERE ${whereClauses.join(' AND ')}` : '';
+                    const result = await pool.query(
+                      `SELECT ${selectCols} FROM ${table} ${where} ${orderClause}`,
+                      whereValues
+                    );
+                    return { data: result.rows, error: null };
+                  }
+                };
+              },
+              single: async () => {
+                const where = whereClauses.length ? `WHERE ${whereClauses.join(' AND ')}` : '';
+                const result = await pool.query(
+                  `SELECT ${selectCols} FROM ${table} ${where} LIMIT 1`,
+                  whereValues
+                );
+                return { data: result.rows[0] || null, error: null };
+              },
+            };
           },
-        }),
-        async execute() {
-          const result = await pool.query(`SELECT ${columns} FROM ${table}`);
-          return { data: result.rows, error: null };
-        },
-      }),
+          gte: (column: string, value: any) => {
+            whereClauses.push(`${column} >= $${whereValues.length + 1}`);
+            whereValues.push(value);
+            return {
+              order: (col: string, opts?: { ascending?: boolean }) => {
+                orderClause = `ORDER BY ${col} ${opts?.ascending ? 'ASC' : 'DESC'}`;
+                return {
+                  async execute() {
+                    const where = whereClauses.length ? `WHERE ${whereClauses.join(' AND ')}` : '';
+                    const result = await pool.query(
+                      `SELECT ${selectCols} FROM ${table} ${where} ${orderClause}`,
+                      whereValues
+                    );
+                    return { data: result.rows, error: null };
+                  }
+                };
+              },
+              async execute() {
+                const where = whereClauses.length ? `WHERE ${whereClauses.join(' AND ')}` : '';
+                const result = await pool.query(
+                  `SELECT ${selectCols} FROM ${table} ${where}`,
+                  whereValues
+                );
+                return { data: result.rows, error: null };
+              }
+            };
+          },
+          order: (col: string, opts?: { ascending?: boolean }) => {
+            orderClause = `ORDER BY ${col} ${opts?.ascending ? 'ASC' : 'DESC'}`;
+            return {
+              async execute() {
+                const result = await pool.query(
+                  `SELECT ${selectCols} FROM ${table} ${orderClause}`
+                );
+                return { data: result.rows, error: null };
+              }
+            };
+          },
+          async execute() {
+            const result = await pool.query(`SELECT ${selectCols} FROM ${table}`);
+            return { data: result.rows, error: null };
+          },
+        };
+      },
       insert: (values: any) => ({
         async execute() {
           const keys = Object.keys(values);
