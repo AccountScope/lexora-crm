@@ -11,7 +11,7 @@ import type {
 } from "@/types";
 import type { ConflictCheckInput, ConflictStatusInput, ConflictWaiverInput } from "@/lib/api/validation";
 
-const fetcher = async <T>(url: string, options?: RequestInit): Promise<T> => {
+const fetcher = async <T,>(url: string, options?: RequestInit): Promise<T> => {
   const res = await fetch(url, options);
   if (!res.ok) {
     throw new Error(await res.text());

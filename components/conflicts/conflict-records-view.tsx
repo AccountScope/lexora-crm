@@ -4,8 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import Link from "next/link";
-import { useAddWatchListEntry, useConflictChecks, useRemoveWatchListEntry, useWatchList } from "@/lib/hooks/use-conflicts";
-import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -76,8 +74,7 @@ const exportCsv = (records: ConflictCheckRecord[]) => {
   ]);
   const csv = [header, ...rows]
     .map((row) => row.map((cell) => `"${cell}"`).join(","))
-    .join("
-");
+    .join("\n");
   const blob = new Blob([csv], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
@@ -87,7 +84,6 @@ const exportCsv = (records: ConflictCheckRecord[]) => {
   URL.revokeObjectURL(url);
 };
 
-};
 
 export const ConflictRecordsView = () => {
   const [search, setSearch] = useState("");
