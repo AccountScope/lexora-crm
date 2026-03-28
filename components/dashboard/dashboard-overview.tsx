@@ -1,6 +1,7 @@
 "use client";
 
 import { useCases } from "@/lib/hooks/use-cases";
+import { useUpcomingDeadlines } from "@/lib/hooks/use-deadlines";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
@@ -9,8 +10,10 @@ import Link from "next/link";
 
 export const DashboardOverview = () => {
   const { data, isFetching } = useCases({});
+  const { data: deadlinesData } = useUpcomingDeadlines(5);
   const matters = data?.data ?? [];
   const recent = matters.slice(0, 4);
+  const upcomingDeadlines = deadlinesData?.data ?? [];
 
   return (
     <div className="space-y-6">
@@ -47,28 +50,52 @@ export const DashboardOverview = () => {
           </CardContent>
         </Card>
       </div>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Recent activity</CardTitle>
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/cases">View all</Link>
-          </Button>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {isFetching && <p className="text-sm text-muted-foreground">Refreshing data…</p>}
-          {recent.map((matter) => (
-            <div key={matter.id} className="flex items-center justify-between rounded-lg border p-3">
-              <div>
-                <p className="font-medium">{matter.title}</p>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Next deadlines</CardTitle>
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/deadlines">Open tracker</Link>
+            </Button>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {upcomingDeadlines.length === 0 && <p className="text-sm text-muted-foreground">No upcoming deadlines.</p>}
+            {upcomingDeadlines.map((deadline) => (
+              <div key={deadline.id} className="rounded-lg border p-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium">{deadline.title}</p>
+                  <Badge>{deadline.priority}</Badge>
+                </div>
                 <p className="text-xs text-muted-foreground">
-                  Updated {formatDistanceToNow(new Date(matter.opensOn), { addSuffix: true })}
+                  Due {formatDistanceToNow(new Date(deadline.dueDate), { addSuffix: true })}
                 </p>
               </div>
-              <Badge>{matter.status}</Badge>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
+            ))}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Recent activity</CardTitle>
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/cases">View all</Link>
+            </Button>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {isFetching && <p className="text-sm text-muted-foreground">Refreshing data…</p>}
+            {recent.map((matter) => (
+              <div key={matter.id} className="flex items-center justify-between rounded-lg border p-3">
+                <div>
+                  <p className="font-medium">{matter.title}</p>
+                  <p className="text-xs text-muted-foreground">
+                    Updated {formatDistanceToNow(new Date(matter.opensOn), { addSuffix: true })}
+                  </p>
+                </div>
+                <Badge>{matter.status}</Badge>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

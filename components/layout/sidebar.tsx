@@ -10,12 +10,16 @@ import {
   ShieldCheck,
   MessageSquare,
   LayoutGrid,
+  Clock3,
+  ReceiptText,
 } from "lucide-react";
 
 const routes = [
-  { name: "Overview", href: "/", icon: LayoutGrid },
+  { name: "Overview", href: "/dashboard", icon: LayoutGrid },
   { name: "Cases", href: "/cases", icon: Briefcase },
   { name: "Document Vault", href: "/documents", icon: Files },
+  { name: "Time tracking", href: "/time", icon: Clock3 },
+  { name: "Billing", href: "/billing", icon: ReceiptText },
   { name: "Teams", href: "/teams", icon: Users },
   { name: "Compliance", href: "/compliance", icon: ShieldCheck },
   { name: "Messaging", href: "/messaging", icon: MessageSquare },

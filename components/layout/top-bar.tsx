@@ -1,9 +1,9 @@
 "use client";
 
-import { Bell, Search, Shield } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Bell, Shield } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { GlobalSearch } from "@/components/search/global-search";
 
 export const TopBar = () => {
   return (
@@ -13,15 +13,11 @@ export const TopBar = () => {
         Enterprise legal CRM
       </div>
       <div className="flex flex-1 items-center gap-3 px-6">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input className="pl-9" placeholder="Search cases, documents, or clients" />
+        <div className="flex-1">
+          <GlobalSearch />
         </div>
         <ThemeToggle />
-        <button className="relative rounded-full border p-2 text-muted-foreground">
-          <Bell className="h-4 w-4" />
-          <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-primary" />
-        </button>
+        <NotificationBell />
         <Avatar className="h-9 w-9 border">
           <AvatarFallback>HJ</AvatarFallback>
         </Avatar>
