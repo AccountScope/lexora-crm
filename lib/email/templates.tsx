@@ -8,7 +8,9 @@ export type EmailTemplateType =
   | "DOCUMENT_UPLOADED"
   | "INVOICE_SENT"
   | "NEW_CASE_ASSIGNMENT"
-  | "CLIENT_PORTAL_MESSAGE";
+  | "CLIENT_PORTAL_MESSAGE"
+  | "EMAIL_VERIFICATION"
+  | "TWO_FACTOR_RECOVERY";
 
 export interface DeadlineReminderData {
   title: string;
@@ -56,6 +58,18 @@ export interface ClientPortalMessageData {
   link?: string;
 }
 
+export interface EmailVerificationData {
+  email: string;
+  verifyUrl: string;
+  expiresAt: string;
+}
+
+export interface TwoFactorRecoveryData {
+  email: string;
+  recoverUrl: string;
+  expiresAt: string;
+}
+
 export type EmailTemplatePayloadMap = {
   DEADLINE_REMINDER: DeadlineReminderData;
   CASE_UPDATE: CaseUpdateData;
@@ -63,6 +77,8 @@ export type EmailTemplatePayloadMap = {
   INVOICE_SENT: InvoiceSentData;
   NEW_CASE_ASSIGNMENT: CaseAssignmentData;
   CLIENT_PORTAL_MESSAGE: ClientPortalMessageData;
+  EMAIL_VERIFICATION: EmailVerificationData;
+  TWO_FACTOR_RECOVERY: TwoFactorRecoveryData;
 };
 
 const baseStyles = {
@@ -188,6 +204,31 @@ const ClientPortalMessageTemplate = (data: ClientPortalMessageData) => (
   </BaseTemplate>
 );
 
+const EmailVerificationTemplate = (data: EmailVerificationData) => (
+  <BaseTemplate preview="Verify your Lexora account">
+    <Heading as="h2">Confirm your email</Heading>
+    <Text style={baseStyles.text}>You're almost set. Click the secure link below to verify {data.email}.</Text>
+    <Link href={data.verifyUrl} style={{ color: "#2563eb", fontSize: "14px" }}>
+      Verify email address ↗
+    </Link>
+    <Text style={baseStyles.text}>This link expires {new Date(data.expiresAt).toLocaleString()}.</Text>
+  </BaseTemplate>
+);
+
+const TwoFactorRecoveryTemplate = (data: TwoFactorRecoveryData) => (
+  <BaseTemplate preview="Recover access to Lexora">
+    <Heading as="h2">2FA recovery link</Heading>
+    <Text style={baseStyles.text}>
+      Someone requested a two-factor reset for {data.email}. If this was you, use the link below to regain access.
+    </Text>
+    <Link href={data.recoverUrl} style={{ color: "#2563eb", fontSize: "14px" }}>
+      Disable 2FA temporarily ↗
+    </Link>
+    <Text style={baseStyles.text}>The link expires {new Date(data.expiresAt).toLocaleString()}.</Text>
+    <Text style={baseStyles.muted}>Ignore this email if you still have access — no changes were made.</Text>
+  </BaseTemplate>
+);
+
 const SUBJECTS: Record<EmailTemplateType, (data: any) => string> = {
   DEADLINE_REMINDER: (data: DeadlineReminderData) => `Reminder: ${data.title} due ${new Date(data.dueDate).toLocaleDateString()}`,
   CASE_UPDATE: (data: CaseUpdateData) => `Case update · ${data.caseTitle}`,
@@ -195,6 +236,8 @@ const SUBJECTS: Record<EmailTemplateType, (data: any) => string> = {
   INVOICE_SENT: (data: InvoiceSentData) => `Invoice ${data.invoiceNumber} sent`,
   NEW_CASE_ASSIGNMENT: (data: CaseAssignmentData) => `Assigned: ${data.caseTitle}`,
   CLIENT_PORTAL_MESSAGE: (data: ClientPortalMessageData) => `Portal message from ${data.clientName}`,
+  EMAIL_VERIFICATION: () => "Verify your Lexora account",
+  TWO_FACTOR_RECOVERY: () => "Lexora 2FA recovery link",
 };
 
 const COMPONENTS: Record<EmailTemplateType, (data: any) => JSX.Element> = {
@@ -204,6 +247,8 @@ const COMPONENTS: Record<EmailTemplateType, (data: any) => JSX.Element> = {
   INVOICE_SENT: InvoiceSentTemplate,
   NEW_CASE_ASSIGNMENT: CaseAssignmentTemplate,
   CLIENT_PORTAL_MESSAGE: ClientPortalMessageTemplate,
+  EMAIL_VERIFICATION: EmailVerificationTemplate,
+  TWO_FACTOR_RECOVERY: TwoFactorRecoveryTemplate,
 };
 
 const textBody = (template: EmailTemplateType, data: any) => {
@@ -220,6 +265,10 @@ const textBody = (template: EmailTemplateType, data: any) => {
       return `You were assigned to ${data.caseTitle} as ${data.role}.`;
     case "CLIENT_PORTAL_MESSAGE":
       return `New portal message from ${data.clientName}: ${data.preview}`;
+    case "EMAIL_VERIFICATION":
+      return `Verify your Lexora account by visiting ${data.verifyUrl}. Link expires ${new Date(data.expiresAt).toLocaleString()}.`;
+    case "TWO_FACTOR_RECOVERY":
+      return `Use ${data.recoverUrl} to recover your Lexora account before ${new Date(data.expiresAt).toLocaleString()}.`;
     default:
       return "Lexora notification";
   }

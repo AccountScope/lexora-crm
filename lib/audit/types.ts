@@ -1,11 +1,19 @@
 export type AuditEventType =
   | "auth.login"
   | "auth.logout"
+  | "auth.password.reset.requested"
+  | "auth.password.reset.completed"
+  | "auth.password.changed"
+  | "auth.password.breach_detected"
   | "auth.token.issued"
   | "auth.token.revoked"
   | "auth.token.invalid"
   | "auth.authorization.denied"
-  | "auth.authorization.granted";
+  | "auth.authorization.granted"
+  | "auth.session.created"
+  | "auth.session.revoked"
+  | "auth.session.invalidated"
+  | "auth.session.extended";
 
 export interface AuditActor {
   id: string;

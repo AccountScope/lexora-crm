@@ -73,6 +73,23 @@ CREATE TABLE users (
     phone               TEXT,
     timezone            TEXT,
     last_login_at       TIMESTAMPTZ,
+    password_hash       TEXT,
+    password_changed_at TIMESTAMPTZ,
+    password_expires_at TIMESTAMPTZ,
+    force_password_change BOOLEAN NOT NULL DEFAULT FALSE,
+    two_factor_secret   TEXT,
+    two_factor_enabled  BOOLEAN NOT NULL DEFAULT FALSE,
+    two_factor_attempts INTEGER NOT NULL DEFAULT 0,
+    two_factor_locked_until TIMESTAMPTZ,
+    two_factor_recovery_token TEXT,
+    two_factor_recovery_expires TIMESTAMPTZ,
+    two_factor_force_started_at TIMESTAMPTZ,
+    two_factor_force_deadline TIMESTAMPTZ,
+    two_factor_session_revoked_at TIMESTAMPTZ,
+    email_verified      BOOLEAN NOT NULL DEFAULT FALSE,
+    email_verification_token TEXT,
+    email_verification_expires TIMESTAMPTZ,
+    email_verification_last_sent TIMESTAMPTZ,
     data_classification data_classification NOT NULL DEFAULT 'INTERNAL_ONLY',
     created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -81,6 +98,8 @@ CREATE TABLE users (
 
 CREATE INDEX users_status_idx ON users(status);
 CREATE INDEX users_type_idx ON users(user_type);
+CREATE INDEX users_email_verification_token_idx ON users(email_verification_token);
+CREATE INDEX users_two_factor_recovery_token_idx ON users(two_factor_recovery_token);
 
 CREATE TABLE user_roles (
     user_id             UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -89,6 +108,63 @@ CREATE TABLE user_roles (
     created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     PRIMARY KEY (user_id, role_id)
 );
+
+CREATE TABLE backup_codes (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id     UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    code_hash   TEXT NOT NULL,
+    used        BOOLEAN NOT NULL DEFAULT FALSE,
+    used_at     TIMESTAMPTZ,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX backup_codes_user_id_idx ON backup_codes(user_id);
+
+CREATE TABLE password_history (
+    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id       UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    password_hash TEXT NOT NULL,
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX password_history_user_id_idx ON password_history(user_id);
+
+CREATE TABLE password_reset_tokens (
+    id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id      UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token        TEXT NOT NULL UNIQUE,
+    expires_at   TIMESTAMPTZ NOT NULL,
+    used         BOOLEAN NOT NULL DEFAULT FALSE,
+    used_at      TIMESTAMPTZ,
+    ip_address   INET,
+    user_agent   TEXT,
+    created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX password_reset_tokens_user_id_idx ON password_reset_tokens(user_id);
+CREATE INDEX password_reset_tokens_token_idx ON password_reset_tokens(token);
+
+CREATE TABLE sessions (
+    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id       UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token         TEXT NOT NULL UNIQUE,
+    device        TEXT,
+    browser       TEXT,
+    os            TEXT,
+    user_agent    TEXT,
+    fingerprint   TEXT,
+    remember_me   BOOLEAN NOT NULL DEFAULT FALSE,
+    ip_address    INET,
+    location      TEXT,
+    last_activity TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    expires_at    TIMESTAMPTZ NOT NULL,
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX sessions_user_id_idx ON sessions(user_id);
+CREATE INDEX sessions_last_activity_idx ON sessions(last_activity);
+
 
 CREATE TABLE clients (
     id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
