@@ -61,8 +61,8 @@ export async function POST(request: NextRequest) {
         client,
         actorId: row.user_id,
         actorEmail: row.email,
-        ipAddress,
-        userAgent: userAgent || undefined,
+        ipAddress: ipAddress || undefined,
+        userAgent: userAgent ?? undefined,
         checkBreach: true,
       });
 
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
     await logAuthEvent({
       type: "auth.password.reset.completed",
       success: true,
-      actor: { id: userId, email, ipAddress: ipAddress || undefined, userAgent: userAgent || undefined },
+      actor: { id: userId, email, ipAddress: ipAddress || undefined, userAgent: userAgent ?? undefined },
     });
 
     return NextResponse.json({ ok: true, meta });

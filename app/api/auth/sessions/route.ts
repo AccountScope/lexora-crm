@@ -1,3 +1,4 @@
+import { ApiError } from "@/lib/api/errors";
 import { NextRequest, NextResponse } from "next/server";
 import { requireUser } from "@/lib/auth";
 import { handleApiError } from "@/lib/api/response";

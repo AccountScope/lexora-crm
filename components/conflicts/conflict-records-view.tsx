@@ -101,7 +101,7 @@ export const ConflictRecordsView = () => {
 
   const handleAddWatch = async () => {
     if (!watchParty.trim()) return;
-    await addEntry.mutateAsync({ partyName: watchParty.trim(), reason: watchReason || undefined });
+    await addEntry.mutateAsync?.({ partyName: watchParty.trim(), reason: watchReason || undefined });
     setWatchParty("");
     setWatchReason("");
   };
@@ -195,8 +195,8 @@ export const ConflictRecordsView = () => {
           </CardContent>
           {data?.meta && (
             <CardFooter className="text-xs text-muted-foreground">
-              Showing {(data.meta.page - 1) * data.meta.pageSize + 1}–
-              {Math.min(data.meta.page * data.meta.pageSize, data.meta.total)} of {data.meta.total}
+              Showing {(data.meta.page - 1) * data.meta.perPage + 1}–
+              {Math.min(data.meta.page * data.meta.perPage, data.meta.total)} of {data.meta.total}
             </CardFooter>
           )}
         </Card>
@@ -241,7 +241,7 @@ export const ConflictRecordsView = () => {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => removeEntry.mutateAsync(entry.id)}
+                      onClick={() => removeEntry.mutateAsync?.(entry.id)}
                     >
                       Remove
                     </Button>

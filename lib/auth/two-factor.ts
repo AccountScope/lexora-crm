@@ -572,7 +572,7 @@ export const requestTwoFactorRecovery = async (authUserId: string) => {
      WHERE id = $1`,
     [record.id, digest, recoveryLinkTtlMinutes, new Date().toISOString()]
   );
-  const { subject, html, text } = await renderEmailTemplate("TWO_FACTOR_RECOVERY", {
+  const { subject, html, text } = await renderEmailTemplate("TWO_FACTOR_RECOVERY" as any, {
     email: record.email,
     recoverUrl: `${appBaseUrl}/login/two-factor?token=${token}`,
     expiresAt: expiresAt.toISOString(),

@@ -39,7 +39,7 @@ export const ConflictCard = ({ conflict, onAction }: ConflictCardProps) => {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant={severity}>{conflict.severity.toUpperCase()}</Badge>
+          <Badge variant={severity as any}>{conflict.severity.toUpperCase()}</Badge>
           <Badge variant="outline">{label}</Badge>
         </div>
       </CardHeader>

@@ -15,7 +15,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
       const config = body.config as ReportConfig;
       const result = await runReport(config, { limit: body.limit ?? 500 });
       const exportPayload = await exportReportResult(format, { name: body.name ?? "LEXORA Report", result });
-      return new Response(exportPayload.buffer, {
+      return new Response(exportPayload.buffer as any, {
         headers: {
           "Content-Type": exportPayload.contentType,
           "Content-Disposition": `attachment; filename="report.${exportPayload.extension}"`,
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     const mergedConfig: ReportConfig = { ...detail.config, ...overrides, filters: overrides?.filters ?? detail.config.filters };
     const result = await runReport(mergedConfig, { limit: overrides?.limit ?? 500 });
     const exportPayload = await exportReportResult(format, { name: detail.name, result });
-    return new Response(exportPayload.buffer, {
+    return new Response(exportPayload.buffer as any, {
       headers: {
         "Content-Type": exportPayload.contentType,
         "Content-Disposition": `attachment; filename="${detail.name.replace(/[^a-z0-9_-]/gi, "_").toLowerCase()}.${exportPayload.extension}"`,

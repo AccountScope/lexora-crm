@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
         await logAuthEvent({
           type: "auth.password.reset.requested",
           success: true,
-          actor: { id: user.id, email: user.email, ipAddress, userAgent: userAgent || undefined },
+          actor: { id: user.id, email: user.email, ipAddress: ipAddress || undefined, userAgent: userAgent ?? undefined },
         });
       }
     }

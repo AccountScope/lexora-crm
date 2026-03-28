@@ -35,8 +35,8 @@ export async function POST(request: NextRequest) {
         client,
         actorId: user.id,
         actorEmail: user.email || undefined,
-        ipAddress,
-        userAgent: userAgent || undefined,
+        ipAddress: ipAddress || undefined,
+        userAgent: userAgent ?? undefined,
         checkBreach: true,
       });
     });
