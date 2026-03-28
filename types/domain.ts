@@ -322,3 +322,125 @@ export interface PasswordHealthMeta {
   passwordExpiresAt?: string | null;
   forcePasswordChange?: boolean;
 }
+
+export type UserStatus = "INVITED" | "ACTIVE" | "SUSPENDED" | "DISABLED";
+
+export interface DirectoryUser {
+  id: string;
+  name: string;
+  email: string;
+  roles: string[];
+}
+
+export interface AdminUserRole {
+  id: string;
+  name: string;
+}
+
+export interface UserLoginEvent {
+  id: string;
+  occurredAt: string;
+  ipAddress?: string | null;
+  location?: string | null;
+  device?: string | null;
+  browser?: string | null;
+  status?: string | null;
+}
+
+export interface UserAuditLogEntry {
+  id: string;
+  occurredAt: string;
+  eventType: string;
+  actor?: {
+    id?: string | null;
+    email?: string | null;
+  } | null;
+  details?: Record<string, any> | null;
+}
+
+export interface AdminUserSummary {
+  id: string;
+  fullName: string;
+  email: string;
+  status: UserStatus;
+  userType: string;
+  phone?: string | null;
+  lastLoginAt?: string | null;
+  emailVerified: boolean;
+  roles: AdminUserRole[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminUserDetail extends AdminUserSummary {
+  firstName: string;
+  lastName: string;
+  timezone?: string | null;
+  loginHistory: UserLoginEvent[];
+  auditLog: UserAuditLogEntry[];
+}
+
+export interface AdminUserMetrics {
+  totalUsers: number;
+  activeUsers: number;
+  invitedUsers: number;
+  pendingInvitations: number;
+  roles: { role: string; count: number }[];
+  verification: { verified: number; unverified: number };
+  lastLogin: { past24h: number; past7d: number; stale: number };
+}
+
+export type InvitationStatus = "pending" | "accepted" | "expired" | "cancelled";
+
+export interface InvitationRecord {
+  id: string;
+  email: string;
+  role?: AdminUserRole | null;
+  invitedBy?: { id: string; name: string; email?: string | null } | null;
+  status: InvitationStatus;
+  customMessage?: string | null;
+  token?: string | null;
+  expiresAt: string;
+  createdAt: string;
+  acceptedAt?: string | null;
+  cancelledAt?: string | null;
+}
+
+export interface RoleSummary {
+  id: string;
+  name: string;
+  description?: string;
+  isSystem: boolean;
+  isCustom: boolean;
+  userCount: number;
+}
+
+export interface RoleDetail extends RoleSummary {
+  permissions: string[];
+  users: DirectoryUser[];
+}
+
+export interface TeamSummary {
+  id: string;
+  name: string;
+  description?: string;
+  parentId?: string | null;
+  memberCount: number;
+  createdAt: string;
+  createdBy: { id: string; name: string } | null;
+}
+
+export interface TeamMember {
+  id: string;
+  name: string;
+  email: string;
+  roles: string[];
+  addedAt?: string;
+  addedBy?: string | null;
+}
+
+export interface TeamDetail extends TeamSummary {
+  members: TeamMember[];
+  parent: { id: string; name: string } | null;
+  children: { id: string; name: string }[];
+}

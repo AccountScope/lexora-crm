@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
       }
       case "extend": {
         if (!token) {
-          throw new Error("No active session token");
+          throw new ApiError(401, "No active session token");
         }
         const session = await extendSession(token, payload.rememberMe ?? rememberPreference);
         const cookie = serializeSessionCookie(token, session.rememberMe);

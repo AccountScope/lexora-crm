@@ -12,7 +12,8 @@ export type EmailTemplateType =
   | "PASSWORD_RESET"
   | "PASSWORD_CHANGED"
   | "EMAIL_VERIFICATION"
-  | "TWO_FACTOR_RECOVERY";
+  | "TWO_FACTOR_RECOVERY"
+  | "USER_INVITATION";
 
 export interface DeadlineReminderData {
   title: string;
@@ -60,6 +61,13 @@ export interface ClientPortalMessageData {
   link?: string;
 }
 
+export interface UserInvitationEmailData {
+  invitationUrl: string;
+  roleName: string;
+  invitedBy?: string;
+  expiresAt: string;
+  customMessage?: string;
+}
 
 export interface PasswordResetEmailData {
   firstName?: string;
@@ -96,6 +104,7 @@ export type EmailTemplatePayloadMap = {
   INVOICE_SENT: InvoiceSentData;
   NEW_CASE_ASSIGNMENT: CaseAssignmentData;
   CLIENT_PORTAL_MESSAGE: ClientPortalMessageData;
+  USER_INVITATION: UserInvitationEmailData;
   PASSWORD_RESET: PasswordResetEmailData;
   PASSWORD_CHANGED: PasswordChangedEmailData;
   EMAIL_VERIFICATION: EmailVerificationData;
@@ -225,6 +234,20 @@ const ClientPortalMessageTemplate = (data: ClientPortalMessageData) => (
   </BaseTemplate>
 );
 
+const UserInvitationTemplate = (data: UserInvitationEmailData) => (
+  <BaseTemplate preview="You're invited to Lexora">
+    <Heading as="h2">You've been invited</Heading>
+    <Text style={baseStyles.text}>You were invited to join Lexora as <strong>{data.roleName}</strong>{data.invitedBy ? ` by ${data.invitedBy}` : ''}.</Text>
+    <Text style={baseStyles.text}>This secure link expires {new Date(data.expiresAt).toLocaleString()}.</Text>
+    {data.customMessage ? (
+      <Text style={{ ...baseStyles.text, fontStyle: 'italic' }}>“{data.customMessage}”</Text>
+    ) : null}
+    <Link href={data.invitationUrl} style={{ color: '#2563eb', fontSize: '14px' }}>
+      Set up your account ↗
+    </Link>
+  </BaseTemplate>
+);
+
 const PasswordResetTemplate = (data: PasswordResetEmailData) => (
   <BaseTemplate preview="Reset your Lexora password">
     <Heading as="h2">Reset your password</Heading>
@@ -299,6 +322,7 @@ const SUBJECTS: Record<EmailTemplateType, (data: any) => string> = {
   PASSWORD_CHANGED: () => "Your Lexora password was changed",
   EMAIL_VERIFICATION: () => "Verify your Lexora account",
   TWO_FACTOR_RECOVERY: () => "Lexora 2FA recovery link",
+  USER_INVITATION: (data: UserInvitationEmailData) => `You're invited to Lexora (${data.roleName})`,
 };
 
 const COMPONENTS: Record<EmailTemplateType, (data: any) => JSX.Element> = {
@@ -312,6 +336,7 @@ const COMPONENTS: Record<EmailTemplateType, (data: any) => JSX.Element> = {
   PASSWORD_CHANGED: PasswordChangedTemplate,
   EMAIL_VERIFICATION: EmailVerificationTemplate,
   TWO_FACTOR_RECOVERY: TwoFactorRecoveryTemplate,
+  USER_INVITATION: UserInvitationTemplate,
 };
 
 const textBody = (template: EmailTemplateType, data: any) => {
@@ -336,6 +361,8 @@ const textBody = (template: EmailTemplateType, data: any) => {
       return `Verify your Lexora account by visiting ${data.verifyUrl}. Link expires ${new Date(data.expiresAt).toLocaleString()}.`;
     case "TWO_FACTOR_RECOVERY":
       return `Use ${data.recoverUrl} to recover your Lexora account before ${new Date(data.expiresAt).toLocaleString()}.`;
+    case "USER_INVITATION":
+      return `You're invited to Lexora as ${data.roleName}. Complete setup at ${data.invitationUrl} before ${new Date(data.expiresAt).toLocaleString()}.`;
     default:
       return "Lexora notification";
   }

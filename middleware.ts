@@ -5,7 +5,7 @@ import { authorizeRequest } from "./lib/rbac/authorizer";
 import { logAuthEvent } from "./lib/audit/logger";
 import { getSecurityOverview } from "./lib/auth/security-overview";
 
-const PUBLIC_PAGE_PREFIXES = ["/verify-email", "/forgot-password", "/reset-password"];
+const PUBLIC_PAGE_PREFIXES = ["/verify-email", "/forgot-password", "/reset-password", "/accept-invitation"];
 const PUBLIC_API_PREFIXES = ["/api/auth/verify-email", "/api/auth/two-factor", "/api/auth/forgot-password", "/api/auth/reset-password"];
 const STATIC_PREFIXES = ["/_next", "/favicon", "/assets", "/manifest", "/robots"];
 const TWO_FACTOR_ROUTE = "/login/two-factor";

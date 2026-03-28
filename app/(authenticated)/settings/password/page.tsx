@@ -26,7 +26,7 @@ interface ApiResponse {
   data: PasswordHealthMeta;
 }
 
-const fetcher = async <T>(url: string, init?: RequestInit): Promise<T> => {
+const fetcher = async <T,>(url: string, init?: RequestInit): Promise<T> => {
   const res = await fetch(url, {
     ...init,
     headers: { "Content-Type": "application/json", ...(init?.headers ?? {}) },
