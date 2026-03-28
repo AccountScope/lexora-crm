@@ -111,7 +111,7 @@ class ServiceWorkerManager {
         }
       };
 
-      navigator.serviceWorker.controller.postMessage(
+      navigator.serviceWorker.controller?.postMessage(
         { type: 'CLEAR_CACHE' },
         [messageChannel.port2]
       );
@@ -128,7 +128,7 @@ class ServiceWorkerManager {
         resolve(event.data.size || 0);
       };
 
-      navigator.serviceWorker.controller.postMessage(
+      navigator.serviceWorker.controller?.postMessage(
         { type: 'GET_CACHE_SIZE' },
         [messageChannel.port2]
       );

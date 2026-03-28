@@ -19,7 +19,7 @@ type AutoLinkMatch = {
  */
 export async function autoLinkEmails(accountId: string): Promise<AutoLinkMatch[]> {
   // Get unlinked emails for this account
-  const emails = await db.query<EmailForLinking>(
+  const emailsResult = await db.query<EmailForLinking>(
     `SELECT id, from_email, subject, body_text 
     FROM emails 
     WHERE email_account_id = $1 AND case_id IS NULL
@@ -27,6 +27,7 @@ export async function autoLinkEmails(accountId: string): Promise<AutoLinkMatch[]
     LIMIT 100`,
     [accountId]
   );
+  const emails = emailsResult.rows;
 
   const matches: AutoLinkMatch[] = [];
 
@@ -86,13 +87,13 @@ async function findCaseMatch(email: EmailForLinking): Promise<AutoLinkMatch | nu
   }
 
   // Rule 3: Match client name in subject line (MEDIUM confidence)
-  const clients = await db.query<{ id: string; company_name: string; matter_id: string }>(
+  const clientsResult = await db.query<{ id: string; company_name: string; matter_id: string }>(
     `SELECT c.id, c.company_name, m.id as matter_id
     FROM clients c
     JOIN matters m ON m.client_id = c.id`
   );
 
-  for (const client of clients) {
+  for (const client of clientsResult.rows) {
     if (email.subject.toLowerCase().includes(client.company_name.toLowerCase())) {
       return {
         emailId: email.id,
@@ -145,14 +146,14 @@ export async function getAutoLinkSuggestions(
   userId: string
 ): Promise<(AutoLinkMatch & { email_subject: string; case_number: string })[]> {
   // Get accounts for this user
-  const accounts = await db.query<{ id: string }>(
+  const accountsResult = await db.query<{ id: string }>(
     'SELECT id FROM email_accounts WHERE user_id = $1',
     [userId]
   );
 
   const allMatches: AutoLinkMatch[] = [];
 
-  for (const account of accounts) {
+  for (const account of accountsResult.rows) {
     const matches = await autoLinkEmails(account.id);
     allMatches.push(...matches);
   }
@@ -189,5 +190,5 @@ export async function bulkLinkEmails(emailIds: string[], caseId: string): Promis
     [caseId, emailIds]
   );
 
-  return result.length;
+  return result.rowCount ?? 0;
 }

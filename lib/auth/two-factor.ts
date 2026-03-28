@@ -1,4 +1,6 @@
+// @ts-ignore - no type declarations
 import crypto from "crypto";
+// @ts-ignore - no type declarations for speakeasy
 import speakeasy from "speakeasy";
 import bcrypt from "bcrypt";
 import type { Role } from "@/lib/rbac/roles";

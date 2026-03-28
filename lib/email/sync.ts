@@ -1,5 +1,6 @@
 import { google } from 'googleapis';
 import { Client } from '@microsoft/microsoft-graph-client';
+// @ts-ignore - no type declarations for mailparser
 import { simpleParser, ParsedMail } from 'mailparser';
 import { getValidAccessToken } from './oauth';
 import { db } from '@/lib/api/db';
@@ -160,9 +161,9 @@ async function syncOutlookAccount(account: EmailAccount, accessToken: string): P
  */
 async function storeEmail(accountId: string, parsed: ParsedMail, messageId: string): Promise<void> {
   const from = parsed.from?.value[0];
-  const toEmails = parsed.to?.value.map((a) => a.address || '') || [];
-  const ccEmails = parsed.cc?.value.map((a) => a.address || '') || [];
-  const bccEmails = parsed.bcc?.value.map((a) => a.address || '') || [];
+  const toEmails = parsed.to?.value.map((a: any) => a.address || '') || [];
+  const ccEmails = parsed.cc?.value.map((a: any) => a.address || '') || [];
+  const bccEmails = parsed.bcc?.value.map((a: any) => a.address || '') || [];
 
   // Check if email already exists
   const exists = await db.queryOne(
@@ -256,14 +257,14 @@ async function storeOutlookEmail(accountId: string, message: any): Promise<void>
  * Sync all enabled email accounts for a user
  */
 export async function syncAllUserAccounts(userId: string): Promise<{ accountId: string; count: number }[]> {
-  const accounts = await db.query<{ id: string }>(
+  const accountsResult = await db.query<{ id: string }>(
     'SELECT id FROM email_accounts WHERE user_id = $1 AND sync_enabled = TRUE',
     [userId]
   );
 
   const results: { accountId: string; count: number }[] = [];
 
-  for (const account of accounts) {
+  for (const account of accountsResult.rows) {
     try {
       const count = await syncEmailAccount(account.id);
       results.push({ accountId: account.id, count });

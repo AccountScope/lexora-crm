@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+// @ts-ignore
 import QRCode from "qrcode";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
