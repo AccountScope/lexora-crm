@@ -1,4 +1,4 @@
-import { Pool, PoolClient, QueryResult } from "pg";
+import { Pool, PoolClient, QueryResult, QueryResultRow } from "pg";
 import crypto from "crypto";
 
 type DeploymentMode = "supabase" | "self_hosted";
@@ -38,7 +38,7 @@ export const withDb = async <T>(worker: (client: PoolClient) => Promise<T>): Pro
   }
 };
 
-export const query = async <T = any>(sql: string, params: any[] = []): Promise<QueryResult<T>> => {
+export const query = async <T extends QueryResultRow = any>(sql: string, params: any[] = []): Promise<QueryResult<T>> => {
   return pool.query<T>(sql, params);
 };
 
@@ -63,7 +63,7 @@ export const db = {
   
   // Compatibility methods for Phase 3A code
   // TODO: Refactor Phase 3A code to use withDb/query directly
-  async queryOne<T = any>(sql: string, params: any[] = []): Promise<T | null> {
+  async queryOne<T extends QueryResultRow = any>(sql: string, params: any[] = []): Promise<T | null> {
     const result = await pool.query<T>(sql, params);
     return result.rows[0] || null;
   },

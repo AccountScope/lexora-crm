@@ -29,7 +29,7 @@ const fetchUserVerificationRow = async (userId: string) => {
 };
 
 const dispatchVerificationEmail = async (email: string, token: string, expiresAt: string) => {
-  const { subject, html, text } = renderEmailTemplate("EMAIL_VERIFICATION", {
+  const { subject, html, text } = await renderEmailTemplate("EMAIL_VERIFICATION", {
     email,
     verifyUrl: verificationLink(token),
     expiresAt,

@@ -55,14 +55,14 @@ const normalizePermissions = (permissions: string[]): string[] => {
 
 const resolvePermissionIds = async (client: any, permissionKeys: string[]): Promise<Map<string, string>> => {
   if (!permissionKeys.length) return new Map();
-  const result = await client.query<{ id: string; key: string }>(
+  const result = await client.query(
     `SELECT id, key FROM permissions WHERE key = ANY($1::text[])`,
     [permissionKeys]
   );
   if (result.rowCount !== permissionKeys.length) {
     throw new ApiError(400, "One or more permissions are not registered");
   }
-  return new Map(result.rows.map((row) => [row.key, row.id]));
+  return new Map(result.rows.map((row: any) => [row.key, row.id]));
 };
 
 const assertRoleIsCustom = async (roleId: string) => {

@@ -5,14 +5,14 @@ import type { Role } from "@/lib/rbac/roles";
 import { query, withDb } from "@/lib/api/db";
 import { ApiError } from "@/lib/api/errors";
 // Lazy-load email functions to avoid Edge Runtime issues in middleware
-const renderEmailTemplate = async (...args: any[]) => {
+const renderEmailTemplate = async (template: string, data: any) => {
   const { renderEmailTemplate: fn } = await import("@/lib/email/templates");
-  return fn(...args);
+  return fn(template, data);
 };
 
-const sendEmail = async (...args: any[]) => {
+const sendEmail = async (to: string, subject: string, html: string, text: string) => {
   const { sendEmail: fn } = await import("@/lib/email/send");
-  return fn(...args);
+  return fn(to, subject, html, text);
 };
 import { getAppBaseUrl } from "@/lib/utils/app-url";
 
@@ -572,7 +572,7 @@ export const requestTwoFactorRecovery = async (authUserId: string) => {
      WHERE id = $1`,
     [record.id, digest, recoveryLinkTtlMinutes, new Date().toISOString()]
   );
-  const { subject, html, text } = renderEmailTemplate("TWO_FACTOR_RECOVERY", {
+  const { subject, html, text } = await renderEmailTemplate("TWO_FACTOR_RECOVERY", {
     email: record.email,
     recoverUrl: `${appBaseUrl}/login/two-factor?token=${token}`,
     expiresAt: expiresAt.toISOString(),

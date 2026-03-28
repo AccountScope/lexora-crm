@@ -38,6 +38,14 @@ interface WatchListRow {
 
 interface ConflictDraft {
   caseId?: string | null;
+  severity?: ConflictSeverity;
+  caseNumber?: string;
+  caseTitle?: string;
+  description?: string | null;
+  partyName?: string;
+  conflictType?: ConflictType;
+  caseStatus?: string;
+  lawyerName?: string;
 }
 interface ConflictInsertRow {
   id: string;
