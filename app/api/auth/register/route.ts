@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     });
 
     await logAuthEvent({
-      type: "auth.register.success",
+      type: "auth.session.created",
       success: true,
       actor: { id: user.id, email: user.email },
     });

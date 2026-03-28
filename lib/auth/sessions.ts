@@ -1,5 +1,4 @@
 import crypto from "node:crypto";
-import geoip from "geoip-lite";
 import { UAParser } from "ua-parser-js";
 import type { NextRequest } from "next/server";
 import { query } from "@/lib/api/db";
@@ -99,10 +98,12 @@ const buildDeviceProfile = (userAgent?: string | null) => {
   };
 };
 
-const lookupLocation = (ip?: string | null) => {
+const lookupLocation = async (ip?: string | null) => {
   if (!ip) return null;
   try {
-    const info = geoip.lookup(ip);
+    // Dynamic import to avoid build-time issues
+    const geoip = await import("geoip-lite");
+    const info = geoip.default.lookup(ip);
     if (!info) return null;
     const parts = [info.city, info.region, info.country].filter(Boolean);
     return parts.join(", ");
@@ -133,7 +134,7 @@ const createSessionRecord = async (options: EnsureSessionOptions) => {
   const remember = options.rememberMe ?? false;
   const expiresAt = new Date(Date.now() + (remember ? REMEMBER_ME_DURATION_MS : DEFAULT_SESSION_DURATION_MS));
   const profile = buildDeviceProfile(options.userAgent);
-  const location = lookupLocation(options.ipAddress);
+  const location = await lookupLocation(options.ipAddress);
   await query(
     `INSERT INTO sessions (user_id, token, device, browser, os, user_agent, fingerprint, remember_me, ip_address, location, last_activity, expires_at)
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,NOW(),$11)`,
@@ -348,4 +349,4 @@ export const serializeRememberCookie = (remember: boolean) => ({
 
 export const describeDeviceFromUserAgent = (userAgent?: string | null) => buildDeviceProfile(userAgent).device;
 
-export const resolveLocationFromIp = (ip?: string | null) => lookupLocation(ip);
+export const resolveLocationFromIp = async (ip?: string | null) => await lookupLocation(ip);

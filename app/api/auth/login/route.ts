@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/api/db";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
-import { createSession } from "@/lib/auth/sessions";
+import { ensureSession, serializeSessionCookie, serializeRememberCookie } from "@/lib/auth/sessions";
 import { logAuthEvent } from "@/lib/audit/logger";
 import { cookies } from "next/headers";
 
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     if (result.rows.length === 0) {
       // Don't reveal whether user exists
       await logAuthEvent({
-        type: "auth.login.failed",
+        type: "auth.login",
         success: false,
         details: { reason: "invalid_credentials", email },
       });
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
 
     if (!isValidPassword) {
       await logAuthEvent({
-        type: "auth.login.failed",
+        type: "auth.login",
         success: false,
         actor: { id: user.id, email: user.email },
         details: { reason: "invalid_password" },
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
     // Check if email is verified
     if (!user.email_verified) {
       await logAuthEvent({
-        type: "auth.login.blocked",
+        type: "auth.login",
         success: false,
         actor: { id: user.id, email: user.email },
         details: { reason: "email_not_verified" },
@@ -79,24 +79,23 @@ export async function POST(request: NextRequest) {
     // Check if 2FA is required
     if (user.two_factor_enabled) {
       // Create temporary session for 2FA challenge
-      const session = await createSession({
+      const { token } = await ensureSession({
         userId: user.id,
-        ipAddress: request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown",
-        userAgent: request.headers.get("user-agent") || "unknown",
-        twoFactorVerified: false,
+        userEmail: user.email,
+        ipAddress: request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || undefined,
+        userAgent: request.headers.get("user-agent") || undefined,
+        rememberMe: false,
       });
 
-      // Set session cookie
-      cookies().set("lexora-session", session.token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 60 * 15, // 15 minutes for 2FA completion
-        path: "/",
+      // Set session cookie (15 min for 2FA)
+      const sessionCookie = serializeSessionCookie(token, false);
+      cookies().set(sessionCookie.name, sessionCookie.value, {
+        ...sessionCookie.options,
+        maxAge: 60 * 15, // Override to 15 minutes for 2FA completion
       });
 
       await logAuthEvent({
-        type: "auth.login.2fa_required",
+        type: "auth.login",
         success: true,
         actor: { id: user.id, email: user.email },
       });
@@ -108,24 +107,23 @@ export async function POST(request: NextRequest) {
     }
 
     // Create full session
-    const session = await createSession({
+    const { token } = await ensureSession({
       userId: user.id,
-      ipAddress: request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown",
-      userAgent: request.headers.get("user-agent") || "unknown",
-      twoFactorVerified: false,
+      userEmail: user.email,
+      ipAddress: request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || undefined,
+      userAgent: request.headers.get("user-agent") || undefined,
+      rememberMe: true, // Default to remember me
     });
 
     // Set session cookie
-    cookies().set("lexora-session", session.token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      path: "/",
-    });
+    const sessionCookie = serializeSessionCookie(token, true);
+    const rememberCookie = serializeRememberCookie(true);
+    
+    cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.options);
+    cookies().set(rememberCookie.name, rememberCookie.value, rememberCookie.options);
 
     await logAuthEvent({
-      type: "auth.login.success",
+      type: "auth.login",
       success: true,
       actor: { id: user.id, email: user.email },
     });
