@@ -100,7 +100,7 @@ COMMENT ON TABLE ai_usage IS 'Track AI API usage for billing and analytics';
 -- Purpose: Store AI configuration per organization/user
 CREATE TABLE IF NOT EXISTS ai_settings (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+    organization_id UUID,
     user_id UUID REFERENCES users(id), -- NULL = org-wide settings
     default_provider TEXT NOT NULL DEFAULT 'openai' CHECK (default_provider IN ('openai', 'anthropic', 'local')),
     openai_api_key TEXT, -- Encrypted in application
@@ -160,7 +160,7 @@ COMMENT ON COLUMN matters.embedding IS 'Vector embedding for semantic search (38
 CREATE TABLE IF NOT EXISTS search_history (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+    organization_id UUID,
     query TEXT NOT NULL,
     search_type TEXT NOT NULL CHECK (search_type IN ('keyword', 'semantic')),
     filters JSONB, -- Store applied filters
@@ -182,7 +182,7 @@ COMMENT ON TABLE search_history IS 'User search history for analytics and sugges
 CREATE TABLE IF NOT EXISTS chat_conversations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+    organization_id UUID,
     title TEXT,
     context JSONB, -- Current page context (case_id, document_id, etc.)
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
