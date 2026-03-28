@@ -474,7 +474,7 @@ const TimeTrackingPage = () => {
                 <Button type="button" variant="outline" onClick={addBulkRow}>
                   Add row
                 </Button>
-                <Button type="button" onClick={submitBulk} disabled={bulkEntry.isLoading}>
+                <Button type="button" onClick={submitBulk} disabled={bulkEntry.isPending}>
                   Submit {bulkRows.length} entr{bulkRows.length === 1 ? "y" : "ies"}
                 </Button>
               </div>

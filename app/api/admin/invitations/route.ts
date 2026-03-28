@@ -22,7 +22,8 @@ export async function GET(request: NextRequest) {
   try {
     await ensureAdmin(request);
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get("status") ?? undefined;
+    const statusParam = searchParams.get("status");
+    const status = statusParam as "all" | "pending" | "accepted" | "expired" | "cancelled" | undefined;
     const search = searchParams.get("search") ?? undefined;
     const page = searchParams.get("page") ? Number(searchParams.get("page")) : undefined;
     const pageSize = searchParams.get("pageSize") ? Number(searchParams.get("pageSize")) : undefined;

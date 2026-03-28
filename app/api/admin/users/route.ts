@@ -40,13 +40,16 @@ export async function GET(request: NextRequest) {
       const data = await getAdminUserById(userId);
       return success({ data });
     }
+    const verifiedParam = searchParams.get("verified");
+    const sortDirParam = searchParams.get("sortDirection");
+    
     const data = await listAdminUsers({
       search: searchParams.get("search") ?? undefined,
       status: searchParams.get("status") ?? undefined,
       roleId: searchParams.get("roleId") ?? undefined,
-      verified: searchParams.get("verified") ?? undefined,
+      verified: (verifiedParam === "true" || verifiedParam === "false") ? verifiedParam as "true" | "false" : undefined,
       sortBy: searchParams.get("sortBy") ?? undefined,
-      sortDirection: searchParams.get("sortDirection") ?? undefined,
+      sortDirection: (sortDirParam === "asc" || sortDirParam === "desc") ? sortDirParam as "asc" | "desc" : undefined,
       page: searchParams.get("page") ? Number(searchParams.get("page")) : undefined,
       pageSize: searchParams.get("pageSize") ? Number(searchParams.get("pageSize")) : undefined,
     });
