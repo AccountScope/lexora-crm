@@ -5,7 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/api/db';
+import { withDb, query } from '@/lib/api/db';
 import { getCurrentUser } from '@/lib/auth';
 import { validateTransaction } from '@/lib/trust/validation';
 import Decimal from 'decimal.js';
@@ -23,64 +23,71 @@ export async function GET(request: NextRequest) {
     const startDate = searchParams.get('start_date');
     const endDate = searchParams.get('end_date');
 
-    const supabase = createClient();
+    let sql = `
+      SELECT 
+        tt.*,
+        json_build_object(
+          'id', cl.id,
+          'client', json_build_object('id', c.id, 'name', c.name)
+        ) as client_ledger,
+        json_build_object('id', ta.id, 'name', ta.name) as trust_account,
+        json_build_object(
+          'id', u.id,
+          'first_name', u.first_name,
+          'last_name', u.last_name
+        ) as created_by_user
+      FROM trust_transactions tt
+      LEFT JOIN client_ledgers cl ON tt.client_ledger_id = cl.id
+      LEFT JOIN clients c ON cl.client_id = c.id
+      LEFT JOIN trust_accounts ta ON tt.trust_account_id = ta.id
+      LEFT JOIN users u ON tt.created_by = u.id
+      WHERE tt.user_id = $1
+    `;
 
-    let query = supabase
-      .from('trust_transactions')
-      .select(`
-        *,
-        client_ledgers!client_ledger_id (
-          id,
-          clients!client_id (
-            id,
-            name
-          )
-        ),
-        trust_accounts!trust_account_id (
-          id,
-          name
-        ),
-        users!created_by (
-          id,
-          first_name,
-          last_name
-        )
-      `)
-      .order('date', { ascending: false });
+    const params: any[] = [user.id];
+    let paramCount = 1;
 
     if (trustAccountId) {
-      query = query.eq('trust_account_id', trustAccountId);
+      paramCount++;
+      sql += ` AND tt.trust_account_id = $${paramCount}`;
+      params.push(trustAccountId);
     }
 
     if (clientLedgerId) {
-      query = query.eq('client_ledger_id', clientLedgerId);
+      paramCount++;
+      sql += ` AND tt.client_ledger_id = $${paramCount}`;
+      params.push(clientLedgerId);
     }
 
     if (startDate) {
-      query = query.gte('date', startDate);
+      paramCount++;
+      sql += ` AND tt.date >= $${paramCount}`;
+      params.push(startDate);
     }
 
     if (endDate) {
-      query = query.lte('date', endDate);
+      paramCount++;
+      sql += ` AND tt.date <= $${paramCount}`;
+      params.push(endDate);
     }
 
-    const { data: transactions, error } = await query;
+    sql += ` ORDER BY tt.date DESC`;
 
-    if (error) throw error;
+    const result = await query(sql, params);
 
     // Format transactions
-    const formattedTransactions = (transactions || []).map((txn: any) => ({
+    const formattedTransactions = result.rows.map((txn: any) => ({
       id: txn.id,
       date: txn.date,
       type: txn.type,
       amount: txn.amount,
       description: txn.description,
       reference_number: txn.reference_number,
-      client_name: txn.client_ledgers?.clients?.name || 'Unknown Client',
-      trust_account_name: txn.trust_accounts?.name || 'Unknown Account',
+      client_name: txn.client_ledger?.client?.name || 'Unknown Client',
+      trust_account_name: txn.trust_account?.name || 'Unknown Account',
       reconciled: txn.reconciled,
-      created_by_name: txn.users
-        ? `${txn.users.first_name} ${txn.users.last_name}`
+      created_by_name: txn.created_by_user?.first_name && txn.created_by_user?.last_name
+        ? `${txn.created_by_user.first_name} ${txn.created_by_user.last_name}`
         : 'System'
     }));
 
@@ -126,131 +133,149 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid transaction type' }, { status: 400 });
     }
 
-    const supabase = createClient();
+    // Execute in transaction
+    const transaction = await withDb(async (client) => {
+      // Get client ledger
+      const ledgerResult = await client.query(
+        'SELECT * FROM client_ledgers WHERE id = $1 AND user_id = $2',
+        [client_ledger_id, user.id]
+      );
 
-    // Get client ledger
-    const { data: ledger, error: ledgerError } = await supabase
-      .from('client_ledgers')
-      .select('*')
-      .eq('id', client_ledger_id)
-      .single();
+      if (ledgerResult.rows.length === 0) {
+        throw new Error('Client ledger not found');
+      }
 
-    if (ledgerError || !ledger) {
-      return NextResponse.json({ error: 'Client ledger not found' }, { status: 404 });
-    }
+      const ledger = ledgerResult.rows[0];
 
-    // Get destination ledger if transfer
-    let destinationLedger = null;
-    if (type === 'transfer' && destination_ledger_id) {
-      const { data: destLedger, error: destError } = await supabase
-        .from('client_ledgers')
-        .select('*')
-        .eq('id', destination_ledger_id)
-        .single();
+      // Get destination ledger if transfer
+      let destinationLedger = null;
+      if (type === 'transfer' && destination_ledger_id) {
+        const destResult = await client.query(
+          'SELECT * FROM client_ledgers WHERE id = $1 AND user_id = $2',
+          [destination_ledger_id, user.id]
+        );
 
-      if (destError || !destLedger) {
-        return NextResponse.json(
-          { error: 'Destination ledger not found' },
-          { status: 404 }
+        if (destResult.rows.length === 0) {
+          throw new Error('Destination ledger not found');
+        }
+
+        destinationLedger = destResult.rows[0];
+      }
+
+      // Validate transaction
+      const validation = validateTransaction(
+        { type, amount, client_ledger_id, destination_ledger_id, description, reference_number },
+        ledger,
+        destinationLedger || undefined
+      );
+
+      if (!validation.valid) {
+        throw new Error(validation.errors.join(', '));
+      }
+
+      // Create transaction
+      const txnResult = await client.query(
+        `INSERT INTO trust_transactions (
+          trust_account_id, client_ledger_id, destination_ledger_id,
+          type, amount, date, description, reference_number,
+          invoice_id, case_id, user_id, created_by
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+        RETURNING *`,
+        [
+          ledger.trust_account_id,
+          client_ledger_id,
+          type === 'transfer' ? destination_ledger_id : null,
+          type,
+          amount,
+          date,
+          description,
+          reference_number,
+          invoice_id,
+          case_id,
+          user.id,
+          user.id
+        ]
+      );
+
+      const newTransaction = txnResult.rows[0];
+
+      // Audit log
+      await client.query(
+        `INSERT INTO trust_audit_log (
+          trust_account_id, transaction_id, action, new_values, performed_by
+        ) VALUES ($1, $2, $3, $4, $5)`,
+        [ledger.trust_account_id, newTransaction.id, 'created_transaction', JSON.stringify(newTransaction), user.id]
+      );
+
+      // Check for compliance violations
+      const amountDec = new Decimal(amount);
+      let newBalance = new Decimal(ledger.current_balance);
+
+      if (type === 'deposit') {
+        newBalance = newBalance.plus(amountDec);
+      } else if (type === 'withdrawal' || type === 'fee' || type === 'transfer') {
+        newBalance = newBalance.minus(amountDec);
+      }
+
+      // Create compliance alerts if needed
+      if (newBalance.lessThan(0)) {
+        await client.query(
+          `INSERT INTO trust_compliance_alerts (
+            trust_account_id, client_ledger_id, transaction_id,
+            alert_type, severity, message
+          ) VALUES ($1, $2, $3, $4, $5, $6)`,
+          [
+            ledger.trust_account_id,
+            client_ledger_id,
+            newTransaction.id,
+            'negative_balance',
+            'critical',
+            `Negative balance detected: ${newBalance.toFixed(2)}`
+          ]
+        );
+      } else if (newBalance.lessThan(500) && newBalance.greaterThan(0)) {
+        await client.query(
+          `INSERT INTO trust_compliance_alerts (
+            trust_account_id, client_ledger_id, transaction_id,
+            alert_type, severity, message
+          ) VALUES ($1, $2, $3, $4, $5, $6)`,
+          [
+            ledger.trust_account_id,
+            client_ledger_id,
+            newTransaction.id,
+            'low_balance',
+            'low',
+            `Low balance warning: ${newBalance.toFixed(2)}`
+          ]
         );
       }
 
-      destinationLedger = destLedger;
-    }
+      // Large transaction alert
+      if (amountDec.greaterThan(10000)) {
+        await client.query(
+          `INSERT INTO trust_compliance_alerts (
+            trust_account_id, client_ledger_id, transaction_id,
+            alert_type, severity, message
+          ) VALUES ($1, $2, $3, $4, $5, $6)`,
+          [
+            ledger.trust_account_id,
+            client_ledger_id,
+            newTransaction.id,
+            'large_transaction',
+            'medium',
+            `Large transaction detected: ${amountDec.toFixed(2)}`
+          ]
+        );
+      }
 
-    // Validate transaction
-    const validation = validateTransaction(
-      { type, amount, client_ledger_id, destination_ledger_id, description, reference_number },
-      ledger,
-      destinationLedger || undefined
-    );
-
-    if (!validation.valid) {
-      return NextResponse.json(
-        { error: validation.errors.join(', ') },
-        { status: 400 }
-      );
-    }
-
-    // Create transaction
-    const { data: transaction, error: txnError } = await supabase
-      .from('trust_transactions')
-      .insert({
-        trust_account_id: ledger.trust_account_id,
-        client_ledger_id,
-        destination_ledger_id: type === 'transfer' ? destination_ledger_id : null,
-        type,
-        amount,
-        date,
-        description,
-        reference_number,
-        invoice_id,
-        case_id,
-        created_by: user.id
-      })
-      .select()
-      .single();
-
-    if (txnError) throw txnError;
-
-    // Audit log
-    await supabase.from('trust_audit_log').insert({
-      trust_account_id: ledger.trust_account_id,
-      transaction_id: transaction.id,
-      action: 'created_transaction',
-      new_values: transaction,
-      performed_by: user.id
+      return newTransaction;
     });
-
-    // Check for compliance violations after transaction
-    const amountDec = new Decimal(amount);
-    let newBalance = new Decimal(ledger.current_balance);
-
-    if (type === 'deposit') {
-      newBalance = newBalance.plus(amountDec);
-    } else if (type === 'withdrawal' || type === 'fee' || type === 'transfer') {
-      newBalance = newBalance.minus(amountDec);
-    }
-
-    // Create compliance alert if needed
-    if (newBalance.lessThan(0)) {
-      await supabase.from('trust_compliance_alerts').insert({
-        trust_account_id: ledger.trust_account_id,
-        client_ledger_id,
-        transaction_id: transaction.id,
-        alert_type: 'negative_balance',
-        severity: 'critical',
-        message: `Negative balance detected: ${newBalance.toFixed(2)}`
-      });
-    } else if (newBalance.lessThan(500) && newBalance.greaterThan(0)) {
-      await supabase.from('trust_compliance_alerts').insert({
-        trust_account_id: ledger.trust_account_id,
-        client_ledger_id,
-        transaction_id: transaction.id,
-        alert_type: 'low_balance',
-        severity: 'low',
-        message: `Low balance warning: ${newBalance.toFixed(2)}`
-      });
-    }
-
-    // Large transaction alert
-    if (amountDec.greaterThan(10000)) {
-      await supabase.from('trust_compliance_alerts').insert({
-        trust_account_id: ledger.trust_account_id,
-        client_ledger_id,
-        transaction_id: transaction.id,
-        alert_type: 'large_transaction',
-        severity: 'medium',
-        message: `Large transaction detected: ${amountDec.toFixed(2)}`
-      });
-    }
 
     return NextResponse.json({ transaction }, { status: 201 });
   } catch (error) {
     console.error('[TRUST_TRANSACTIONS_POST]', error);
-    return NextResponse.json(
-      { error: 'Failed to create transaction' },
-      { status: 500 }
-    );
+    const message = error instanceof Error ? error.message : 'Failed to create transaction';
+    const status = message.includes('not found') || message.includes('Invalid') ? 400 : 500;
+    return NextResponse.json({ error: message }, { status });
   }
 }

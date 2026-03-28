@@ -1,10 +1,10 @@
 /**
  * Trust Reconciliation API
- * POST - Submit bank reconciliation
+ * POST - Submit bank reconciliation (three-way IOLTA compliance)
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/api/db';
+import { withDb, query } from '@/lib/api/db';
 import { getCurrentUser } from '@/lib/auth';
 import { generateThreeWayReport } from '@/lib/trust/reports';
 import Decimal from 'decimal.js';
@@ -26,21 +26,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = createClient();
-
     // Get trust account
-    const { data: account, error: accountError } = await supabase
-      .from('trust_accounts')
-      .select('*')
-      .eq('id', trust_account_id)
-      .single();
+    const accountResult = await query(
+      'SELECT * FROM trust_accounts WHERE id = $1 AND user_id = $2',
+      [trust_account_id, user.id]
+    );
 
-    if (accountError || !account) {
+    if (accountResult.rows.length === 0) {
       return NextResponse.json(
         { error: 'Trust account not found' },
         { status: 404 }
       );
     }
+
+    const account = accountResult.rows[0];
 
     // Generate three-way report
     const threeWayReport = await generateThreeWayReport(trust_account_id);
@@ -56,7 +55,7 @@ export async function POST(request: NextRequest) {
     const ledgerTotal = new Decimal(threeWayReport.ledger_total);
     const difference = bankBalance.minus(bookBalance);
 
-    // Determine status
+    // Determine status (IOLTA compliance check)
     let status = 'reconciled';
     if (Math.abs(difference.toNumber()) > 0.01) {
       status = 'discrepancy';
@@ -65,79 +64,97 @@ export async function POST(request: NextRequest) {
       status = 'discrepancy';
     }
 
-    // Check if reconciliation already exists for this date
-    const { data: existing } = await supabase
-      .from('trust_reconciliations')
-      .select('id')
-      .eq('trust_account_id', trust_account_id)
-      .eq('reconciliation_date', reconciliation_date)
-      .single();
+    // Execute reconciliation in transaction
+    const reconciliation = await withDb(async (client) => {
+      // Check if reconciliation already exists for this date
+      const existingResult = await client.query(
+        `SELECT id FROM trust_reconciliations 
+         WHERE trust_account_id = $1 AND reconciliation_date = $2`,
+        [trust_account_id, reconciliation_date]
+      );
 
-    let reconciliation;
+      let result;
 
-    if (existing) {
-      // Update existing
-      const { data, error } = await supabase
-        .from('trust_reconciliations')
-        .update({
-          bank_statement_balance: bankBalance.toFixed(2),
-          book_balance: bookBalance.toFixed(2),
-          ledger_balance: ledgerTotal.toFixed(2),
-          difference: difference.toFixed(2),
-          status,
-          reconciled_by: user.id,
-          reconciled_at: new Date().toISOString()
-        })
-        .eq('id', existing.id)
-        .select()
-        .single();
+      if (existingResult.rows.length > 0) {
+        // Update existing
+        result = await client.query(
+          `UPDATE trust_reconciliations
+           SET bank_statement_balance = $1,
+               book_balance = $2,
+               ledger_balance = $3,
+               difference = $4,
+               status = $5,
+               reconciled_by = $6,
+               reconciled_at = NOW()
+           WHERE id = $7
+           RETURNING *`,
+          [
+            bankBalance.toFixed(2),
+            bookBalance.toFixed(2),
+            ledgerTotal.toFixed(2),
+            difference.toFixed(2),
+            status,
+            user.id,
+            existingResult.rows[0].id
+          ]
+        );
+      } else {
+        // Create new
+        result = await client.query(
+          `INSERT INTO trust_reconciliations (
+            trust_account_id, reconciliation_date,
+            bank_statement_balance, book_balance, ledger_balance,
+            difference, status, reconciled_by, reconciled_at
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
+          RETURNING *`,
+          [
+            trust_account_id,
+            reconciliation_date,
+            bankBalance.toFixed(2),
+            bookBalance.toFixed(2),
+            ledgerTotal.toFixed(2),
+            difference.toFixed(2),
+            status,
+            user.id
+          ]
+        );
+      }
 
-      if (error) throw error;
-      reconciliation = data;
-    } else {
-      // Create new
-      const { data, error } = await supabase
-        .from('trust_reconciliations')
-        .insert({
+      // Update last_reconciled_at on trust account
+      await client.query(
+        'UPDATE trust_accounts SET last_reconciled_at = NOW() WHERE id = $1',
+        [trust_account_id]
+      );
+
+      // Create compliance alert if discrepancy (IOLTA violation)
+      if (status === 'discrepancy') {
+        await client.query(
+          `INSERT INTO trust_compliance_alerts (
+            trust_account_id, alert_type, severity, message
+          ) VALUES ($1, $2, $3, $4)`,
+          [
+            trust_account_id,
+            'failed_reconciliation',
+            'high',
+            `Reconciliation discrepancy detected: ${difference.toFixed(2)}`
+          ]
+        );
+      }
+
+      // Audit log (compliance requirement)
+      await client.query(
+        `INSERT INTO trust_audit_log (
+          trust_account_id, action, new_values, performed_by
+        ) VALUES ($1, $2, $3, $4)`,
+        [
           trust_account_id,
-          reconciliation_date,
-          bank_statement_balance: bankBalance.toFixed(2),
-          book_balance: bookBalance.toFixed(2),
-          ledger_balance: ledgerTotal.toFixed(2),
-          difference: difference.toFixed(2),
-          status,
-          reconciled_by: user.id,
-          reconciled_at: new Date().toISOString()
-        })
-        .select()
-        .single();
+          'completed_reconciliation',
+          JSON.stringify(result.rows[0]),
+          user.id
+        ]
+      );
 
-      if (error) throw error;
-      reconciliation = data;
-    }
-
-    // Update last_reconciled_at on trust account
-    await supabase
-      .from('trust_accounts')
-      .update({ last_reconciled_at: new Date().toISOString() })
-      .eq('id', trust_account_id);
-
-    // Create compliance alert if discrepancy
-    if (status === 'discrepancy') {
-      await supabase.from('trust_compliance_alerts').insert({
-        trust_account_id,
-        alert_type: 'failed_reconciliation',
-        severity: 'high',
-        message: `Reconciliation discrepancy detected: ${difference.toFixed(2)}`
-      });
-    }
-
-    // Audit log
-    await supabase.from('trust_audit_log').insert({
-      trust_account_id,
-      action: 'completed_reconciliation',
-      new_values: reconciliation,
-      performed_by: user.id
+      return result.rows[0];
     });
 
     return NextResponse.json({ reconciliation }, { status: 201 });
