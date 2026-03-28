@@ -52,3 +52,8 @@ export const healthCheck = async () => {
   await query("SELECT 1");
   return { latencyMs: Date.now() - start, mode: deploymentMode };
 };
+
+// Create a simple client wrapper for compatibility
+export const createClient = () => ({
+  query: pool.query.bind(pool),
+});

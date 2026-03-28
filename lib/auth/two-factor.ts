@@ -4,8 +4,16 @@ import bcrypt from "bcrypt";
 import type { Role } from "@/lib/rbac/roles";
 import { query, withDb } from "@/lib/api/db";
 import { ApiError } from "@/lib/api/errors";
-import { renderEmailTemplate } from "@/lib/email/templates";
-import { sendEmail } from "@/lib/email/send";
+// Lazy-load email functions to avoid Edge Runtime issues in middleware
+const renderEmailTemplate = async (...args: any[]) => {
+  const { renderEmailTemplate: fn } = await import("@/lib/email/templates");
+  return fn(...args);
+};
+
+const sendEmail = async (...args: any[]) => {
+  const { sendEmail: fn } = await import("@/lib/email/send");
+  return fn(...args);
+};
 import { getAppBaseUrl } from "@/lib/utils/app-url";
 
 const issuer = process.env.TWO_FACTOR_ISSUER ?? "Lexora";

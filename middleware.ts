@@ -3,10 +3,10 @@ import { getAuthContext } from "./lib/auth";
 import { DEFAULT_ROUTE_POLICIES } from "./lib/rbac/policies";
 import { authorizeRequest } from "./lib/rbac/authorizer";
 import { logAuthEvent } from "./lib/audit/logger";
-import { getSecurityOverview } from "./lib/auth/two-factor";
+import { getSecurityOverview } from "./lib/auth/security-overview";
 
-const PUBLIC_PAGE_PREFIXES = ["/verify-email"];
-const PUBLIC_API_PREFIXES = ["/api/auth/verify-email", "/api/auth/two-factor"];
+const PUBLIC_PAGE_PREFIXES = ["/verify-email", "/forgot-password", "/reset-password"];
+const PUBLIC_API_PREFIXES = ["/api/auth/verify-email", "/api/auth/two-factor", "/api/auth/forgot-password", "/api/auth/reset-password"];
 const STATIC_PREFIXES = ["/_next", "/favicon", "/assets", "/manifest", "/robots"];
 const TWO_FACTOR_ROUTE = "/login/two-factor";
 const SECURITY_SETTINGS_ROUTE = "/settings/security";
@@ -18,8 +18,9 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isApi = pathname.startsWith("/api");
   const isStatic = STATIC_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+  const isTwoFactorPage = pathname.startsWith(TWO_FACTOR_ROUTE);
   const isPublicApi = isApi && isPrefixed(pathname, PUBLIC_API_PREFIXES);
-  const isPublicPage = !isApi && isPrefixed(pathname, PUBLIC_PAGE_PREFIXES);
+  const isPublicPage = !isApi && !isTwoFactorPage && isPrefixed(pathname, PUBLIC_PAGE_PREFIXES);
 
   if (isStatic || isPublicApi || isPublicPage) {
     return NextResponse.next();
@@ -38,7 +39,9 @@ export async function middleware(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("next", pathname);
+    if (pathname !== "/login") {
+      loginUrl.searchParams.set("next", pathname);
+    }
     return NextResponse.redirect(loginUrl);
   }
 
@@ -59,7 +62,6 @@ export async function middleware(request: NextRequest) {
 
   const twoFactor = overview.twoFactor;
   const isSecurityRoute = pathname.startsWith(SECURITY_SETTINGS_ROUTE);
-  const isTwoFactorPage = pathname.startsWith(TWO_FACTOR_ROUTE);
 
   if (twoFactor.required) {
     if (!twoFactor.enabled && twoFactor.blocking && !isSecurityRoute) {

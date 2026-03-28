@@ -9,6 +9,8 @@ export type EmailTemplateType =
   | "INVOICE_SENT"
   | "NEW_CASE_ASSIGNMENT"
   | "CLIENT_PORTAL_MESSAGE"
+  | "PASSWORD_RESET"
+  | "PASSWORD_CHANGED"
   | "EMAIL_VERIFICATION"
   | "TWO_FACTOR_RECOVERY";
 
@@ -58,6 +60,23 @@ export interface ClientPortalMessageData {
   link?: string;
 }
 
+
+export interface PasswordResetEmailData {
+  firstName?: string;
+  resetUrl: string;
+  expiresInMinutes: number;
+  supportEmail?: string;
+}
+
+export interface PasswordChangedEmailData {
+  firstName?: string;
+  changedAt: string;
+  device?: string | null;
+  location?: string | null;
+  ipAddress?: string | null;
+  nextStepsUrl?: string;
+}
+
 export interface EmailVerificationData {
   email: string;
   verifyUrl: string;
@@ -77,6 +96,8 @@ export type EmailTemplatePayloadMap = {
   INVOICE_SENT: InvoiceSentData;
   NEW_CASE_ASSIGNMENT: CaseAssignmentData;
   CLIENT_PORTAL_MESSAGE: ClientPortalMessageData;
+  PASSWORD_RESET: PasswordResetEmailData;
+  PASSWORD_CHANGED: PasswordChangedEmailData;
   EMAIL_VERIFICATION: EmailVerificationData;
   TWO_FACTOR_RECOVERY: TwoFactorRecoveryData;
 };
@@ -204,6 +225,44 @@ const ClientPortalMessageTemplate = (data: ClientPortalMessageData) => (
   </BaseTemplate>
 );
 
+const PasswordResetTemplate = (data: PasswordResetEmailData) => (
+  <BaseTemplate preview="Reset your Lexora password">
+    <Heading as="h2">Reset your password</Heading>
+    <Text style={baseStyles.text}>
+      {data.firstName ? `${data.firstName}, ` : ""}we received a request to reset your Lexora password.
+      This link stays valid for {data.expiresInMinutes} minutes.
+    </Text>
+    <Link href={data.resetUrl} style={{ color: "#2563eb", fontSize: "14px" }}>
+      Create a new password ↗
+    </Link>
+    <Text style={baseStyles.text}>
+      Didn't request this? Safely ignore this email, or contact security at {data.supportEmail ?? "security@lexora.app"}.
+    </Text>
+  </BaseTemplate>
+);
+
+const PasswordChangedTemplate = (data: PasswordChangedEmailData) => (
+  <BaseTemplate preview="Your Lexora password was changed">
+    <Heading as="h2">Password changed</Heading>
+    <Text style={baseStyles.text}>
+      {data.firstName ? `${data.firstName}, ` : ""}we noticed your Lexora password was updated on {new Date(data.changedAt).toLocaleString()}.
+    </Text>
+    {(data.device || data.location || data.ipAddress) && (
+      <Text style={baseStyles.text}>
+        {data.device ? `Device: ${data.device}. ` : ""}
+        {data.location ? `Location: ${data.location}. ` : ""}
+        {data.ipAddress ? `IP: ${data.ipAddress}.` : ""}
+      </Text>
+    )}
+    {data.nextStepsUrl && (
+      <Link href={data.nextStepsUrl} style={{ color: "#2563eb", fontSize: "14px" }}>
+        Secure your account
+      </Link>
+    )}
+    <Text style={baseStyles.muted}>If this wasn't you, reset your password immediately.</Text>
+  </BaseTemplate>
+);
+
 const EmailVerificationTemplate = (data: EmailVerificationData) => (
   <BaseTemplate preview="Verify your Lexora account">
     <Heading as="h2">Confirm your email</Heading>
@@ -236,6 +295,8 @@ const SUBJECTS: Record<EmailTemplateType, (data: any) => string> = {
   INVOICE_SENT: (data: InvoiceSentData) => `Invoice ${data.invoiceNumber} sent`,
   NEW_CASE_ASSIGNMENT: (data: CaseAssignmentData) => `Assigned: ${data.caseTitle}`,
   CLIENT_PORTAL_MESSAGE: (data: ClientPortalMessageData) => `Portal message from ${data.clientName}`,
+  PASSWORD_RESET: () => "Reset your Lexora password",
+  PASSWORD_CHANGED: () => "Your Lexora password was changed",
   EMAIL_VERIFICATION: () => "Verify your Lexora account",
   TWO_FACTOR_RECOVERY: () => "Lexora 2FA recovery link",
 };
@@ -247,6 +308,8 @@ const COMPONENTS: Record<EmailTemplateType, (data: any) => JSX.Element> = {
   INVOICE_SENT: InvoiceSentTemplate,
   NEW_CASE_ASSIGNMENT: CaseAssignmentTemplate,
   CLIENT_PORTAL_MESSAGE: ClientPortalMessageTemplate,
+  PASSWORD_RESET: PasswordResetTemplate,
+  PASSWORD_CHANGED: PasswordChangedTemplate,
   EMAIL_VERIFICATION: EmailVerificationTemplate,
   TWO_FACTOR_RECOVERY: TwoFactorRecoveryTemplate,
 };
@@ -265,6 +328,10 @@ const textBody = (template: EmailTemplateType, data: any) => {
       return `You were assigned to ${data.caseTitle} as ${data.role}.`;
     case "CLIENT_PORTAL_MESSAGE":
       return `New portal message from ${data.clientName}: ${data.preview}`;
+    case "PASSWORD_RESET":
+      return `Reset your Lexora password using ${data.resetUrl}. Link expires in ${data.expiresInMinutes} minutes.`;
+    case "PASSWORD_CHANGED":
+      return `Your Lexora password changed on ${new Date(data.changedAt).toLocaleString()}. If this wasn't you, reset it immediately.`;
     case "EMAIL_VERIFICATION":
       return `Verify your Lexora account by visiting ${data.verifyUrl}. Link expires ${new Date(data.expiresAt).toLocaleString()}.`;
     case "TWO_FACTOR_RECOVERY":

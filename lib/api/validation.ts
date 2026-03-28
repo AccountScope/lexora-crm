@@ -170,3 +170,30 @@ export type DeadlineInput = z.infer<typeof deadlineInputSchema>;
 export type DeadlineTemplateInput = z.infer<typeof deadlineTemplateSchema>;
 export type DeadlineUpdateInput = z.infer<typeof deadlineUpdateSchema>;
 export type NotificationPreferencesInput = z.infer<typeof notificationPreferenceSchema>;
+
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().email(),
+});
+
+export const resetPasswordSchema = z.object({
+  token: z.string().min(32),
+  password: z.string().min(12),
+});
+
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(6),
+  newPassword: z.string().min(12),
+});
+
+export const sessionActionSchema = z.discriminatedUnion("action", [
+  z.object({ action: z.literal("revoke"), sessionId: z.string().uuid() }),
+  z.object({ action: z.literal("revoke-others") }),
+  z.object({ action: z.literal("extend"), rememberMe: z.boolean().optional() }),
+  z.object({ action: z.literal("remember"), rememberMe: z.boolean() }),
+]);
+
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
+export type SessionActionInput = z.infer<typeof sessionActionSchema>;

@@ -302,3 +302,23 @@ export interface UserNotification {
   deadlineId?: string | null;
   priority?: DeadlinePriority;
 }
+
+export interface ActiveSession {
+  id: string;
+  device?: string | null;
+  browser?: string | null;
+  os?: string | null;
+  ipAddress?: string | null;
+  location?: string | null;
+  lastActivity: string;
+  createdAt: string;
+  expiresAt: string;
+  rememberMe: boolean;
+  current: boolean;
+}
+
+export interface PasswordHealthMeta {
+  passwordChangedAt?: string | null;
+  passwordExpiresAt?: string | null;
+  forcePasswordChange?: boolean;
+}
