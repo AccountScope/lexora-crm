@@ -56,7 +56,8 @@ export async function POST(request: NextRequest) {
     const user = await requireUser(request);
     const json = await request.json();
     if (json?.mode === "template") {
-      const payload = deadlineTemplateSchema.parse(json);
+      const { mode: _mode, ...rest } = json;
+      const payload = deadlineTemplateSchema.parse(rest);
       const created = await createDeadlineTemplate(payload, user.id);
       return success({ data: created }, { status: 201 });
     }

@@ -234,8 +234,8 @@ export const InvoiceGenerator = ({ timeEntries, matters, onGenerate, generating 
 
         <div>
           <Label className="mb-2 block">Include unbilled time</Label>
-          <div className="space-y-2">
-            {timeEntries.slice(0, 6).map((entry) => (
+          <div className="space-y-2 max-h-80 overflow-y-auto pr-2">
+            {timeEntries.map((entry) => (
               <div key={entry.id} className="flex items-center justify-between rounded-md border p-3">
                 <div>
                   <p className="font-medium">{entry.matter.title}</p>

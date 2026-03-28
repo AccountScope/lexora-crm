@@ -60,7 +60,7 @@ export const CaseDetailView = ({ matterId }: { matterId: string }) => {
       <DocumentVault matterId={matterId} clientId={detail.client.id} />
       {detail.documents.length > 0 && (
         <DocumentChain
-          documentIds={detail.documents.map((doc) => ({ id: doc.id, title: doc.title }))}
+          documentIds={detail.documents.map((doc: any) => ({ id: doc.id, title: doc.title }))}
         />
       )}
     </div>
