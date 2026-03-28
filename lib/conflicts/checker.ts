@@ -110,13 +110,13 @@ const formatDescription = (draft: ConflictDraft) => {
 const dedupeConflicts = (drafts: ConflictDraft[]): ConflictDraft[] => {
   const map = new Map<string, ConflictDraft>();
   drafts.forEach((draft) => {
-    const key = [draft.caseId ?? "none", draft.conflictType, normalizePartyName(draft.partyName)].join("|");
+    const key = [draft.caseId ?? "none", draft.conflictType ?? "unknown", normalizePartyName(draft.partyName ?? "")].join("|");
     const existing = map.get(key);
     if (!existing) {
       map.set(key, draft);
       return;
     }
-    if (severityRank[draft.severity] > severityRank[existing.severity]) {
+    if (severityRank[draft.severity ?? "low"] > severityRank[existing.severity ?? "low"]) {
       map.set(key, draft);
     }
   });

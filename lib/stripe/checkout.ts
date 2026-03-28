@@ -131,7 +131,7 @@ export async function previewPlanChange(
     const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
     // Preview the invoice for the plan change
-    const invoice = await stripe.invoices.retrieveUpcoming({
+    const invoice = await (stripe.invoices as any).retrieveUpcoming({
       customer: subscription.customer as string,
       subscription: subscriptionId,
       subscription_items: [

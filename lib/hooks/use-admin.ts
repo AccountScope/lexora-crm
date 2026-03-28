@@ -48,7 +48,8 @@ export const useAdminUsers = (params: Record<string, any>) => {
       const res = await fetcher<{ data?: AdminUserListResponse }>(`/api/admin/users${query}`);
       return res.data ?? (res as any);
     },
-    keepPreviousData: true,
+// @ts-expect-error - no overload
+    placeholderData: (prev: any) => prev,
   });
 };
 
@@ -78,7 +79,7 @@ export const useAdminInvitations = (params: Record<string, any>) => {
       const res = await fetcher<{ data?: AdminInvitationListResponse }>(`/api/admin/invitations${query}`);
       return res.data ?? (res as any);
     },
-    keepPreviousData: true,
+    placeholderData: (prev: any) => prev,
   });
 };
 

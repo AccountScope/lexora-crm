@@ -274,7 +274,7 @@ export async function getUsageSummary(userId: string): Promise<{
   };
 
   // Calculate overage charges
-  const overageCharges = calculateOverageCharges(plan, usage);
+  const overageCharges = calculateOverageCharges(plan, usage as any);
 
   return {
     plan,

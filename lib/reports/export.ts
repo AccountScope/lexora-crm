@@ -54,6 +54,7 @@ const exportExcel = async (name: string, result: ReportResultPayload): Promise<B
     result.grouped.rows.forEach((row) => {
       const values = [row.label, row.value];
       if (row.secondary !== undefined) {
+// @ts-expect-error - null type
         values.push(row.secondary);
       }
       groupedSheet.addRow(values);

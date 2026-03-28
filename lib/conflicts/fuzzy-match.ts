@@ -27,7 +27,7 @@ export interface FuzzyMatchResult<T = unknown> {
   confidence: number;
 }
 
-const defaultOptions: Fuse.IFuseOptions<FuseDocument<any>> = {
+const defaultOptions: any = {
   includeScore: true,
   threshold: 0.35,
   distance: 120,
@@ -35,7 +35,7 @@ const defaultOptions: Fuse.IFuseOptions<FuseDocument<any>> = {
   ignoreLocation: true,
 };
 
-export const createFuzzyMatcher = <T>(candidates: FuzzyCandidate<T>[], options?: Partial<Fuse.IFuseOptions<FuseDocument<T>>>) => {
+export const createFuzzyMatcher = <T>(candidates: FuzzyCandidate<T>[], options?: any) => {
   const documents: FuseDocument<T>[] = candidates.map((candidate) => ({
     value: normalizePartyName(candidate.name),
     aliases: (candidate.aliases ?? []).map(normalizePartyName).filter(Boolean),

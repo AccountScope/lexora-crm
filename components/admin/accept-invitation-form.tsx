@@ -20,7 +20,7 @@ const strengthColors = ["bg-red-500", "bg-orange-500", "bg-yellow-500", "bg-emer
 export const AcceptInvitationForm = ({ invitation, token }: Props) => {
   const [state, formAction] = useFormState(acceptInvitationAction, { error: null });
   const [password, setPassword] = useState("");
-  const score = password ? (zxcvbn as any)(password).score : 0;
+  const score = password ? ((zxcvbn as any)(password))?.score ?? 0 : 0;
   return (
     <form className="space-y-4" action={formAction}>
       <input type="hidden" name="token" value={token} />

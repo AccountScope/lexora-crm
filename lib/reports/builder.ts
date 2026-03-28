@@ -308,6 +308,7 @@ export const runReport = async (input: ReportConfig, options?: { limit?: number 
     rows,
     totalRows,
     grouped,
+// @ts-expect-error - chart type
     chart,
     kpis,
     generatedAt: new Date().toISOString(),

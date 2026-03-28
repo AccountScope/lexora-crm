@@ -294,7 +294,7 @@ export const updateAdminUserProfile = async (
       })());
     }
 
-    await Promise.all(updates);
+    await Promise.all(updates) as any;
     await recordUserAuditLog(actorId, userId, "user.updated", payload);
     return getAdminUserById(userId);
   });

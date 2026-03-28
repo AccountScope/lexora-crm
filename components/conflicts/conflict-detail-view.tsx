@@ -123,7 +123,7 @@ export const ConflictDetailView = ({ conflictId }: { conflictId: string }) => {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label>Status</Label>
-                <Select value={status} onValueChange={setStatus}>
+                <Select value={status} onValueChange={(v: any) => setStatus(v as any)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>

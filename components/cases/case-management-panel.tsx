@@ -49,8 +49,8 @@ export const CaseManagementPanel = () => {
               <Input placeholder="Matter title" {...form.register("title")} />
               <Input placeholder="Matter number" {...form.register("matterNumber")} />
               <Input placeholder="Client ID" {...form.register("clientId")} />
-              <Input placeholder="Practice area" {...form.register("practiceArea")} />
-              <Textarea placeholder="Description" {...form.register("description")} />
+              <Input placeholder="Practice area" {...form.register("practiceArea" as any)} />
+              <Textarea placeholder="Description" {...form.register("description" as any)} />
               <Button type="submit" disabled={mutation.isPending}>
                 Create
               </Button>

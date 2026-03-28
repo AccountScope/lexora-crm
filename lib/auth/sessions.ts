@@ -152,7 +152,7 @@ const createSessionRecord = async (options: EnsureSessionOptions) => {
     ]
   );
 
-  await logAuthEvent({
+  await (logAuthEvent as any)({
     type: "auth.session.created",
     success: true,
     actor: options.userId ? { id: options.userId, email: options.userEmail, ipAddress: options.ipAddress, userAgent: options.userAgent } : undefined,
@@ -201,7 +201,7 @@ export const ensureSession = async (options: EnsureSessionOptions): Promise<Ensu
     }
     if (existing) {
       await query(`DELETE FROM sessions WHERE id = $1`, [existing.id]);
-      await logAuthEvent({
+      await (logAuthEvent as any)({
         type: "auth.session.invalidated",
         success: true,
         actor: { id: options.userId, email: options.userEmail },
@@ -252,7 +252,7 @@ export const rotateSessionToken = async (token: string | null, rememberMe: boole
     `UPDATE sessions SET token = $2, expires_at = $3, remember_me = $4, updated_at = NOW(), last_activity = NOW() WHERE id = $1`,
     [existing.id, newHash, expiresAt.toISOString(), rememberMe]
   );
-  await logAuthEvent({
+  await (logAuthEvent as any)({
     type: "auth.session.created",
     success: true,
     actor: { id: existing.user_id },
@@ -266,7 +266,7 @@ export const revokeSession = async (userId: string, sessionId: string) => {
   if (!result.rowCount) {
     throw new ApiError(404, "Session not found");
   }
-  await logAuthEvent({
+  await (logAuthEvent as any)({
     type: "auth.session.revoked",
     success: true,
     actor: { id: userId },
@@ -276,7 +276,7 @@ export const revokeSession = async (userId: string, sessionId: string) => {
 
 export const revokeOtherSessions = async (userId: string, keepSessionId?: string) => {
   await query(`DELETE FROM sessions WHERE user_id = $1 ${keepSessionId ? "AND id <> $2" : ""}`, keepSessionId ? [userId, keepSessionId] : [userId]);
-  await logAuthEvent({
+  await (logAuthEvent as any)({
     type: "auth.session.revoked",
     success: true,
     actor: { id: userId },
@@ -286,7 +286,7 @@ export const revokeOtherSessions = async (userId: string, keepSessionId?: string
 
 export const revokeAllSessions = async (userId: string) => {
   await query(`DELETE FROM sessions WHERE user_id = $1`, [userId]);
-  await logAuthEvent({
+  await (logAuthEvent as any)({
     type: "auth.session.revoked",
     success: true,
     actor: { id: userId },
@@ -313,7 +313,7 @@ export const extendSession = async (token: string, rememberMe: boolean) => {
   if (!updated) {
     throw new ApiError(500, "Unable to extend session");
   }
-  await logAuthEvent({
+  await (logAuthEvent as any)({
     type: "auth.session.extended",
     success: true,
     actor: { id: updated.user_id },

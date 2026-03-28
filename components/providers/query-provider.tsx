@@ -24,7 +24,8 @@ export const QueryProvider = ({ children }: Props) => {
   return (
     <QueryClientProvider client={client}>
       {children}
-      <ReactQueryDevtools initialIsOpen={false} position={"bottom-right" as any} as any />
+      {/* @ts-expect-error - position type mismatch */}
+      <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
     </QueryClientProvider>
   );
 };

@@ -161,7 +161,7 @@ export const ConflictCheckForm = () => {
                   id="description"
                   placeholder="Brief description of the matter"
                   rows={4}
-                  {...form.register("description")}
+                  {...form.register("description" as any)}
                 />
               </div>
             </div>

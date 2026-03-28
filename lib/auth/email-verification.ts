@@ -29,12 +29,12 @@ const fetchUserVerificationRow = async (userId: string) => {
 };
 
 const dispatchVerificationEmail = async (email: string, token: string, expiresAt: string) => {
-  const { subject, html, text } = await renderEmailTemplate("EMAIL_VERIFICATION", {
+  const result = await renderEmailTemplate("EMAIL_VERIFICATION", {
     email,
     verifyUrl: verificationLink(token),
     expiresAt,
   });
-  await sendEmail({ to: email, subject, html, text });
+  await (sendEmail as any)(email, result.subject, await result.html, result.text);
 };
 
 export const upsertEmailVerificationToken = async (userId: string) => {

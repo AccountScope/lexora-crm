@@ -9,12 +9,12 @@ import { ApiError } from "@/lib/api/errors";
 // Lazy-load email functions to avoid Edge Runtime issues in middleware
 const renderEmailTemplate = async (template: string, data: any) => {
   const { renderEmailTemplate: fn } = await import("@/lib/email/templates");
-  return fn(template, data);
+  return (fn as any)(template, data);
 };
 
 const sendEmail = async (to: string, subject: string, html: string, text: string) => {
   const { sendEmail: fn } = await import("@/lib/email/send");
-  return fn(to, subject, html, text);
+  return (fn as any)(to, subject, html, text);
 };
 import { getAppBaseUrl } from "@/lib/utils/app-url";
 
@@ -579,7 +579,7 @@ export const requestTwoFactorRecovery = async (authUserId: string) => {
     recoverUrl: `${appBaseUrl}/login/two-factor?token=${token}`,
     expiresAt: expiresAt.toISOString(),
   });
-  await sendEmail({ to: record.email, subject, html, text });
+  await sendEmail(record.email, subject, await html, text);
 };
 
 export const completeTwoFactorRecovery = async (token: string) => {

@@ -94,8 +94,8 @@ export const ConflictRecordsView = () => {
   const { data, isFetching } = { data: { data: [], meta: { total: 0, page: 1, perPage: 10, totalPages: 0 } }, isFetching: false }; // useConflictChecks(filters);
   const conflicts = data?.data ?? [];
   const watchList = { data: { data: [] } }; // useWatchList();
-  const addEntry = { mutate: () => {}, mutateAsync: async () => {}, isPending: false }; // useAddWatchListEntry();
-  const removeEntry = { mutate: () => {}, mutateAsync: async () => {}, isPending: false }; // useRemoveWatchListEntry();
+  const addEntry = { mutate: (_: any) => {}, mutateAsync: async (_: any) => {}, isPending: false }; // useAddWatchListEntry();
+  const removeEntry = { mutate: (_: any) => {}, mutateAsync: async (_: any) => {}, isPending: false }; // useRemoveWatchListEntry();
   const [watchParty, setWatchParty] = useState("");
   const [watchReason, setWatchReason] = useState("");
 

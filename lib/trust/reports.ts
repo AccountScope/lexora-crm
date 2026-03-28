@@ -50,7 +50,7 @@ export async function generateThreeWayReport(
   trustAccountId: string
 ): Promise<ThreeWayReport | null> {
   try {
-    const supabase = createClient();
+    const supabase = createClient() as any;
 
     // Get trust account
     const { data: account, error: accountError } = await supabase
@@ -115,7 +115,7 @@ export async function generateThreeWayReport(
  */
 export async function generateClientLedgerReport(): Promise<ClientLedgerReport[]> {
   try {
-    const supabase = createClient();
+    const supabase = createClient() as any;
 
     const { data: ledgers, error } = await (supabase as any)
       .from('client_ledgers')
@@ -172,7 +172,7 @@ export async function generateTransactionActivityReport(
   trustAccountId?: string
 ): Promise<TransactionActivityReport[]> {
   try {
-    const supabase = createClient();
+    const supabase = createClient() as any;
 
     let query = supabase
       .from('trust_transactions')
@@ -236,7 +236,7 @@ export async function generateTransactionActivityReport(
  */
 export async function generateOutstandingFeesReport(): Promise<any[]> {
   try {
-    const supabase = createClient();
+    const supabase = createClient() as any;
 
     // This would need to query invoices that are paid but not transferred from trust
     // For now, return empty array as placeholder
@@ -252,7 +252,7 @@ export async function generateOutstandingFeesReport(): Promise<any[]> {
  */
 export async function generateZeroBalanceLedgersReport(): Promise<ClientLedgerReport[]> {
   try {
-    const supabase = createClient();
+    const supabase = createClient() as any;
 
     const { data: ledgers, error } = await (supabase as any)
       .from('client_ledgers')
