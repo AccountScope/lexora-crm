@@ -54,8 +54,9 @@ export const UserTable = () => {
     if (!payload) return [] as RoleSummary[];
     return payload.data ?? payload;
   }, [rolesQuery.data]);
-  const users = (data as any)?.users ?? data?.data?.users ?? [];
-  const pagination = (data as any)?.pagination ?? data?.data?.pagination ?? { total: 0, page: 1, pageSize: 50 };
+  const responseData = data as any;
+  const users = responseData?.users ?? responseData?.data?.users ?? [];
+  const pagination = responseData?.pagination ?? responseData?.data?.pagination ?? { total: 0, page: 1, pageSize: 50 };
 
   useEffect(() => {
     setSelected(new Set());

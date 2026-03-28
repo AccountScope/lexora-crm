@@ -155,7 +155,7 @@ export const ReportBuilder = ({
               <Select
                 value={config.dateRange?.preset ?? "last_30_days"}
                 onValueChange={(value) =>
-                  updateConfig({ dateRange: value === "custom" ? { preset: value, startDate: config.dateRange?.startDate, endDate: config.dateRange?.endDate } : { preset: value as ReportConfig["dateRange"]!["preset"] } })
+                  updateConfig({ dateRange: value === "custom" ? { preset: value, startDate: config.dateRange?.startDate, endDate: config.dateRange?.endDate } as any : { preset: value } as any })
                 }
               >
                 <SelectTrigger>
@@ -174,12 +174,12 @@ export const ReportBuilder = ({
                   <Input
                     type="date"
                     value={config.dateRange.startDate ?? ""}
-                    onChange={(event) => updateConfig({ dateRange: { ...config.dateRange, startDate: event.target.value } })}
+                    onChange={(event) => updateConfig({ dateRange: { ...config.dateRange, startDate: event.target.value } as any })}
                   />
                   <Input
                     type="date"
                     value={config.dateRange.endDate ?? ""}
-                    onChange={(event) => updateConfig({ dateRange: { ...config.dateRange, endDate: event.target.value } })}
+                    onChange={(event) => updateConfig({ dateRange: { ...config.dateRange, endDate: event.target.value } as any })}
                   />
                 </div>
               )}
@@ -258,7 +258,7 @@ export const ReportBuilder = ({
             <div className="flex gap-2">
               <Select
                 value={config.visualization?.chart ?? "table"}
-                onValueChange={(value) => updateConfig({ visualization: { ...(config.visualization ?? {}), chart: value as ReportConfig["visualization"]!["chart"] } })}
+                onValueChange={(value) => updateConfig({ visualization: { ...(config.visualization ?? {}), chart: value } as any })}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -272,7 +272,7 @@ export const ReportBuilder = ({
               </Select>
               <Select
                 value={config.visualization?.metric ?? definition.metrics[0]?.key}
-                onValueChange={(value) => updateConfig({ visualization: { ...(config.visualization ?? {}), metric: value } })}
+                onValueChange={(value) => updateConfig({ visualization: { ...(config.visualization ?? {}), metric: value } as any })}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Metric" />

@@ -80,7 +80,7 @@ export const FilterBuilder = ({ fields, filters, logic, onLogicChange, onChange 
       return (
         <Select
           value={String(filter.value ?? "true")}
-          onValueChange={(value) => updateFilter(index!, { value: value === "true" })}
+          onValueChange={(value) => updateFilter(index!, { value: value === "true" } as any)}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select" />

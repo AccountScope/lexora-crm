@@ -19,8 +19,9 @@ const statusLabels: Record<string, string> = {
 export const InvitationsTable = () => {
   const [filters, setFilters] = useState({ status: "pending", page: 1, pageSize: 25 });
   const { data, isFetching } = useAdminInvitations(filters);
-  const invitations = (data as any)?.invitations ?? data?.data?.invitations ?? [];
-  const pagination = (data as any)?.pagination ?? data?.data?.pagination ?? { total: invitations.length, page: 1, pageSize: 25 };
+  const responseData = data as any;
+  const invitations = responseData?.invitations ?? responseData?.data?.invitations ?? [];
+  const pagination = responseData?.pagination ?? responseData?.data?.pagination ?? { total: invitations.length, page: 1, pageSize: 25 };
   const { resend, cancel } = useInvitationActions();
   const totalPages = Math.max(Math.ceil(pagination.total / (filters.pageSize || 1)), 1);
 

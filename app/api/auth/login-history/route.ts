@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0');
 
     const attempts = await getLoginHistory({
-      email: auth.user.email,
+      email: auth.user.email || '',
       limit,
       offset,
     });

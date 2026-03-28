@@ -69,7 +69,7 @@ export const SessionTimeoutWarning = ({ timeoutMinutes = 30, warningMinutes = 5 
 
   const stayLoggedIn = useCallback(async () => {
     try {
-      await extend.mutateAsync();
+      await extend.mutateAsync({} as any);
     } finally {
       handleActivity();
     }

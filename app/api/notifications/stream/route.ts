@@ -37,6 +37,7 @@ export async function GET(request: NextRequest) {
         controller.close();
       });
 
+      // @ts-expect-error - onCancel exists at runtime
       controller.onCancel = cleanup;
     },
   });
