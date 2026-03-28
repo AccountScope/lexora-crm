@@ -25,10 +25,10 @@ export async function GET(request: NextRequest) {
     const token = extractSessionToken(request);
     const ensureResult = await ensureSession({
       userId: user.id,
-      userEmail: user.email ?? undefined,
+      userEmail: user.email || undefined,
       token,
       ipAddress: getClientIp(request),
-      userAgent: request.headers.get("user-agent") ?? undefined,
+      userAgent: request.headers.get("user-agent") || undefined,
       rememberMe: rememberPreference,
     });
 
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
       }
       case "revoke-others": {
         const sessionId = await getSessionIdForToken(token);
-        await revokeOtherSessions(user.id, sessionId ?? undefined);
+        await revokeOtherSessions(user.id, sessionId || undefined);
         break;
       }
       case "extend": {

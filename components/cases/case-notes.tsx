@@ -45,7 +45,7 @@ export const CaseNotes = ({ matterId, notes }: { matterId: string; notes?: CaseN
                 {option.label}
               </Button>
             ))}
-            <Button disabled={mutation.isLoading} onClick={handleSubmit}>
+            <Button disabled={mutation.isPending} onClick={handleSubmit}>
               Save note
             </Button>
           </div>

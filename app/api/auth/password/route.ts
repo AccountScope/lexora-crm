@@ -34,14 +34,14 @@ export async function POST(request: NextRequest) {
       return updatePasswordForUser(user.id, payload.newPassword, {
         client,
         actorId: user.id,
-        actorEmail: user.email ?? undefined,
+        actorEmail: user.email || undefined,
         ipAddress,
-        userAgent: userAgent ?? undefined,
+        userAgent: userAgent || undefined,
         checkBreach: true,
       });
     });
 
-    await revokeOtherSessions(user.id, sessionId ?? undefined);
+    await revokeOtherSessions(user.id, sessionId || undefined);
 
     const rotated = await rotateSessionToken(token, rememberPreference);
 
@@ -49,11 +49,11 @@ export async function POST(request: NextRequest) {
       template: "PASSWORD_CHANGED",
       to: user.email ?? "",
       data: {
-        firstName: result.user?.firstName ?? undefined,
+        firstName: result.user?.firstName || undefined,
         changedAt: result.passwordChangedAt ?? new Date().toISOString(),
-        device: describeDeviceFromUserAgent(userAgent ?? undefined),
+        device: describeDeviceFromUserAgent(userAgent || undefined),
         location: resolveLocationFromIp(ipAddress),
-        ipAddress: ipAddress ?? undefined,
+        ipAddress: ipAddress || undefined,
         nextStepsUrl: `${APP_URL.replace(/\/$/, "")}/settings/password`,
       },
     });

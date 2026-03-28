@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
         actorId: row.user_id,
         actorEmail: row.email,
         ipAddress,
-        userAgent: userAgent ?? undefined,
+        userAgent: userAgent || undefined,
         checkBreach: true,
       });
 
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
 
     await revokeAllSessions(userId);
 
-    const device = describeDeviceFromUserAgent(userAgent ?? undefined);
+    const device = describeDeviceFromUserAgent(userAgent || undefined);
     const location = resolveLocationFromIp(ipAddress);
     const meta = await getPasswordMetadata(userId);
     const secureUrl = `${APP_URL.replace(/\/$/, "")}/settings/password`;
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
         changedAt: new Date().toISOString(),
         device,
         location,
-        ipAddress: ipAddress ?? undefined,
+        ipAddress: ipAddress || undefined,
         nextStepsUrl: secureUrl,
       },
     });
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
     await logAuthEvent({
       type: "auth.password.reset.completed",
       success: true,
-      actor: { id: userId, email, ipAddress: ipAddress ?? undefined, userAgent: userAgent ?? undefined },
+      actor: { id: userId, email, ipAddress: ipAddress || undefined, userAgent: userAgent || undefined },
     });
 
     return NextResponse.json({ ok: true, meta });

@@ -101,7 +101,7 @@ export const ClientPortal = () => {
                       ))}
                     </div>
                     <Textarea value={message} onChange={(event) => setMessage(event.target.value)} placeholder="Send a secure message" />
-                    <Button onClick={handleSend} disabled={sender.isLoading || !message.trim()}>
+                    <Button onClick={handleSend} disabled={sender.isPending || !message.trim()}>
                       Send
                     </Button>
                   </CardContent>

@@ -162,8 +162,8 @@ async function handleInvoicePaymentSucceeded(event: Stripe.Event): Promise<void>
   console.log('Invoice payment succeeded:', invoice.id);
 
   // If this is a subscription invoice, ensure subscription is active
-  if (invoice.subscription) {
-    const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
+  if ((invoice as any).subscription) {
+    const subscription = await stripe.subscriptions.retrieve((invoice as any).subscription as string);
     await syncSubscriptionFromStripe(subscription);
   }
 
@@ -198,16 +198,16 @@ async function handleInvoicePaymentFailed(event: Stripe.Event): Promise<void> {
   console.log('Invoice payment failed:', invoice.id);
 
   // Update subscription status
-  if (invoice.subscription) {
+  if ((invoice as any).subscription) {
     await query(
       `UPDATE subscriptions 
        SET status = 'past_due', updated_at = NOW()
        WHERE stripe_subscription_id = $1`,
-      [invoice.subscription]
+      [(invoice as any).subscription]
     );
 
     // Send payment failure email
-    const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
+    const subscription = await stripe.subscriptions.retrieve((invoice as any).subscription as string);
     const userId = subscription.metadata?.userId;
     
     if (userId) {

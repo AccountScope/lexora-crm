@@ -81,8 +81,8 @@ export const DocumentVault = ({ matterId, clientId }: Props) => {
           <p className="mt-2 text-sm text-muted-foreground">
             Drag and drop files here or click to browse.
           </p>
-          <Button variant="secondary" className="mt-3" disabled={uploader.isLoading}>
-            {uploader.isLoading ? "Uploading..." : "Select files"}
+          <Button variant="secondary" className="mt-3" disabled={uploader.isPending}>
+            {uploader.isPending ? "Uploading..." : "Select files"}
           </Button>
         </div>
         <div className="flex flex-wrap gap-2">

@@ -290,8 +290,8 @@ export async function syncSubscriptionFromStripe(
     stripeCustomerId: stripeSubscription.customer as string,
     plan,
     status: stripeSubscription.status,
-    currentPeriodStart: new Date(stripeSubscription.current_period_start * 1000),
-    currentPeriodEnd: new Date(stripeSubscription.current_period_end * 1000),
+    currentPeriodStart: new Date((stripeSubscription as any).current_period_start * 1000),
+    currentPeriodEnd: new Date((stripeSubscription as any).current_period_end * 1000),
     trialStart: stripeSubscription.trial_start
       ? new Date(stripeSubscription.trial_start * 1000)
       : undefined,

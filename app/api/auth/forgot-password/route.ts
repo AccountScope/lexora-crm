@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
           template: "PASSWORD_RESET",
           to: user.email,
           data: {
-            firstName: user.first_name ?? undefined,
+            firstName: user.first_name || undefined,
             resetUrl,
             expiresInMinutes: RESET_EXPIRY_MINUTES,
             supportEmail: SUPPORT_EMAIL,
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
         await logAuthEvent({
           type: "auth.password.reset.requested",
           success: true,
-          actor: { id: user.id, email: user.email, ipAddress, userAgent: userAgent ?? undefined },
+          actor: { id: user.id, email: user.email, ipAddress, userAgent: userAgent || undefined },
         });
       }
     }

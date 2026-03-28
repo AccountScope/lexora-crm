@@ -51,7 +51,7 @@ export const CaseManagementPanel = () => {
               <Input placeholder="Client ID" {...form.register("clientId")} />
               <Input placeholder="Practice area" {...form.register("practiceArea")} />
               <Textarea placeholder="Description" {...form.register("description")} />
-              <Button type="submit" disabled={mutation.isLoading}>
+              <Button type="submit" disabled={mutation.isPending}>
                 Create
               </Button>
             </form>
