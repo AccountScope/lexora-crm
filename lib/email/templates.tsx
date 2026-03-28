@@ -9,6 +9,7 @@ export type EmailTemplateType =
   | "INVOICE_SENT"
   | "NEW_CASE_ASSIGNMENT"
   | "CLIENT_PORTAL_MESSAGE"
+  | "COMMENT_MENTION"
   | "PASSWORD_RESET"
   | "PASSWORD_CHANGED"
   | "EMAIL_VERIFICATION"
@@ -61,6 +62,13 @@ export interface ClientPortalMessageData {
   link?: string;
 }
 
+export interface CommentMentionEmailData {
+  actorName: string;
+  preview?: string;
+  contextTitle?: string;
+  link?: string;
+}
+
 export interface UserInvitationEmailData {
   invitationUrl: string;
   roleName: string;
@@ -104,6 +112,7 @@ export type EmailTemplatePayloadMap = {
   INVOICE_SENT: InvoiceSentData;
   NEW_CASE_ASSIGNMENT: CaseAssignmentData;
   CLIENT_PORTAL_MESSAGE: ClientPortalMessageData;
+  COMMENT_MENTION: CommentMentionEmailData;
   USER_INVITATION: UserInvitationEmailData;
   PASSWORD_RESET: PasswordResetEmailData;
   PASSWORD_CHANGED: PasswordChangedEmailData;
@@ -234,6 +243,21 @@ const ClientPortalMessageTemplate = (data: ClientPortalMessageData) => (
   </BaseTemplate>
 );
 
+const CommentMentionTemplate = (data: CommentMentionEmailData) => (
+  <BaseTemplate preview={`${data.actorName} mentioned you${data.contextTitle ? ` in ${data.contextTitle}` : ""}`}>
+    <Heading as="h2">You were mentioned</Heading>
+    <Text style={baseStyles.text}>
+      <strong>{data.actorName}</strong> mentioned you{data.contextTitle ? ` in ${data.contextTitle}` : ""}.
+    </Text>
+    {data.preview && <Text style={{ ...baseStyles.text, fontStyle: "italic" }}>“{data.preview}”</Text>}
+    {data.link && (
+      <Link href={data.link} style={{ color: "#2563eb", fontSize: "14px" }}>
+        Jump to thread ↗
+      </Link>
+    )}
+  </BaseTemplate>
+);
+
 const UserInvitationTemplate = (data: UserInvitationEmailData) => (
   <BaseTemplate preview="You're invited to Lexora">
     <Heading as="h2">You've been invited</Heading>
@@ -318,6 +342,7 @@ const SUBJECTS: Record<EmailTemplateType, (data: any) => string> = {
   INVOICE_SENT: (data: InvoiceSentData) => `Invoice ${data.invoiceNumber} sent`,
   NEW_CASE_ASSIGNMENT: (data: CaseAssignmentData) => `Assigned: ${data.caseTitle}`,
   CLIENT_PORTAL_MESSAGE: (data: ClientPortalMessageData) => `Portal message from ${data.clientName}`,
+  COMMENT_MENTION: (data: CommentMentionEmailData) => `${data.actorName} mentioned you${data.contextTitle ? ` in ${data.contextTitle}` : ""}`,
   PASSWORD_RESET: () => "Reset your Lexora password",
   PASSWORD_CHANGED: () => "Your Lexora password was changed",
   EMAIL_VERIFICATION: () => "Verify your Lexora account",
@@ -332,6 +357,7 @@ const COMPONENTS: Record<EmailTemplateType, (data: any) => JSX.Element> = {
   INVOICE_SENT: InvoiceSentTemplate,
   NEW_CASE_ASSIGNMENT: CaseAssignmentTemplate,
   CLIENT_PORTAL_MESSAGE: ClientPortalMessageTemplate,
+  COMMENT_MENTION: CommentMentionTemplate,
   PASSWORD_RESET: PasswordResetTemplate,
   PASSWORD_CHANGED: PasswordChangedTemplate,
   EMAIL_VERIFICATION: EmailVerificationTemplate,
@@ -353,6 +379,8 @@ const textBody = (template: EmailTemplateType, data: any) => {
       return `You were assigned to ${data.caseTitle} as ${data.role}.`;
     case "CLIENT_PORTAL_MESSAGE":
       return `New portal message from ${data.clientName}: ${data.preview}`;
+    case "COMMENT_MENTION":
+      return `${data.actorName} mentioned you${data.contextTitle ? ` in ${data.contextTitle}` : ""}: ${data.preview ?? "Open Lexora to reply."}`;
     case "PASSWORD_RESET":
       return `Reset your Lexora password using ${data.resetUrl}. Link expires in ${data.expiresInMinutes} minutes.`;
     case "PASSWORD_CHANGED":

@@ -6,6 +6,7 @@ import { CaseNotes } from "@/components/cases/case-notes";
 import { CaseTeam } from "@/components/cases/case-team";
 import { DocumentVault } from "@/components/documents/document-vault";
 import { DocumentChain } from "@/components/documents/document-chain";
+import { CaseEmails } from "@/components/email/case-emails";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -57,6 +58,7 @@ export const CaseDetailView = ({ matterId }: { matterId: string }) => {
         </div>
         <CaseTeam team={detail.team} />
       </div>
+      <CaseEmails caseId={matterId} />
       <DocumentVault matterId={matterId} clientId={detail.client.id} />
       {detail.documents.length > 0 && (
         <DocumentChain

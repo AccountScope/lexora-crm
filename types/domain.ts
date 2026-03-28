@@ -272,8 +272,14 @@ export type NotificationType =
   | "CASE_UPDATE"
   | "DOCUMENT_UPLOADED"
   | "INVOICE_SENT"
+  | "INVOICE_PAID"
   | "NEW_CASE_ASSIGNMENT"
-  | "CLIENT_PORTAL_MESSAGE";
+  | "CASE_ASSIGNMENT"
+  | "CLIENT_PORTAL_MESSAGE"
+  | "COMMENT_MENTION"
+  | "DOCUMENT_TO_CASE"
+  | "DEADLINE_ALERT"
+  | "USER_INVITED";
 
 export interface NotificationPreferences {
   userId: string;
@@ -301,7 +307,88 @@ export interface UserNotification {
   relatedDocumentId?: string | null;
   deadlineId?: string | null;
   priority?: DeadlinePriority;
+  commentId?: string | null;
 }
+
+export type ActivityCategory =
+  | "case"
+  | "document"
+  | "time"
+  | "billing"
+  | "user"
+  | "comment"
+  | "mention";
+
+export interface ActivityRecord {
+  id: string;
+  type: ActivityCategory;
+  action: string;
+  description: string;
+  createdAt: string;
+  metadata?: Record<string, any> | null;
+  linkUrl?: string | null;
+  icon?: string | null;
+  user?: UserReference | null;
+  case?: {
+    id: string;
+    title?: string | null;
+    matterNumber?: string | null;
+  } | null;
+  document?: {
+    id: string;
+    title: string;
+  } | null;
+}
+
+export interface ActivityFeedResponse {
+  data: ActivityRecord[];
+  meta: {
+    nextCursor?: string;
+    total?: number;
+  };
+}
+
+export interface ActivityFilters {
+  types?: ActivityCategory[];
+  userId?: string;
+  caseId?: string;
+  documentId?: string;
+  search?: string;
+  from?: string;
+  to?: string;
+}
+
+export type CommentEntityType = "case" | "document" | "time_entry" | "billing" | "user";
+
+export interface CommentAttachment {
+  documentId: string;
+  title: string;
+  mimeType?: string | null;
+  sizeBytes?: number | null;
+}
+
+export interface CommentRecord {
+  id: string;
+  content: string;
+  entityType: CommentEntityType;
+  entityId: string;
+  user: UserReference | null;
+  parentId?: string | null;
+  mentions: UserReference[];
+  attachments: CommentAttachment[];
+  likesCount: number;
+  likedByCurrentUser?: boolean;
+  canEdit?: boolean;
+  canDelete?: boolean;
+  createdAt: string;
+  updatedAt?: string | null;
+  deletedAt?: string | null;
+  replies?: CommentRecord[];
+}
+
+export type NotificationStreamEvent =
+  | { kind: "notification"; targetUserId: string; payload: UserNotification }
+  | { kind: "activity"; payload: ActivityRecord };
 
 export interface ActiveSession {
   id: string;
@@ -443,4 +530,202 @@ export interface TeamDetail extends TeamSummary {
   members: TeamMember[];
   parent: { id: string; name: string } | null;
   children: { id: string; name: string }[];
+}
+
+export type ReportType = "cases" | "time" | "billing" | "documents" | "users";
+
+export type ReportFilterOperator = "equals" | "contains" | "greater_than" | "less_than" | "between" | "in_list";
+
+export type ReportColumnType = "string" | "number" | "date" | "currency" | "duration" | "boolean";
+
+export interface ReportFilter {
+  field: string;
+  operator: ReportFilterOperator;
+  value?: string | number | (string | number)[] | null;
+  valueTo?: string | number | null;
+}
+
+export interface ReportDateRange {
+  preset: "last_7_days" | "last_30_days" | "last_90_days" | "all_time" | "custom";
+  startDate?: string | null;
+  endDate?: string | null;
+}
+
+export interface ReportSort {
+  field: string;
+  direction: "asc" | "desc";
+}
+
+export interface ReportVisualizationConfig {
+  chart: "bar" | "line" | "pie" | "table";
+  metric?: string;
+  seriesField?: string;
+}
+
+export interface ReportConfig {
+  type: ReportType;
+  dateRange?: ReportDateRange;
+  fields: string[];
+  filters: ReportFilter[];
+  filterLogic?: "AND" | "OR";
+  groupBy?: string | null;
+  sort?: ReportSort | null;
+  limit?: number;
+  visualization?: ReportVisualizationConfig;
+}
+
+export interface ReportColumn {
+  key: string;
+  label: string;
+  type: ReportColumnType;
+}
+
+export type ReportRow = Record<string, string | number | boolean | null>;
+
+export interface ReportGroupedRow {
+  label: string;
+  value: number;
+  secondary?: number | null;
+}
+
+export interface ReportChartDataset {
+  label: string;
+  data: number[];
+}
+
+export interface ReportChartConfig {
+  type: "bar" | "line" | "pie";
+  labels: string[];
+  datasets: ReportChartDataset[];
+  prefix?: string;
+  suffix?: string;
+}
+
+export interface ReportKpiCard {
+  label: string;
+  value: string;
+  helper?: string;
+  trend?: number | null;
+}
+
+export interface ReportResultPayload {
+  columns: ReportColumn[];
+  rows: ReportRow[];
+  totalRows: number;
+  grouped?: { field: string; rows: ReportGroupedRow[] } | null;
+  chart?: ReportChartConfig;
+  kpis?: ReportKpiCard[];
+  generatedAt: string;
+}
+
+export interface ReportSchedule {
+  id: string;
+  reportId: string;
+  frequency: "daily" | "weekly" | "monthly";
+  dayOfWeek?: number | null;
+  dayOfMonth?: number | null;
+  timeOfDay: string;
+  recipients: string[];
+  format: "excel" | "pdf" | "csv";
+  enabled: boolean;
+  lastRunAt?: string | null;
+  createdAt: string;
+}
+
+export interface SavedReportRecord {
+  id: string;
+  name: string;
+  description?: string | null;
+  type: ReportType;
+  config: ReportConfig;
+  isTemplate: boolean;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ReportListItem extends SavedReportRecord {
+  scheduleCount: number;
+  nextRunAt?: string | null;
+  lastRunAt?: string | null;
+}
+
+export interface ReportDetailPayload extends SavedReportRecord {
+  schedules: ReportSchedule[];
+}
+
+export type ConflictStatus = "pending" | "accepted" | "waived" | "rejected" | "escalated";
+export type ConflictSeverity = "high" | "medium" | "low";
+export type ConflictType = "direct" | "opposing" | "related" | "former_client" | "third_party";
+
+export interface ConflictSummaryCounts {
+  total: number;
+  high: number;
+  medium: number;
+  low: number;
+}
+
+export interface ConflictMatchRecord {
+  id: string;
+  conflictCheckId: string;
+  caseId?: string | null;
+  caseNumber?: string | null;
+  caseTitle?: string | null;
+  caseStatus?: string | null;
+  lawyerName?: string | null;
+  conflictType: ConflictType;
+  severity: ConflictSeverity;
+  partyName: string;
+  description?: string | null;
+  createdAt: string;
+}
+
+export interface ConflictCheckRecord {
+  id: string;
+  clientName: string;
+  opposingParties: string[];
+  otherParties: string[];
+  caseType?: string | null;
+  description?: string | null;
+  status: ConflictStatus;
+  resolutionNotes?: string | null;
+  requestedBy: { id: string; name: string; email?: string | null };
+  resolvedBy?: { id: string; name: string; email?: string | null } | null;
+  summary: ConflictSummaryCounts;
+  createdAt: string;
+  resolvedAt?: string | null;
+}
+
+export interface ConflictCheckDetail extends ConflictCheckRecord {
+  conflicts: ConflictMatchRecord[];
+  waivers: ConflictWaiverRecord[];
+  auditTrail: ConflictAuditEntry[];
+}
+
+export interface ConflictWaiverRecord {
+  id: string;
+  conflictCheckId: string;
+  caseId?: string | null;
+  waiverText: string;
+  signedDocumentId?: string | null;
+  signedBy?: string | null;
+  signedAt?: string | null;
+  expiresAt?: string | null;
+  createdAt: string;
+}
+
+export interface ConflictAuditEntry {
+  id: string;
+  action: string;
+  actor?: { id: string; name: string; email?: string | null } | null;
+  notes?: string | null;
+  timestamp: string;
+}
+
+export interface WatchListEntry {
+  id: string;
+  partyName: string;
+  reason?: string | null;
+  addedBy?: { id: string; name: string; email?: string | null } | null;
+  createdAt: string;
 }

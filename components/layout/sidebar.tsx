@@ -12,14 +12,18 @@ import {
   LayoutGrid,
   Clock3,
   ReceiptText,
+  Scale,
+  Mail,
 } from "lucide-react";
 
 const routes = [
   { name: "Overview", href: "/dashboard", icon: LayoutGrid },
   { name: "Cases", href: "/cases", icon: Briefcase },
+  { name: "Emails", href: "/emails", icon: Mail },
   { name: "Document Vault", href: "/documents", icon: Files },
   { name: "Time tracking", href: "/time", icon: Clock3 },
   { name: "Billing", href: "/billing", icon: ReceiptText },
+  { name: "Conflicts", href: "/conflicts", icon: Scale },
   { name: "Teams", href: "/teams", icon: Users },
   { name: "Compliance", href: "/compliance", icon: ShieldCheck },
   { name: "Messaging", href: "/messaging", icon: MessageSquare },

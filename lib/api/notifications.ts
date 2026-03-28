@@ -8,8 +8,14 @@ const NOTIFICATION_TYPES: NotificationType[] = [
   "CASE_UPDATE",
   "DOCUMENT_UPLOADED",
   "INVOICE_SENT",
+  "INVOICE_PAID",
   "NEW_CASE_ASSIGNMENT",
+  "CASE_ASSIGNMENT",
   "CLIENT_PORTAL_MESSAGE",
+  "COMMENT_MENTION",
+  "DOCUMENT_TO_CASE",
+  "DEADLINE_ALERT",
+  "USER_INVITED",
 ];
 
 const buildDefaultToggles = () => {
@@ -104,6 +110,7 @@ export const listNotifications = async (
       n.related_document_id as "relatedDocumentId",
       n.deadline_id as "deadlineId",
       n.priority,
+      n.comment_id as "commentId",
       n.read_at as "readAt",
       n.created_at as "createdAt"
     FROM notifications n
@@ -117,20 +124,7 @@ export const listNotifications = async (
     [userId]
   );
   return {
-    notifications: result.rows.map((row) => ({
-      id: row.id,
-      type: row.type,
-      title: row.title,
-      message: row.message,
-      url: row.url,
-      metadata: row.metadata,
-      relatedCaseId: row.relatedCaseId,
-      relatedDocumentId: row.relatedDocumentId,
-      deadlineId: row.deadlineId,
-      priority: row.priority,
-      readAt: row.readAt,
-      createdAt: row.createdAt,
-    })),
+    notifications: result.rows.map(mapNotificationRow),
     unreadCount: Number(unreadCountResult.rows[0]?.count ?? "0"),
   };
 };
@@ -157,13 +151,44 @@ interface CreateNotificationPayload {
   relatedDocumentId?: string | null;
   deadlineId?: string | null;
   priority?: DeadlinePriority | null;
+  commentId?: string | null;
 }
 
-export const createNotification = async (payload: CreateNotificationPayload) => {
-  await query(
+const mapNotificationRow = (row: any): UserNotification => ({
+  id: row.id,
+  type: row.type,
+  title: row.title,
+  message: row.message,
+  url: row.url,
+  metadata: row.metadata,
+  relatedCaseId: row.relatedCaseId,
+  relatedDocumentId: row.relatedDocumentId,
+  deadlineId: row.deadlineId,
+  priority: row.priority,
+  commentId: row.commentId,
+  readAt: row.readAt,
+  createdAt: row.createdAt,
+});
+
+export const createNotification = async (payload: CreateNotificationPayload): Promise<UserNotification> => {
+  const result = await query(
     `INSERT INTO notifications (
-      user_id, type, title, message, url, metadata, related_case_id, related_document_id, deadline_id, priority
-    ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
+      user_id, type, title, message, url, metadata, related_case_id, related_document_id, deadline_id, priority, comment_id
+    ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+    RETURNING
+      id,
+      type,
+      title,
+      message,
+      url,
+      metadata,
+      related_case_id as "relatedCaseId",
+      related_document_id as "relatedDocumentId",
+      deadline_id as "deadlineId",
+      priority,
+      comment_id as "commentId",
+      read_at as "readAt",
+      created_at as "createdAt"`,
     [
       payload.userId,
       payload.type,
@@ -175,6 +200,8 @@ export const createNotification = async (payload: CreateNotificationPayload) => 
       payload.relatedDocumentId ?? null,
       payload.deadlineId ?? null,
       payload.priority ?? null,
+      payload.commentId ?? null,
     ]
   );
+  return mapNotificationRow(result.rows[0]);
 };

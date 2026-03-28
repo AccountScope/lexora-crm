@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { NotificationPreferences, UserNotification } from "@/types";
 
@@ -57,4 +58,20 @@ export const useMarkNotification = () => {
       client.invalidateQueries({ queryKey: ["notifications"] });
     },
   });
+};
+
+export const useNotificationStream = () => {
+  const client = useQueryClient();
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    const source = new EventSource("/api/notifications/stream");
+    const handler = () => {
+      client.invalidateQueries({ queryKey: ["notifications"], exact: false });
+    };
+    source.addEventListener("notification", handler);
+    return () => {
+      source.removeEventListener("notification", handler);
+      source.close();
+    };
+  }, [client]);
 };
