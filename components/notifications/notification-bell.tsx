@@ -1,98 +1,129 @@
 "use client";
 
-import Link from "next/link";
-import { Bell, CheckCheck, Loader2, Mail, Undo2 } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { useNotifications, useMarkNotification } from "@/lib/hooks/use-notifications";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Bell, Check } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { useRouter } from "next/navigation";
 
-export const NotificationBell = () => {
-  const { data, isLoading } = useNotifications({ limit: 15 });
-  const markMutation = useMarkNotification();
-  const unreadCount = data?.meta.unreadCount ?? 0;
-  const notifications = data?.data ?? [];
+interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  url?: string | null;
+  readAt?: string | null;
+  createdAt: string;
+}
+
+export function NotificationBell() {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const [open, setOpen] = useState(false);
+
+  const { data: notifications } = useQuery<Notification[]>({
+    queryKey: ["notifications"],
+    queryFn: async () => {
+      const res = await fetch("/api/notifications");
+      if (!res.ok) throw new Error("Failed to fetch notifications");
+      return res.json();
+    },
+    refetchInterval: 30000, // Refetch every 30 seconds
+  });
+
+  const markReadMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/notifications/${id}/read`, { method: "POST" });
+      if (!res.ok) throw new Error("Failed to mark as read");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    },
+  });
+
+  const markAllReadMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch("/api/notifications/read-all", { method: "POST" });
+      if (!res.ok) throw new Error("Failed to mark all as read");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    },
+  });
+
+  const unreadCount = notifications?.filter((n) => !n.readAt).length || 0;
+
+  const handleNotificationClick = (notification: Notification) => {
+    if (!notification.readAt) {
+      markReadMutation.mutate(notification.id);
+    }
+    if (notification.url) {
+      router.push(notification.url);
+    }
+    setOpen(false);
+  };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
-        <Button className="relative" size="icon" variant="ghost">
+        <Button variant="ghost" size="icon" className="relative">
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
-            <span className="absolute -right-1 -top-1 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold text-white">
+            <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-destructive text-xs text-destructive-foreground flex items-center justify-center">
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-80 p-0">
-        <div className="flex items-center justify-between border-b px-4 py-2">
-          <div>
-            <p className="text-sm font-medium">Notifications</p>
-            <p className="text-xs text-muted-foreground">Stay ahead of every deadline</p>
-          </div>
-          {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+      <DropdownMenuContent align="end" className="w-80">
+        <div className="flex items-center justify-between px-2 py-2">
+          <span className="font-semibold">Notifications</span>
+          {unreadCount > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => markAllReadMutation.mutate()}
+              disabled={markAllReadMutation.isPending}
+            >
+              <Check className="h-4 w-4 mr-1" />
+              Mark all read
+            </Button>
+          )}
         </div>
-        <ScrollArea className="h-80">
-          <div className="divide-y">
-            {notifications.length === 0 && (
-              <div className="p-4 text-sm text-muted-foreground">Nothing new right now.</div>
-            )}
-            {notifications.map((notification) => {
-              const isUnread = !notification.readAt;
-              const href = notification.url ?? (notification.relatedCaseId ? `/cases/${notification.relatedCaseId}` : undefined);
-              return (
-                <div key={notification.id} className="flex gap-3 p-4">
-                  <div className="mt-1">
-                    {notification.type === "DEADLINE_REMINDER" ? (
-                      <Mail className="h-4 w-4 text-primary" />
-                    ) : (
-                      <Bell className="h-4 w-4 text-muted-foreground" />
-                    )}
-                  </div>
-                  <div className="flex-1 space-y-1">
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-medium leading-tight">{notification.title}</p>
-                      {notification.priority && (
-                        <Badge variant={notification.priority === "HIGH" ? "warning" : "secondary"}>{notification.priority}</Badge>
-                      )}
-                    </div>
-                    <p className="text-xs text-muted-foreground">{notification.message}</p>
-                    <p className="text-[11px] text-muted-foreground">
-                      {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
-                    </p>
-                    <div className="flex gap-2 text-xs">
-                      {href && (
-                        <Link className="text-primary hover:underline" href={href}>
-                          Open
-                        </Link>
-                      )}
-                      <button
-                        className="inline-flex items-center gap-1 text-muted-foreground hover:text-primary"
-                        disabled={markMutation.isPending}
-                        onClick={() => markMutation.mutate({ notificationId: notification.id, read: isUnread })}
-                        type="button"
-                      >
-                        {isUnread ? (
-                          <>
-                            <CheckCheck className="h-3 w-3" /> Mark read
-                          </>
-                        ) : (
-                          <>
-                            <Undo2 className="h-3 w-3" /> Mark unread
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </div>
+        <DropdownMenuSeparator />
+        {notifications && notifications.length > 0 ? (
+          <div className="max-h-96 overflow-y-auto">
+            {notifications.slice(0, 10).map((notification) => (
+              <DropdownMenuItem
+                key={notification.id}
+                className={`cursor-pointer ${!notification.readAt ? "bg-accent/50" : ""}`}
+                onClick={() => handleNotificationClick(notification)}
+              >
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm truncate">{notification.title}</p>
+                  <p className="text-xs text-muted-foreground line-clamp-2">
+                    {notification.message}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+                  </p>
                 </div>
-              );
-            })}
+              </DropdownMenuItem>
+            ))}
           </div>
-        </ScrollArea>
+        ) : (
+          <div className="py-8 text-center text-sm text-muted-foreground">
+            No notifications
+          </div>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
-};
+}

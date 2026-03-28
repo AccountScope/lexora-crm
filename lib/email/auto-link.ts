@@ -1,4 +1,4 @@
-import { db } from '@/lib/http/db';
+import { db } from '@/lib/api/db';
 
 type EmailForLinking = {
   id: string;

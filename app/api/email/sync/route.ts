@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 import { requireUser } from '@/lib/auth';
 import { handleApiError, success } from '@/lib/api/response';
 import { syncEmailAccount, syncAllUserAccounts } from '@/lib/email/sync';
-import { db } from '@/lib/http/db';
+import { db } from '@/lib/api/db';
 
 export async function POST(request: NextRequest) {
   try {

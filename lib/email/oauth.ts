@@ -1,7 +1,7 @@
 import { google } from 'googleapis';
 import { Client } from '@microsoft/microsoft-graph-client';
 import { encrypt, decrypt } from './encryption';
-import { db } from '@/lib/http/db';
+import { db } from '@/lib/api/db';
 
 // Gmail OAuth2 configuration
 const GMAIL_CLIENT_ID = process.env.GMAIL_CLIENT_ID;

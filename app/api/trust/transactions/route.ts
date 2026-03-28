@@ -5,8 +5,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/api/supabase-server';
-import { getCurrentUser } from '@/lib/auth/session';
+import { createClient } from '@/lib/api/db';
+import { getCurrentUser } from '@/lib/auth';
 import { validateTransaction } from '@/lib/trust/validation';
 import Decimal from 'decimal.js';
 

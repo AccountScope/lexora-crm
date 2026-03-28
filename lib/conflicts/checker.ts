@@ -38,6 +38,7 @@ interface WatchListRow {
 
 interface ConflictDraft {
   caseId?: string | null;
+}
 interface ConflictInsertRow {
   id: string;
   conflictCheckId: string;

@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { requireUser } from '@/lib/auth';
 import { handleApiError, success } from '@/lib/api/response';
-import { db } from '@/lib/http/db';
+import { db } from '@/lib/api/db';
 
 export async function GET(
   request: NextRequest,

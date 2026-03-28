@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getCurrentUser } from '@/lib/auth/session';
+import { getCurrentUser } from '@/lib/auth';
 import { generateThreeWayReport } from '@/lib/trust/reports';
 
 export async function GET(request: NextRequest) {

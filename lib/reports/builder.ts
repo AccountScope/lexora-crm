@@ -160,7 +160,6 @@ const buildFilters = (
   }
 };
 
-};
 
 const buildBaseQuery = (definition: ReturnType<typeof getReportDefinition>, config: ReportConfig) => {
   const builder = createWhereBuilder();

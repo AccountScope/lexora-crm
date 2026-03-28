@@ -2,7 +2,7 @@ import { google } from 'googleapis';
 import { Client } from '@microsoft/microsoft-graph-client';
 import { simpleParser, ParsedMail } from 'mailparser';
 import { getValidAccessToken } from './oauth';
-import { db } from '@/lib/http/db';
+import { db } from '@/lib/api/db';
 
 export type SyncSettings = {
   frequency: number; // minutes

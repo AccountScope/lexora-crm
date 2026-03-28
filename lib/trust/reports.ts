@@ -4,7 +4,7 @@
  */
 
 import Decimal from 'decimal.js';
-import { createClient } from '@/lib/api/supabase-server';
+import { createClient } from '@/lib/api/db';
 
 export interface ThreeWayReport {
   trust_account_id: string;
