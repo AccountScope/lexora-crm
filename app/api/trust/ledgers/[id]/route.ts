@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/api/db';
+import { query } from '@/lib/api/db';
 import { getCurrentUser } from '@/lib/auth';
 
 export async function GET(
@@ -18,83 +18,78 @@ export async function GET(
     }
 
     const { id } = params;
-    const supabase = createClient();
 
     // Get ledger details
-    const { data: ledger, error: ledgerError } = await supabase
-      .from('client_ledgers')
-      .select(`
-        *,
-        clients!client_id (
-          id,
-          name,
-          email
-        ),
-        trust_accounts!trust_account_id (
-          id,
-          name
-        )
-      `)
-      .eq('id', id)
-      .single();
+    const ledgerResult = await query(
+      `SELECT 
+        cl.*,
+        c.id as client_id,
+        c.name as client_name,
+        c.email as client_email,
+        ta.id as trust_account_id,
+        ta.name as trust_account_name
+       FROM client_ledgers cl
+       LEFT JOIN clients c ON cl.client_id = c.id
+       LEFT JOIN trust_accounts ta ON cl.trust_account_id = ta.id
+       WHERE cl.id = $1 AND cl.user_id = $2`,
+      [id, user.id]
+    );
 
-    if (ledgerError) throw ledgerError;
-    if (!ledger) {
+    if (ledgerResult.rows.length === 0) {
       return NextResponse.json({ error: 'Ledger not found' }, { status: 404 });
     }
 
-    // Get transaction history
-    const { data: transactions, error: txnError } = await supabase
-      .from('trust_transactions')
-      .select(`
-        *,
-        users!created_by (
-          id,
-          first_name,
-          last_name
-        )
-      `)
-      .eq('client_ledger_id', id)
-      .order('date', { ascending: false });
+    const ledger = ledgerResult.rows[0];
 
-    if (txnError) throw txnError;
+    // Get transaction history
+    const txnResult = await query(
+      `SELECT 
+        tt.*,
+        u.first_name,
+        u.last_name
+       FROM trust_transactions tt
+       LEFT JOIN users u ON tt.created_by = u.id
+       WHERE tt.client_ledger_id = $1
+       ORDER BY tt.date DESC`,
+      [id]
+    );
 
     // Format response
     const formattedLedger = {
       id: ledger.id,
       client_id: ledger.client_id,
-      client_name: ledger.clients?.name || 'Unknown Client',
+      client_name: ledger.client_name || 'Unknown Client',
       current_balance: ledger.current_balance,
       status: ledger.status,
-      trust_account_name: ledger.trust_accounts?.name || 'Unknown Account',
+      trust_account_name: ledger.trust_account_name || 'Unknown Account',
       trust_account_id: ledger.trust_account_id,
       created_at: ledger.created_at
     };
 
-    const formattedTransactions = (transactions || []).map((txn: any) => ({
+    const formattedTransactions = txnResult.rows.map((txn: any) => ({
       id: txn.id,
       date: txn.date,
       type: txn.type,
       amount: txn.amount,
       description: txn.description,
       reference_number: txn.reference_number,
-      balance_after: 0, // Will calculate running balance
-      created_by_name: txn.users
-        ? `${txn.users.first_name} ${txn.users.last_name}`
+      balance_after: 0, // Will calculate below
+      created_by_name: txn.first_name && txn.last_name
+        ? `${txn.first_name} ${txn.last_name}`
         : 'System'
     }));
 
-    // Calculate running balances
-    let runningBalance = ledger.current_balance;
+    // Calculate running balances (backwards from current)
+    let runningBalance = parseFloat(ledger.current_balance);
     for (let i = 0; i < formattedTransactions.length; i++) {
       formattedTransactions[i].balance_after = runningBalance;
       const txn = formattedTransactions[i];
       
       // Work backwards through transactions
       if (txn.type === 'deposit') {
-        runningBalance -= txn.amount;
+        runningBalance -= parseFloat(txn.amount);
       } else if (txn.type === 'withdrawal' || txn.type === 'fee') {
-        runningBalance += txn.amount;
+        runningBalance += parseFloat(txn.amount);
       }
     }
 
