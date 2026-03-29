@@ -37,6 +37,7 @@ const PUBLIC_ROUTES = new Set([
   "/api/health",
   "/api/debug/db-test",
   "/api/debug/login-test",
+  "/api/debug/full-diagnostic",
 ]);
 
 // Static file prefixes
