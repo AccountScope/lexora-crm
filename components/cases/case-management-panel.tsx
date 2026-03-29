@@ -115,6 +115,11 @@ export const CaseManagementPanel = () => {
               label: "Create your first case",
               onClick: () => setDialogOpen(true),
             }}
+            tips={[
+              "Assign unique matter numbers for easy tracking",
+              "Add practice area for better organization",
+              "Include detailed descriptions for clarity"
+            ]}
           />
         ) : (
           <>

@@ -7,6 +7,12 @@ import { PageHeader } from "@/components/ui/page-header";
 import { WelcomeCard } from "@/components/dashboard/welcome-card";
 import { OnboardingModal } from "@/components/onboarding/onboarding-modal";
 import { 
+  Tooltip, 
+  TooltipContent, 
+  TooltipProvider, 
+  TooltipTrigger 
+} from "@/components/ui/tooltip";
+import { 
   DollarSign, 
   FileText, 
   Clock, 
@@ -29,7 +35,7 @@ import {
   XAxis, 
   YAxis, 
   CartesianGrid, 
-  Tooltip, 
+  Tooltip as RechartsTooltip, 
   Legend, 
   ResponsiveContainer 
 } from "recharts";
@@ -200,7 +206,8 @@ export default function ExecutiveDashboard() {
     return new Intl.NumberFormat('en-GB', {
       style: 'currency',
       currency: 'GBP',
-      minimumFractionDigits: 0
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
     }).format(amount);
   };
 
@@ -216,6 +223,7 @@ export default function ExecutiveDashboard() {
     <>
       <OnboardingModal />
       
+      <TooltipProvider>
       <div className="space-y-6">
         <PageHeader
           title="Executive Dashboard"
@@ -237,9 +245,16 @@ export default function ExecutiveDashboard() {
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Revenue Card */}
-        <Card>
+        <Card className="hover-lift">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Revenue (This Month)</CardTitle>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <CardTitle className="text-sm font-medium cursor-help">Revenue (This Month)</CardTitle>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Total revenue generated this month from all matters</p>
+              </TooltipContent>
+            </Tooltip>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -264,9 +279,16 @@ export default function ExecutiveDashboard() {
         </Card>
 
         {/* Active Matters Card */}
-        <Card>
+        <Card className="hover-lift">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Matters</CardTitle>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <CardTitle className="text-sm font-medium cursor-help">Active Matters</CardTitle>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Current matters being actively worked on</p>
+              </TooltipContent>
+            </Tooltip>
             <Briefcase className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -278,9 +300,16 @@ export default function ExecutiveDashboard() {
         </Card>
 
         {/* Utilization Rate Card */}
-        <Card>
+        <Card className="hover-lift">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Utilization Rate</CardTitle>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <CardTitle className="text-sm font-medium cursor-help">Utilization Rate</CardTitle>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Percentage of billable hours vs total working hours</p>
+              </TooltipContent>
+            </Tooltip>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -292,9 +321,16 @@ export default function ExecutiveDashboard() {
         </Card>
 
         {/* Outstanding Invoices Card */}
-        <Card>
+        <Card className="hover-lift">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Outstanding Invoices</CardTitle>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <CardTitle className="text-sm font-medium cursor-help">Outstanding Invoices</CardTitle>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Total value of invoices awaiting payment from clients</p>
+              </TooltipContent>
+            </Tooltip>
             <AlertCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -322,7 +358,7 @@ export default function ExecutiveDashboard() {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" />
                 <YAxis />
-                <Tooltip 
+                <RechartsTooltip 
                   formatter={(value) => formatCurrency(value as number)}
                 />
                 <Legend />
@@ -361,7 +397,7 @@ export default function ExecutiveDashboard() {
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <RechartsTooltip />
               </PieChart>
             </ResponsiveContainer>
           </CardContent>
@@ -407,7 +443,7 @@ export default function ExecutiveDashboard() {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="area" />
                 <YAxis />
-                <Tooltip />
+                <RechartsTooltip />
                 <Bar dataKey="count" fill="#3b82f6" />
               </BarChart>
             </ResponsiveContainer>
@@ -478,6 +514,7 @@ export default function ExecutiveDashboard() {
         </CardContent>
       </Card>
     </div>
+    </TooltipProvider>
     </>
   );
 }

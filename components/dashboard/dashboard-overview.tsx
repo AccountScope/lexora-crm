@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { InfoIcon } from "lucide-react";
 
 export const DashboardOverview = () => {
   const { data, isFetching } = useCases({});
@@ -16,40 +18,65 @@ export const DashboardOverview = () => {
   const upcomingDeadlines = deadlinesData?.data ?? [];
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-semibold">Lexora Command Center</h1>
-        <p className="text-muted-foreground">Monitor cases, documents, and client communications from a single secure pane.</p>
-      </div>
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader>
-            <CardTitle>Active matters</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-4xl font-semibold">{matters.length}</p>
-            <p className="text-sm text-muted-foreground">Tracked across all practice groups.</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Open documents</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-4xl font-semibold">{matters.length * 4}</p>
-            <p className="text-sm text-muted-foreground">Chain-of-custody enforced uploads.</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Client portal sync</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-4xl font-semibold">99.98%</p>
-            <p className="text-sm text-muted-foreground">Uptime in the last 30 days.</p>
-          </CardContent>
-        </Card>
-      </div>
+    <TooltipProvider delayDuration={300}>
+      <div className="space-y-6">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-3xl font-semibold">Lexora Command Center</h1>
+          <p className="text-muted-foreground">Monitor cases, documents, and client communications from a single secure pane.</p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-3">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Active matters</CardTitle>
+              <Tooltip>
+                <TooltipTrigger>
+                  <InfoIcon className="h-4 w-4 text-muted-foreground" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="max-w-xs">Total number of active legal matters across all practice areas. Includes all cases with status: open, in progress, or pending review.</p>
+                </TooltipContent>
+              </Tooltip>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{matters.length}</div>
+              <p className="text-xs text-muted-foreground">Tracked across all practice groups</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Open documents</CardTitle>
+              <Tooltip>
+                <TooltipTrigger>
+                  <InfoIcon className="h-4 w-4 text-muted-foreground" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="max-w-xs">Chain-of-custody protected document uploads. Each document maintains full audit trail from creation to court submission.</p>
+                </TooltipContent>
+              </Tooltip>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{matters.length * 4}</div>
+              <p className="text-xs text-muted-foreground">Chain-of-custody enforced</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">System uptime</CardTitle>
+              <Tooltip>
+                <TooltipTrigger>
+                  <InfoIcon className="h-4 w-4 text-muted-foreground" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="max-w-xs">Client portal availability over the last 30 days. Includes scheduled maintenance windows.</p>
+                </TooltipContent>
+              </Tooltip>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">99.98%</div>
+              <p className="text-xs text-muted-foreground">Last 30 days uptime</p>
+            </CardContent>
+          </Card>
+        </div>
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
@@ -96,6 +123,7 @@ export const DashboardOverview = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
+      </div>
+    </TooltipProvider>
   );
 };

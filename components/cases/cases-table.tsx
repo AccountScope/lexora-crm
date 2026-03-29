@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/ui/empty-state";
+import { FolderOpen, Plus } from "lucide-react";
 
 type Props = {
   data?: CaseSummary[];
@@ -33,7 +35,7 @@ export const CasesTable = ({ data, loading }: Props) => {
             <Skeleton className="h-10 w-full" />
             <Skeleton className="h-10 w-full" />
           </div>
-        ) : (
+        ) : data && data.length > 0 ? (
           <Table>
             <TableHeader>
               <TableRow>
@@ -46,7 +48,7 @@ export const CasesTable = ({ data, loading }: Props) => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {(data ?? []).map((matter) => (
+              {data.map((matter) => (
                 <TableRow key={matter.id} className="text-sm">
                   <TableCell>
                     <Link href={`/cases/${matter.id}`} className="font-semibold hover:underline">
@@ -67,6 +69,21 @@ export const CasesTable = ({ data, loading }: Props) => {
               ))}
             </TableBody>
           </Table>
+        ) : (
+          <EmptyState
+            icon={FolderOpen}
+            title="No matters yet"
+            description="Start your first legal matter to begin tracking cases, documents, and deadlines in Lexora."
+            actionLabel="Create matter"
+            actionHref="/cases/new"
+            secondaryActionLabel="Learn more"
+            secondaryActionHref="/docs/cases"
+            tips={[
+              "Each matter automatically tracks time, documents, and deadlines",
+              "Link matters to trust accounts for seamless financial tracking",
+              "Assign team members and manage permissions per matter"
+            ]}
+          />
         )}
       </CardContent>
     </Card>

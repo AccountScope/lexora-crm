@@ -58,3 +58,63 @@
 body {
   @apply bg-background text-foreground antialiased;
 }
+
+/* Professional Legal CRM Animations */
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.2s ease-out;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.15s ease-in;
+}
+
+/* Smooth hover transitions */
+.hover-lift {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Professional tooltip styling */
+[data-radix-tooltip-content] {
+  animation: fade-in 0.12s ease-in;
+}
+
+/* Legal badge transitions */
+.legal-badge {
+  transition: all 0.15s ease;
+}
+
+.legal-badge:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+/* Card hover effect */
+.card-interactive {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card-interactive:hover {
+  border-color: hsl(var(--primary) / 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
