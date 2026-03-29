@@ -478,5 +478,6 @@ export default function ExecutiveDashboard() {
         </CardContent>
       </Card>
     </div>
+    </>
   );
 }

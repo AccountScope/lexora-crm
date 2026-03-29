@@ -8,7 +8,7 @@ export const runtime = 'nodejs';
 export default function AuthenticatedLayout({
   children,
 }: {
-  children: React.NodeType;
+  children: React.ReactNode;
 }) {
   return (
     <ErrorBoundary>
