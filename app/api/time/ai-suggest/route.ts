@@ -196,12 +196,114 @@ async function generateEmailSuggestions(
   matters: any[],
   limit: number
 ): Promise<TimeSuggestion[]> {
-  // In production: Fetch emails from Gmail/Outlook API
-  // For now: Return demo suggestions
-
+  const supabase = await createClient();
   const suggestions: TimeSuggestion[] = [];
 
-  // Demo data (replace with real API calls)
+  // Get user's email integration
+  const { data: integration } = await supabase
+    .from("email_integrations")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("provider", "gmail")
+    .eq("enabled", true)
+    .single();
+
+  if (!integration) {
+    // Return demo data if no integration
+    return generateDemoEmailSuggestions(matters, limit);
+  }
+
+  try {
+    // Import Gmail functions dynamically
+    const { listGmailMessages, getGmailThreadLength } = await import(
+      "@/lib/integrations/gmail"
+    );
+    const { matchEmailToMatter, estimateEmailTime } = await import(
+      "@/lib/integrations/openai-time-analysis"
+    );
+
+    // Fetch emails from Gmail
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const emails = await listGmailMessages(
+      integration.access_token,
+      integration.refresh_token,
+      start,
+      end,
+      limit
+    );
+
+    // Analyze each email
+    for (const email of emails) {
+      // Get thread length for time estimation
+      const threadLength = await getGmailThreadLength(
+        integration.access_token,
+        integration.refresh_token,
+        email.threadId
+      );
+
+      // Match to matter using AI
+      const match = await matchEmailToMatter(
+        {
+          subject: email.subject,
+          from: email.from,
+          to: email.to,
+          body: email.body || email.snippet,
+          date: email.date,
+        },
+        matters.map((m) => ({
+          id: m.id,
+          title: m.title,
+          matterNumber: m.matter_number,
+          clientName: m.client.display_name || m.client.legal_name,
+        }))
+      );
+
+      // Estimate time
+      const hours = await estimateEmailTime({
+        subject: email.subject,
+        body: email.body || email.snippet,
+        threadLength,
+      });
+
+      const matchedMatter = match.matterId
+        ? matters.find((m) => m.id === match.matterId)
+        : null;
+
+      suggestions.push({
+        id: `email-${email.id}`,
+        source: "email",
+        sourceId: email.id,
+        date: new Date(email.date).toISOString().slice(0, 10),
+        suggestedHours: hours,
+        description: match.suggestedDescription || email.subject,
+        matterId: match.matterId,
+        matterTitle: matchedMatter?.title || null,
+        clientName:
+          matchedMatter?.client?.display_name ||
+          matchedMatter?.client?.legal_name ||
+          null,
+        confidence: match.confidence,
+        rawData: email,
+        activityCode: match.activityCode || "L110",
+      });
+    }
+
+    return suggestions;
+  } catch (error) {
+    console.error("Gmail integration error:", error);
+    // Fallback to demo data on error
+    return generateDemoEmailSuggestions(matters, limit);
+  }
+}
+
+/**
+ * Generate demo email suggestions (fallback)
+ */
+function generateDemoEmailSuggestions(
+  matters: any[],
+  limit: number
+): TimeSuggestion[] {
   const demoEmails = [
     {
       id: "email-1",
@@ -221,29 +323,37 @@ async function generateEmailSuggestions(
     },
   ];
 
-  for (const email of demoEmails.slice(0, limit)) {
-    // Match email to matter (using AI or rules)
+  return demoEmails.slice(0, limit).map((email) => {
     const matchedMatter = matters.find((m) =>
       email.subject.toLowerCase().includes(m.title.toLowerCase())
     );
 
-    suggestions.push({
+    return {
       id: `suggestion-${email.id}`,
       source: "email",
       sourceId: email.id,
       date: email.date.slice(0, 10),
-      suggestedHours: estimateEmailTime(email.threadLength),
+      suggestedHours: estimateEmailTimeBasic(email.threadLength),
       description: `Client correspondence: ${email.subject}`,
       matterId: matchedMatter?.id || null,
       matterTitle: matchedMatter?.title || null,
-      clientName: matchedMatter?.client?.display_name || matchedMatter?.client?.legal_name || null,
+      clientName:
+        matchedMatter?.client?.display_name ||
+        matchedMatter?.client?.legal_name ||
+        null,
       confidence: matchedMatter ? 0.9 : 0.5,
       rawData: email,
-      activityCode: "L110", // Client correspondence
-    });
-  }
+      activityCode: "L110",
+    };
+  });
+}
 
-  return suggestions;
+/**
+ * Basic time estimation (fallback)
+ */
+function estimateEmailTimeBasic(threadLength: number): number {
+  const minutes = threadLength * 10;
+  return Math.round((minutes / 60) * 10) / 10;
 }
 
 /**
