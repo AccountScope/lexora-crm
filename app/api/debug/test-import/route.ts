@@ -27,10 +27,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(results, { status: 500 });
   }
 
-  // Test 2: Import bcrypt directly
+  // Test 2: Import bcryptjs
   try {
     results.step = 2;
-    const bcrypt = await import("bcrypt");
+    const bcrypt = await import("bcryptjs");
     results.bcrypt = "ok";
   } catch (e: any) {
     results.bcrypt = { error: e.message, stack: e.stack?.split("\n").slice(0, 5) };
