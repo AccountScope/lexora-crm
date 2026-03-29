@@ -3,11 +3,12 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Shield, Lock, CheckCircle } from "lucide-react";
+import { Loader2, Shield, Lock, CheckCircle, Award, Users } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -39,19 +40,16 @@ export default function LoginPage() {
         return;
       }
 
-      // Check if 2FA is required
       if (data.requiresTwoFactor) {
         router.push(`/login/two-factor?next=${encodeURIComponent(nextUrl)}`);
         return;
       }
 
-      // Check if email verification is required
       if (data.requiresEmailVerification) {
         router.push(`/verify-email?next=${encodeURIComponent(nextUrl)}`);
         return;
       }
 
-      // Successful login
       router.push(nextUrl);
     } catch (err) {
       setError("An error occurred. Please try again.");
@@ -60,26 +58,43 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-white">
+    <div className="min-h-screen flex bg-gradient-to-br from-slate-50 via-white to-blue-50">
       {/* Left side - Login form */}
       <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-md">
-          {/* Logo and title */}
+          {/* Logo */}
           <div className="mb-10">
-            <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
-              LEXORA
-            </h1>
-            <p className="mt-2 text-lg text-gray-600">
-              Legal Practice Management System
+            <img 
+              src="/logo.svg" 
+              alt="Lexora" 
+              className="h-12 mb-6"
+            />
+            <h2 className="text-3xl font-bold text-gray-900 tracking-tight">
+              Welcome back
+            </h2>
+            <p className="mt-2 text-base text-gray-600">
+              Sign in to your Lexora account
             </p>
           </div>
 
-          {/* Login form */}
-          <div className="bg-white">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-6">
-              Sign in to your account
-            </h2>
+          {/* Trust badges */}
+          <div className="mb-8 flex items-center gap-6 pb-6 border-b border-gray-200">
+            <div className="flex items-center gap-2 text-sm">
+              <Shield className="w-4 h-4 text-blue-900" />
+              <span className="font-medium text-gray-700">SRA Compliant</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <Lock className="w-4 h-4 text-blue-900" />
+              <span className="font-medium text-gray-700">ISO 27001</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <Award className="w-4 h-4 text-blue-900" />
+              <span className="font-medium text-gray-700">GDPR</span>
+            </div>
+          </div>
 
+          {/* Login form */}
+          <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-8">
             <form onSubmit={handleSubmit} className="space-y-5">
               {error && (
                 <Alert variant="destructive" className="border-red-200 bg-red-50">
@@ -88,7 +103,7 @@ export default function LoginPage() {
               )}
 
               <div>
-                <Label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                <Label htmlFor="email" className="block text-sm font-semibold text-gray-900 mb-2">
                   Email address
                 </Label>
                 <Input
@@ -101,18 +116,18 @@ export default function LoginPage() {
                   disabled={loading}
                   autoComplete="email"
                   autoFocus
-                  className="h-11 border-gray-300 focus:border-blue-900 focus:ring-blue-900"
+                  className="h-12 border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-900/20 text-base"
                 />
               </div>
 
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <Label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                  <Label htmlFor="password" className="block text-sm font-semibold text-gray-900">
                     Password
                   </Label>
                   <Link
                     href="/forgot-password"
-                    className="text-sm font-medium text-blue-900 hover:text-blue-700"
+                    className="text-sm font-semibold text-blue-900 hover:text-blue-700 transition-colors"
                   >
                     Forgot password?
                   </Link>
@@ -126,18 +141,18 @@ export default function LoginPage() {
                   required
                   disabled={loading}
                   autoComplete="current-password"
-                  className="h-11 border-gray-300 focus:border-blue-900 focus:ring-blue-900"
+                  className="h-12 border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-900/20 text-base"
                 />
               </div>
 
               <Button
                 type="submit"
-                className="w-full h-11 bg-blue-900 hover:bg-blue-800 text-white font-medium"
+                className="w-full h-12 bg-blue-900 hover:bg-blue-800 text-white font-semibold text-base shadow-lg shadow-blue-900/20 transition-all hover:shadow-xl hover:shadow-blue-900/30"
                 disabled={loading || !email || !password}
               >
                 {loading ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                     Signing in...
                   </>
                 ) : (
@@ -145,130 +160,153 @@ export default function LoginPage() {
                 )}
               </Button>
 
-              <div className="relative my-4">
+              <div className="relative my-6">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300"></div>
+                  <div className="w-full border-t border-gray-200"></div>
                 </div>
                 <div className="relative flex justify-center text-xs">
-                  <span className="px-2 bg-white text-gray-500">Testing</span>
+                  <span className="px-3 bg-white text-gray-500 font-medium uppercase tracking-wide">
+                    Demo Account
+                  </span>
                 </div>
               </div>
 
               <Button
                 type="button"
                 variant="outline"
-                className="w-full h-11 border-gray-300 text-gray-700 font-medium hover:bg-gray-50"
+                className="w-full h-12 border-2 border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 hover:border-gray-400 transition-all"
                 onClick={() => {
                   setEmail('sabrina@test.com');
                   setPassword('TestPassword123!');
                 }}
                 disabled={loading}
               >
-                Use Demo Account
+                <Users className="mr-2 h-5 w-5" />
+                Use Test Account (Sabrina)
               </Button>
             </form>
 
             <p className="mt-6 text-sm text-gray-600 text-center">
               Need access?{" "}
-              <Link href="/contact" className="font-medium text-blue-900 hover:text-blue-700">
+              <Link href="/contact" className="font-semibold text-blue-900 hover:text-blue-700 transition-colors">
                 Contact your administrator
               </Link>
             </p>
           </div>
 
-          {/* Trust indicators */}
-          <div className="mt-10 pt-8 border-t border-gray-200">
-            <div className="grid grid-cols-2 gap-4 text-center">
-              <div className="flex flex-col items-center">
-                <Shield className="h-5 w-5 text-blue-900 mb-1" />
-                <p className="text-xs font-medium text-gray-900">SRA Compliant</p>
-              </div>
-              <div className="flex flex-col items-center">
-                <Lock className="h-5 w-5 text-blue-900 mb-1" />
-                <p className="text-xs font-medium text-gray-900">Bank-Grade Security</p>
-              </div>
-            </div>
+          {/* Footer */}
+          <div className="mt-8 text-center text-xs text-gray-500">
+            <p>© 2026 Lexora. All rights reserved.</p>
+            <p className="mt-2 space-x-3">
+              <Link href="/privacy" className="hover:text-gray-700 underline transition-colors">Privacy Policy</Link>
+              <span>·</span>
+              <Link href="/terms" className="hover:text-gray-700 underline transition-colors">Terms of Service</Link>
+              <span>·</span>
+              <Link href="/security" className="hover:text-gray-700 underline transition-colors">Security</Link>
+            </p>
           </div>
-        </div>
-
-        {/* Footer */}
-        <div className="mt-8 text-center text-xs text-gray-500">
-          <p>© 2026 Lexora. All rights reserved.</p>
-          <p className="mt-1">
-            <Link href="/privacy" className="hover:text-gray-700 underline">Privacy</Link>
-            {" · "}
-            <Link href="/terms" className="hover:text-gray-700 underline">Terms</Link>
-          </p>
         </div>
       </div>
 
-      {/* Right side - Professional sidebar */}
-      <div className="hidden lg:flex lg:w-2/5 bg-gradient-to-br from-slate-900 to-slate-800 flex-col justify-between p-12 text-white">
-        <div>
-          <h2 className="text-3xl font-bold mb-6 leading-tight">
-            Trusted by leading<br />UK law firms
+      {/* Right side - Professional hero section */}
+      <div className="hidden lg:flex lg:w-2/5 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex-col justify-between p-12 text-white relative overflow-hidden">
+        {/* Subtle pattern overlay */}
+        <div className="absolute inset-0 opacity-10">
+          <svg width="100%" height="100%">
+            <pattern id="dots" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+              <circle cx="20" cy="20" r="1.5" fill="white"/>
+            </pattern>
+            <rect width="100%" height="100%" fill="url(#dots)"/>
+          </svg>
+        </div>
+
+        <div className="relative z-10">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full mb-8">
+            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+            <span className="text-sm font-semibold">Trusted by 150+ UK Law Firms</span>
+          </div>
+
+          <h2 className="text-4xl font-bold mb-6 leading-tight">
+            The complete legal<br />practice platform
           </h2>
           
-          <div className="space-y-8 mt-12">
-            <div className="flex items-start space-x-4">
+          <div className="space-y-6 mt-12">
+            <div className="flex items-start space-x-4 group">
               <div className="flex-shrink-0 mt-1">
-                <CheckCircle className="h-6 w-6 text-green-400" />
+                <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
+                  <CheckCircle className="h-5 w-5 text-blue-300" />
+                </div>
               </div>
               <div>
-                <p className="font-semibold mb-1">SRA-Compliant Trust Accounting</p>
-                <p className="text-sm text-gray-300">
-                  Automated three-way reconciliation and full audit trails
+                <p className="font-semibold text-lg mb-1">SRA-Compliant Trust Accounting</p>
+                <p className="text-sm text-blue-100">
+                  Automated three-way reconciliation with full audit trails
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start space-x-4">
+            <div className="flex items-start space-x-4 group">
               <div className="flex-shrink-0 mt-1">
-                <CheckCircle className="h-6 w-6 text-green-400" />
+                <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
+                  <CheckCircle className="h-5 w-5 text-blue-300" />
+                </div>
               </div>
               <div>
-                <p className="font-semibold mb-1">Secure Document Management</p>
-                <p className="text-sm text-gray-300">
-                  Chain-of-custody tracking for court-ready submissions
+                <p className="font-semibold text-lg mb-1">Intelligent Time Tracking</p>
+                <p className="text-sm text-blue-100">
+                  AI-powered time capture from emails and calendar events
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start space-x-4">
+            <div className="flex items-start space-x-4 group">
               <div className="flex-shrink-0 mt-1">
-                <CheckCircle className="h-6 w-6 text-green-400" />
+                <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
+                  <CheckCircle className="h-5 w-5 text-blue-300" />
+                </div>
               </div>
               <div>
-                <p className="font-semibold mb-1">Comprehensive Case Management</p>
-                <p className="text-sm text-gray-300">
-                  Time tracking, billing, and client portal in one platform
+                <p className="font-semibold text-lg mb-1">Client Portal & Communication</p>
+                <p className="text-sm text-blue-100">
+                  Real-time updates and secure messaging for clients
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="mt-16 pt-8 border-t border-slate-700">
-            <p className="text-sm text-gray-400 italic">
-              "Lexora has transformed how we manage client matters and trust accounts. 
-              The SRA compliance features give us complete peace of mind."
-            </p>
-            <p className="mt-3 text-sm font-medium">
-              — Sarah Williams, Managing Partner
-            </p>
-            <p className="text-xs text-gray-400">
-              Williams & Partners Solicitors, London
-            </p>
+          <div className="mt-16 pt-8 border-t border-white/20">
+            <div className="flex items-start space-x-4">
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-lg font-bold">
+                  SW
+                </div>
+              </div>
+              <div>
+                <p className="text-base italic leading-relaxed mb-3">
+                  "Lexora has transformed how we manage our practice. The SRA compliance features 
+                  and automated workflows have saved us countless hours."
+                </p>
+                <p className="text-sm font-semibold">Sarah Williams</p>
+                <p className="text-xs text-blue-200">Managing Partner, Williams & Partners Solicitors</p>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="flex items-center space-x-8 text-xs text-gray-400">
-          <div className="flex items-center space-x-2">
-            <Shield className="h-4 w-4" />
-            <span>GDPR Compliant</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Lock className="h-4 w-4" />
-            <span>ISO 27001</span>
+        <div className="relative z-10 flex items-center justify-between text-xs text-blue-200">
+          <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-2">
+              <Shield className="h-4 w-4" />
+              <span>GDPR Compliant</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Lock className="h-4 w-4" />
+              <span>ISO 27001 Certified</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Award className="h-4 w-4" />
+              <span>SRA Approved</span>
+            </div>
           </div>
         </div>
       </div>

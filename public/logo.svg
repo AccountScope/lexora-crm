@@ -1,0 +1,21 @@
+<svg width="180" height="48" viewBox="0 0 180 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Icon: Scales of Justice -->
+  <g transform="translate(0, 6)">
+    <!-- Left scale -->
+    <path d="M8 20 L8 16 L2 16 L2 20 L5 23 Z" fill="#1e3a8a" stroke="#1e3a8a" stroke-width="1.5"/>
+    <!-- Right scale -->
+    <path d="M18 20 L18 16 L12 16 L12 20 L15 23 Z" fill="#1e3a8a" stroke="#1e3a8a" stroke-width="1.5"/>
+    <!-- Center beam -->
+    <line x1="2" y1="16" x2="18" y2="16" stroke="#1e3a8a" stroke-width="2"/>
+    <!-- Vertical post -->
+    <line x1="10" y1="6" x2="10" y2="30" stroke="#1e3a8a" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Base -->
+    <rect x="4" y="30" width="12" height="2" fill="#1e3a8a" rx="1"/>
+  </g>
+  
+  <!-- Text: LEXORA -->
+  <text x="52" y="32" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="700" fill="#1e3a8a" letter-spacing="-0.5">LEXORA</text>
+  
+  <!-- Tagline -->
+  <text x="52" y="42" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="500" fill="#64748b" letter-spacing="0.5">LEGAL PRACTICE MANAGEMENT</text>
+</svg>
