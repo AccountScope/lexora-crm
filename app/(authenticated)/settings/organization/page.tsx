@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Building2, Save, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { PageHeader } from "@/components/ui/page-header";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 interface Organization {
   id: string;
@@ -94,11 +96,7 @@ export default function OrganizationSettingsPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (!organization) {
@@ -113,12 +111,10 @@ export default function OrganizationSettingsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Organization Settings</h1>
-        <p className="text-muted-foreground mt-1">
-          Manage your organization profile and preferences
-        </p>
-      </div>
+      <PageHeader
+        title="Organization Settings"
+        description="Manage your organization profile and preferences"
+      />
 
       {/* Basic Information */}
       <Card>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
+import { PageHeader } from '@/components/ui/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
@@ -112,13 +113,11 @@ export default function EmailSettingsPage() {
   };
 
   return (
-    <div className="space-y-6 p-6">
-      <div>
-        <h1 className="text-3xl font-bold">Email Integration</h1>
-        <p className="text-muted-foreground mt-2">
-          Connect your email accounts to sync emails and link them to cases
-        </p>
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        title="Email Integration"
+        description="Connect your email accounts to sync emails and link them to cases"
+      />
 
       {/* Connect Accounts */}
       <Card>
