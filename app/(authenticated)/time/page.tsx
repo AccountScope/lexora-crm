@@ -24,6 +24,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AITimeSuggestions } from "@/components/time/ai-time-suggestions";
 import type { CaseSummary, TimeEntryTemplate } from "@/types/domain";
 import { format } from "date-fns";
 
@@ -287,12 +288,37 @@ const TimeTrackingPage = () => {
         </Card>
       </div>
 
-      <Tabs defaultValue="entries">
+      <Tabs defaultValue="ai">
         <TabsList>
+          <TabsTrigger value="ai">AI Suggestions</TabsTrigger>
           <TabsTrigger value="entries">Entries</TabsTrigger>
           <TabsTrigger value="templates">Templates</TabsTrigger>
           <TabsTrigger value="bulk">Bulk entry</TabsTrigger>
         </TabsList>
+        <TabsContent value="ai" className="space-y-4">
+          <AITimeSuggestions
+            onApprove={async (suggestions) => {
+              // Convert AI suggestions to time entries
+              const entries = suggestions
+                .filter((s) => s.matterId) // Only approve matched matters
+                .map((s) => {
+                  const matter = matters.find((m) => m.id === s.matterId);
+                  return {
+                    matterId: s.matterId!,
+                    clientId: matter?.client.id!,
+                    description: s.description,
+                    hours: s.suggestedHours,
+                    workDate: s.date,
+                    billable: true,
+                    activityCode: s.activityCode,
+                  };
+                });
+              
+              // Bulk create time entries
+              await bulkEntry.mutateAsync({ entries });
+            }}
+          />
+        </TabsContent>
         <TabsContent value="entries" className="space-y-4">
           <Card>
             <CardHeader>
