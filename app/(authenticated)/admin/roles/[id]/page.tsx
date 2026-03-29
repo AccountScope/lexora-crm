@@ -17,6 +17,9 @@ import {
   useUpdateRole,
 } from "@/lib/hooks/use-admin-roles";
 import type { DirectoryUser } from "@/types";
+import { PageHeader } from "@/components/ui/page-header";
+import { ArrowLeft } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function RoleDetailPage() {
   const params = useParams<{ id: string }>();
@@ -69,18 +72,21 @@ export default function RoleDetailPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-semibold">{role.name}</h1>
-          <Badge variant={role.isSystem ? "secondary" : "default"}>{role.isSystem ? "System" : "Custom"}</Badge>
-        </div>
-        <p className="text-sm text-muted-foreground">{role.description || "No description provided."}</p>
-        {role.isSystem ? (
-          <p className="text-sm text-muted-foreground">
-            System roles are managed by Lexora and cannot be edited or deleted.
-          </p>
-        ) : null}
-      </div>
+      <PageHeader
+        title={
+          <div className="flex items-center gap-3">
+            <Link href="/admin/roles">
+              <Button variant="ghost" size="sm">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back
+              </Button>
+            </Link>
+            <span>{role.name}</span>
+            <Badge variant={role.isSystem ? "secondary" : "default"}>{role.isSystem ? "System" : "Custom"}</Badge>
+          </div>
+        }
+        description={role.description || "No description provided"}
+      />
 
       <section className="rounded-lg border p-6">
         <div className="mb-4 flex items-center justify-between">

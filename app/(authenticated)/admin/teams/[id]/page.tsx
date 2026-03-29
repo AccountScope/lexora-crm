@@ -16,6 +16,10 @@ import {
 } from "@/lib/hooks/use-admin-teams";
 import { searchDirectory } from "@/lib/hooks/use-admin-roles";
 import type { DirectoryUser } from "@/types";
+import { PageHeader } from "@/components/ui/page-header";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { useToast } from "@/hooks/use-toast";
 
 export default function TeamDetailPage() {
   const params = useParams<{ id: string }>();
@@ -75,17 +79,25 @@ export default function TeamDetailPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-wrap items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold">{team.name}</h1>
-          <p className="text-sm text-muted-foreground">{team.description || "No description provided."}</p>
-        </div>
-        <div className="ml-auto flex gap-2">
+      <PageHeader
+        title={
+          <div className="flex items-center gap-3">
+            <Link href="/admin/teams">
+              <Button variant="ghost" size="sm">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back
+              </Button>
+            </Link>
+            <span>{team.name}</span>
+          </div>
+        }
+        description={team.description || "No description provided"}
+        action={
           <Button variant="destructive" onClick={handleDelete} disabled={deleter.isPending}>
-            Delete team
+            {deleter.isPending ? "Deleting..." : "Delete Team"}
           </Button>
-        </div>
-      </div>
+        }
+      />
 
       <section className="rounded-lg border p-6">
         <div className="mb-4">
