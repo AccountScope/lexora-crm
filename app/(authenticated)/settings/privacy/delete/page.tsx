@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { AlertTriangle, Trash2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Checkbox } from "@/components/ui/checkbox";
+import { PageHeader } from "@/components/ui/page-header";
 
 export default function AccountDeletionPage() {
   const [confirmed, setConfirmed] = useState(false);
@@ -51,12 +52,10 @@ export default function AccountDeletionPage() {
 
   return (
     <div className="max-w-4xl space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-destructive">Delete Account</h1>
-        <p className="text-muted-foreground mt-2">
-          Permanently delete your account and all associated data.
-        </p>
-      </div>
+      <PageHeader
+        title="Delete Account"
+        description="Permanently delete your account and all associated data"
+      />
 
       <Alert variant="destructive">
         <AlertTriangle className="h-4 w-4" />

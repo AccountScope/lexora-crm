@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Download, FileArchive, Clock, CheckCircle2, AlertCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { PageHeader } from "@/components/ui/page-header";
 
 export default function DataExportPage() {
   const [loading, setLoading] = useState(false);
@@ -50,12 +51,10 @@ export default function DataExportPage() {
 
   return (
     <div className="max-w-4xl space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Export Your Data</h1>
-        <p className="text-muted-foreground mt-2">
-          Download a copy of all your personal data stored in LEXORA.
-        </p>
-      </div>
+      <PageHeader
+        title="Export Your Data"
+        description="Download a copy of all your personal data stored in LEXORA"
+      />
 
       <Card>
         <CardHeader>
