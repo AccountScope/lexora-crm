@@ -8,6 +8,8 @@
 import { useEffect, useState } from 'react';
 import { Loader2, Download, FileText, AlertCircle } from 'lucide-react';
 import { stripe } from '@/lib/stripe/config';
+import { PageHeader } from '@/components/ui/page-header';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 interface Invoice {
   id: string;
@@ -89,14 +91,11 @@ export default function InvoicesPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-8">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold mb-2">Invoices</h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          View and download your billing invoices
-        </p>
-      </div>
+    <div className="max-w-7xl mx-auto space-y-8">
+      <PageHeader
+        title="Invoices"
+        description="View and download your billing invoices"
+      />
 
       {/* Error Alert */}
       {error && (
