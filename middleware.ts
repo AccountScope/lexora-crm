@@ -42,6 +42,8 @@ const PUBLIC_ROUTES = new Set([
   "/api/debug/test-session-insert",
   "/api/debug/traced-login",
   "/api/debug/minimal-login",
+  "/api/debug/test-bcrypt",
+  "/api/debug/test-import",
 ]);
 
 // Static file prefixes
