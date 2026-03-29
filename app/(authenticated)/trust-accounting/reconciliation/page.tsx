@@ -10,6 +10,7 @@ import { AlertTriangle, CheckCircle, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { PageHeader } from '@/components/ui/page-header';
 
 interface TrustAccount {
   id: string;
@@ -148,14 +149,11 @@ export default function ReconciliationPage() {
   const selectedAccountData = accounts.find((a) => a.id === selectedAccount);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Trust Account Reconciliation</h1>
-        <p className="text-gray-600 mt-1">
-          IOLTA Compliance & Three-Way Reconciliation
-        </p>
-      </div>
+    <div className="space-y-8">
+      <PageHeader
+        title="Trust Account Reconciliation"
+        description="IOLTA Compliance & Three-Way Reconciliation"
+      />
 
       {/* Account Selection */}
       <Card className="p-6 mb-8">
