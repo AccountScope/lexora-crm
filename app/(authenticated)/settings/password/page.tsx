@@ -10,6 +10,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { PasswordStrengthMeter } from "@/components/auth/password-strength-meter";
 import type { PasswordHealthMeta } from "@/types";
+import { PageHeader } from "@/components/ui/page-header";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { SuccessMessage } from "@/components/ui/success-message";
+import { FormField } from "@/components/ui/form-field";
+import { useToast } from "@/hooks/use-toast";
 
 const schema = z
   .object({
@@ -40,6 +45,7 @@ const fetcher = async <T,>(url: string, init?: RequestInit): Promise<T> => {
 
 export default function PasswordSettingsPage() {
   const client = useQueryClient();
+  const { toast } = useToast();
   const [message, setMessage] = useState<string | null>(null);
   const { data, isLoading } = useQuery<ApiResponse>({ queryKey: ["password-meta"], queryFn: () => fetcher<ApiResponse>("/api/auth/password") });
   const form = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema), defaultValues: { currentPassword: "", newPassword: "", confirmPassword: "" } });
@@ -54,9 +60,18 @@ export default function PasswordSettingsPage() {
       form.reset({ currentPassword: "", newPassword: "", confirmPassword: "" });
       client.invalidateQueries({ queryKey: ["password-meta"] });
       setMessage("Password updated successfully");
+      toast({
+        title: "Password updated",
+        description: "Your password has been changed successfully. All other sessions have been logged out.",
+      });
     },
     onError: async (error: any) => {
       setMessage(error?.message ?? "Unable to update password");
+      toast({
+        title: "Error",
+        description: error?.message ?? "Unable to update password. Please try again.",
+        variant: "destructive",
+      });
     },
   });
 
@@ -68,10 +83,10 @@ export default function PasswordSettingsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-semibold">Password & security</h1>
-        <p className="text-sm text-muted-foreground">Rotate credentials regularly to stay within Lexora compliance guardrails.</p>
-      </div>
+      <PageHeader
+        title="Password & Security"
+        description="Rotate credentials regularly to stay within Lexora compliance guardrails"
+      />
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
