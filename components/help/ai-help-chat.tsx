@@ -68,16 +68,31 @@ export function AIHelpChat({ open, onClose }: AIHelpChatProps) {
     setIsLoading(true)
 
     try {
-      // TODO: Replace with actual AI API call
-      // For now, simulate with keyword-based responses
-      const response = await simulateAIResponse(messageText)
+      // Call real AI API
+      const response = await fetch('/api/ai/help', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: messageText,
+          conversationHistory: messages.map(m => ({
+            role: m.role,
+            content: m.content
+          }))
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('AI API request failed')
+      }
+
+      const data = await response.json()
       
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: response.content,
+        content: data.content,
         timestamp: new Date(),
-        suggestions: response.suggestions
+        suggestions: data.suggestions
       }
 
       setMessages(prev => [...prev, assistantMessage])
