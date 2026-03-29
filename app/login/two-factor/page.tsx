@@ -1,3 +1,6 @@
+-e export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 "use client";
 
 // Prevent static generation for this dynamic page

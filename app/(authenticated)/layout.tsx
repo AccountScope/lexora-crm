@@ -1,5 +1,11 @@
-import { AppShell } from "@/components/layout/app-shell";
+// Force all authenticated routes to be dynamic
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
-export default function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
-  return <AppShell>{children}</AppShell>;
+export default function AuthenticatedLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return children;
 }
