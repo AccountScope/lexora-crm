@@ -12,6 +12,8 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
+import { PageHeader } from '@/components/ui/page-header';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 interface Transaction {
   id: string;
@@ -125,26 +127,17 @@ export default function TransactionsPage() {
   );
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading transactions...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Trust Transactions</h1>
-          <p className="text-gray-600 mt-1">All trust account activity</p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={exportToCSV}>
+    <div className="space-y-6">
+      <PageHeader
+        title="Trust Transactions"
+        description="All trust account activity"
+        action={
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={exportToCSV}>
             <Download className="h-4 w-4 mr-2" />
             Export
           </Button>
@@ -155,7 +148,8 @@ export default function TransactionsPage() {
             </Button>
           </Link>
         </div>
-      </div>
+        }
+      />
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
