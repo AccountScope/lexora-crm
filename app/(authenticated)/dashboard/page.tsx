@@ -149,8 +149,46 @@ export default function ExecutiveDashboard() {
 
   if (loading && !metrics) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      <div className="space-y-6">
+        <div>
+          <div className="h-8 w-64 bg-muted animate-pulse rounded mb-2" />
+          <div className="h-4 w-96 bg-muted animate-pulse rounded" />
+        </div>
+        
+        {/* Skeleton KPI Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i}>
+              <CardHeader className="space-y-2">
+                <div className="h-4 w-32 bg-muted animate-pulse rounded" />
+              </CardHeader>
+              <CardContent>
+                <div className="h-8 w-24 bg-muted animate-pulse rounded mb-2" />
+                <div className="h-3 w-full bg-muted animate-pulse rounded" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        
+        {/* Skeleton Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <div className="h-5 w-32 bg-muted animate-pulse rounded" />
+            </CardHeader>
+            <CardContent>
+              <div className="h-80 bg-muted animate-pulse rounded" />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <div className="h-5 w-32 bg-muted animate-pulse rounded" />
+            </CardHeader>
+            <CardContent>
+              <div className="h-80 bg-muted animate-pulse rounded" />
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
