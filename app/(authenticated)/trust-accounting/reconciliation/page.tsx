@@ -6,11 +6,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { AlertTriangle, CheckCircle, Download } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Download, InfoIcon, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { PageHeader } from '@/components/ui/page-header';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface TrustAccount {
   id: string;
@@ -149,11 +150,31 @@ export default function ReconciliationPage() {
   const selectedAccountData = accounts.find((a) => a.id === selectedAccount);
 
   return (
-    <div className="space-y-8">
-      <PageHeader
-        title="Trust Account Reconciliation"
-        description="IOLTA Compliance & Three-Way Reconciliation"
-      />
+    <TooltipProvider delayDuration={300}>
+      <div className="space-y-8">
+        <div className="flex items-start justify-between">
+          <PageHeader
+            title="Trust Account Reconciliation"
+            description="SRA-required monthly three-way reconciliation: bank statement = trust ledger = client ledger totals"
+          />
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="outline" size="sm">
+                <HelpCircle className="h-4 w-4 mr-2" />
+                What is 3-way recon?
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="max-w-md">
+              <p className="font-semibold mb-2">Three-Way Reconciliation:</p>
+              <ol className="list-decimal list-inside space-y-1 text-sm">
+                <li>Bank statement balance (from your bank)</li>
+                <li>Trust account book balance (Lexora records)</li>
+                <li>Sum of all client ledgers (client-by-client totals)</li>
+              </ol>
+              <p className="mt-2 text-sm">All three must match exactly. SRA requires this monthly.</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
 
       {/* Account Selection */}
       <Card className="p-6 mb-8">
@@ -374,6 +395,7 @@ export default function ReconciliationPage() {
           <p className="text-gray-600">Select a trust account to view reconciliation</p>
         </Card>
       )}
-    </div>
+      </div>
+    </TooltipProvider>
   );
 }

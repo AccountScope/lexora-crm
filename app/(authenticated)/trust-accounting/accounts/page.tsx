@@ -6,13 +6,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Plus, AlertTriangle, CheckCircle, InfoIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { PageHeader } from '@/components/ui/page-header';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { LegalTerm } from '@/components/ui/legal-term';
+import { EmptyState } from '@/components/ui/empty-state';
+import { Landmark } from 'lucide-react';
 
 interface TrustAccount {
   id: string;
@@ -69,19 +73,20 @@ export default function TrustAccountsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Trust Accounts"
-        description="IOLTA Compliance & Client Trust Funds"
-        action={
-          <Link href="/trust-accounting/accounts/new">
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Trust Account
-            </Button>
-          </Link>
-        }
-      />
+    <TooltipProvider delayDuration={300}>
+      <div className="space-y-6">
+        <PageHeader
+          title="Trust Accounts"
+          description="SRA-compliant client money accounts (separate from operating funds)"
+          action={
+            <Link href="/trust-accounting/accounts/new">
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Trust Account
+              </Button>
+            </Link>
+          }
+        />
       <div className="flex justify-between items-center mb-8" style={{ display: 'none' }}>
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Trust Accounts</h1>
@@ -97,23 +102,21 @@ export default function TrustAccountsPage() {
 
       {/* Accounts List */}
       {accounts.length === 0 ? (
-        <Card className="p-12 text-center">
-          <div className="max-w-md mx-auto">
-            <AlertTriangle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              No Trust Accounts
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Create your first trust account to manage client funds and ensure IOLTA compliance.
-            </p>
-            <Link href="/trust-accounting/accounts/new">
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Create Trust Account
-              </Button>
-            </Link>
-          </div>
-        </Card>
+        <EmptyState
+          icon={Landmark}
+          title="No trust accounts yet"
+          description="Trust accounts hold client money separately from your firm's operating funds. This is required by the SRA for proper client money handling."
+          actionLabel="Create trust account"
+          actionHref="/trust-accounting/accounts/new"
+          secondaryActionLabel="Learn about trust accounting"
+          secondaryActionHref="/docs/trust-accounting"
+          tips={[
+            "SRA requires monthly three-way reconciliation for all trust accounts",
+            "Client money must never mix with firm operating funds",
+            "Each client should have their own ledger within the trust account",
+            "Interest earned on trust funds typically goes to the Legal Aid Fund"
+          ]}
+        />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {accounts.map((account) => {
@@ -184,7 +187,17 @@ export default function TrustAccountsPage() {
       {accounts.length > 0 && (
         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="p-6">
-            <p className="text-sm text-gray-600 mb-2">Total Trust Funds</p>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm text-gray-600">Total Trust Funds</p>
+              <Tooltip>
+                <TooltipTrigger>
+                  <InfoIcon className="h-4 w-4 text-muted-foreground" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="max-w-xs">Combined balance of all client money held in trust. This must match your client ledger totals.</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <p className="text-3xl font-bold text-gray-900">
               {formatCurrency(
                 accounts.reduce((sum, acc) => sum + acc.current_balance, 0)
@@ -193,20 +206,41 @@ export default function TrustAccountsPage() {
           </Card>
 
           <Card className="p-6">
-            <p className="text-sm text-gray-600 mb-2">Active Accounts</p>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm text-gray-600">Active Accounts</p>
+              <Tooltip>
+                <TooltipTrigger>
+                  <InfoIcon className="h-4 w-4 text-muted-foreground" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="max-w-xs">Trust accounts currently accepting deposits and withdrawals. Inactive accounts are archived.</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <p className="text-3xl font-bold text-gray-900">
               {accounts.filter(a => a.status === 'active').length}
             </p>
           </Card>
 
           <Card className="p-6">
-            <p className="text-sm text-gray-600 mb-2">Needs Reconciliation</p>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm text-gray-600">Needs Reconciliation</p>
+              <Tooltip>
+                <TooltipTrigger>
+                  <InfoIcon className="h-4 w-4 text-muted-foreground" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="max-w-xs">Accounts not reconciled in the last 30 days. SRA requires monthly three-way reconciliation.</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <p className="text-3xl font-bold text-amber-600">
               {accounts.filter(a => needsReconciliation(a.last_reconciled_at)).length}
             </p>
           </Card>
         </div>
       )}
-    </div>
+      </div>
+    </TooltipProvider>
   );
 }

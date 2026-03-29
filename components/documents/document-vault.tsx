@@ -9,7 +9,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { UploadCloud } from "lucide-react";
+import { UploadCloud, InfoIcon, FileText } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { EmptyState } from "@/components/ui/empty-state";
 
 interface Props {
   matterId?: string;
@@ -56,19 +58,31 @@ export const DocumentVault = ({ matterId, clientId }: Props) => {
   });
 
   return (
-    <Card>
-      <CardHeader className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <CardTitle>Document vault</CardTitle>
-          <p className="text-sm text-muted-foreground">Classified storage with chain-of-custody tracking.</p>
-        </div>
-        <Input
-          placeholder="Search documents"
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          className="lg:max-w-sm"
-        />
-      </CardHeader>
+    <TooltipProvider delayDuration={300}>
+      <Card>
+        <CardHeader className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex items-center gap-2">
+            <div>
+              <CardTitle>Document vault</CardTitle>
+              <p className="text-sm text-muted-foreground">Chain-of-custody protected document storage</p>
+            </div>
+            <Tooltip>
+              <TooltipTrigger>
+                <InfoIcon className="h-4 w-4 text-muted-foreground" />
+              </TooltipTrigger>
+              <TooltipContent className="max-w-md">
+                <p className="font-semibold mb-2">Chain of Custody:</p>
+                <p className="text-sm">Every document maintains a full audit trail - who uploaded it, when, who accessed it, and any modifications. Required for court submissions and regulatory compliance.</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+          <Input
+            placeholder="Search documents..."
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            className="lg:max-w-sm"
+          />
+        </CardHeader>
       <CardContent className="space-y-4">
         <div
           {...getRootProps()}
@@ -120,6 +134,23 @@ export const DocumentVault = ({ matterId, clientId }: Props) => {
                 <TableCell colSpan={5}>Refreshing vault…</TableCell>
               </TableRow>
             )}
+            {!isFetching && visibleDocuments.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={5}>
+                  <EmptyState
+                    icon={FileText}
+                    title="No documents yet"
+                    description="Upload your first document to begin building your secure document vault with full chain-of-custody tracking."
+                    tips={[
+                      "Drag and drop files directly into the upload zone",
+                      "All documents are classified and tracked automatically",
+                      "Use folders to organize by document type or matter",
+                      "Every access and modification is logged for compliance"
+                    ]}
+                  />
+                </TableCell>
+              </TableRow>
+            )}
             {visibleDocuments.map((doc) => (
               <TableRow key={doc.id}>
                 <TableCell>
@@ -145,6 +176,7 @@ export const DocumentVault = ({ matterId, clientId }: Props) => {
           </TableBody>
         </Table>
       </CardContent>
-    </Card>
+      </Card>
+    </TooltipProvider>
   );
 };

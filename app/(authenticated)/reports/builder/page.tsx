@@ -9,9 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Save, Eye } from "lucide-react";
+import { Save, Eye, HelpCircle, InfoIcon } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
 import { useToast } from "@/hooks/use-toast";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export default function ReportBuilderPage() {
   const router = useRouter();
@@ -53,11 +54,31 @@ export default function ReportBuilderPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <PageHeader
-        title="Report Builder"
-        description="Create a custom report"
-      />
+    <TooltipProvider delayDuration={300}>
+      <div className="max-w-4xl mx-auto space-y-6">
+        <div className="flex items-start justify-between">
+          <PageHeader
+            title="Report Builder"
+            description="Create custom reports for cases, billing, time tracking, and more"
+          />
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="outline" size="sm">
+                <HelpCircle className="h-4 w-4 mr-2" />
+                Report tips
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="max-w-md">
+              <p className="font-semibold mb-2">Building Great Reports:</p>
+              <ul className="list-disc list-inside space-y-1 text-sm">
+                <li>Start with a clear question (e.g., "Which matters are overdue?")</li>
+                <li>Choose only the fields you need</li>
+                <li>Use date ranges to focus on relevant data</li>
+                <li>Export to CSV for further analysis in Excel</li>
+              </ul>
+            </TooltipContent>
+          </Tooltip>
+        </div>
 
       <Card>
         <CardHeader>
@@ -87,17 +108,27 @@ export default function ReportBuilderPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="type">Report Type *</Label>
+            <div className="flex items-center gap-2">
+              <Label htmlFor="type">Report Type *</Label>
+              <Tooltip>
+                <TooltipTrigger>
+                  <InfoIcon className="h-4 w-4 text-muted-foreground" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="max-w-xs">Choose the primary data source for your report. This determines which fields and filters are available.</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <Select value={type} onValueChange={setType}>
               <SelectTrigger id="type">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="cases">Cases</SelectItem>
-                <SelectItem value="time">Time Entries</SelectItem>
-                <SelectItem value="billing">Billing</SelectItem>
-                <SelectItem value="documents">Documents</SelectItem>
-                <SelectItem value="users">Users</SelectItem>
+                <SelectItem value="cases">Cases (matters, clients, status)</SelectItem>
+                <SelectItem value="time">Time Entries (billable hours)</SelectItem>
+                <SelectItem value="billing">Billing (invoices, payments)</SelectItem>
+                <SelectItem value="documents">Documents (files, uploads)</SelectItem>
+                <SelectItem value="users">Users (team members, roles)</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -135,6 +166,7 @@ export default function ReportBuilderPage() {
           </Button>
         </div>
       </div>
-    </div>
+      </div>
+    </TooltipProvider>
   );
 }
