@@ -35,6 +35,9 @@
       "@/lib/*": [
         "lib/*"
       ],
+      "@/lib/supabase/server": [
+        "lib/supabase/server"
+      ],
       "@/styles/*": [
         "styles/*"
       ],
