@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Shield, Lock, CheckCircle2, Scale } from "lucide-react";
+import { Loader2, Shield, Lock, CheckCircle2, Scale, Building2, Users, FileCheck, Clock } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -63,101 +63,146 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left side - Branding panel */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#1e3a8a] via-[#1e40af] to-[#1d4ed8] relative overflow-hidden">
-        {/* Decorative background pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+      {/* Left side - Corporate branding panel */}
+      <div className="hidden lg:flex lg:w-[45%] bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute inset-0">
+          {/* Subtle grid pattern */}
+          <div className="absolute inset-0 opacity-[0.02]" style={{
+            backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
+            backgroundSize: '40px 40px'
+          }}></div>
+          
+          {/* Gradient orbs */}
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-3xl"></div>
         </div>
 
         {/* Content */}
-        <div className="relative z-10 flex flex-col justify-between p-12 text-white w-full">
-          {/* Logo */}
-          <div className="flex items-center gap-3">
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-2.5">
-              <Scale className="w-7 h-7 text-white" />
+        <div className="relative z-10 flex flex-col justify-between p-12 xl:p-16 text-white w-full">
+          {/* Logo & Brand */}
+          <div>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl p-3 shadow-lg">
+                <Scale className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <span className="text-3xl font-bold tracking-tight">LEXORA</span>
+                <div className="text-xs text-slate-400 font-medium tracking-wider mt-0.5">LEGAL TECHNOLOGIES</div>
+              </div>
             </div>
-            <span className="text-2xl font-bold">LEXORA</span>
           </div>
 
-          {/* Main content */}
-          <div className="space-y-8">
+          {/* Main value proposition */}
+          <div className="space-y-10">
             <div>
-              <h1 className="text-4xl font-bold mb-4 leading-tight">
-                Legal Practice<br />
-                Management<br />
-                Made Simple
+              <div className="inline-block px-3 py-1.5 bg-blue-500/10 border border-blue-400/20 rounded-full mb-6">
+                <span className="text-xs font-semibold text-blue-300 tracking-wider uppercase">Enterprise Legal Platform</span>
+              </div>
+              
+              <h1 className="text-5xl xl:text-6xl font-bold mb-6 leading-[1.1] tracking-tight">
+                Transform Your<br />
+                Legal Practice
               </h1>
-              <p className="text-lg text-blue-100 max-w-md">
-                Trusted by UK law firms to manage matters, billing, and client relationships with confidence.
+              <p className="text-xl text-slate-300 max-w-lg leading-relaxed">
+                The complete practice management solution trusted by leading UK law firms to streamline operations, ensure compliance, and deliver exceptional client service.
               </p>
             </div>
 
-            {/* Feature highlights */}
-            <div className="space-y-3">
+            {/* Key features grid */}
+            <div className="grid grid-cols-2 gap-4">
               {[
-                "SRA-compliant case management",
-                "Automated time tracking & billing",
-                "Trust accounting reconciliation",
-                "Secure client portal"
+                { icon: FileCheck, title: "SRA Compliant", desc: "Full regulatory compliance" },
+                { icon: Clock, title: "Save 40+ Hours", desc: "Per week automation" },
+                { icon: Users, title: "Client Portal", desc: "24/7 secure access" },
+                { icon: Building2, title: "Trust Accounting", desc: "Automated reconciliation" }
               ].map((feature, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  <div className="flex-shrink-0 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full p-1">
-                    <CheckCircle2 className="w-4 h-4 text-white" />
-                  </div>
-                  <span className="text-blue-100">{feature}</span>
+                <div key={i} className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-all duration-300">
+                  <feature.icon className="w-6 h-6 text-blue-400 mb-2" />
+                  <div className="text-sm font-semibold text-white mb-1">{feature.title}</div>
+                  <div className="text-xs text-slate-400">{feature.desc}</div>
                 </div>
               ))}
             </div>
+
+            {/* Social proof */}
+            <div className="space-y-4 pt-6 border-t border-white/10">
+              <div className="flex items-center gap-3">
+                <div className="flex -space-x-3">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 border-2 border-slate-900 flex items-center justify-center text-xs font-bold text-white">
+                      {String.fromCharCode(64 + i)}
+                    </div>
+                  ))}
+                </div>
+                <div>
+                  <div className="text-sm font-semibold text-white">500+ Law Firms</div>
+                  <div className="text-xs text-slate-400">Managing 15,000+ active cases</div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Footer */}
-          <div className="flex items-center gap-6 text-sm text-blue-200">
-            <div className="flex items-center gap-2">
-              <Shield className="w-4 h-4" />
-              <span>ISO 27001 Certified</span>
+          {/* Security & Compliance badges */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-6 text-sm">
+              <div className="flex items-center gap-2">
+                <Shield className="w-5 h-5 text-green-400" />
+                <div>
+                  <div className="font-semibold text-white">ISO 27001</div>
+                  <div className="text-xs text-slate-400">Information Security</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Lock className="w-5 h-5 text-blue-400" />
+                <div>
+                  <div className="font-semibold text-white">Bank-Grade</div>
+                  <div className="text-xs text-slate-400">256-bit Encryption</div>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Lock className="w-4 h-4" />
-              <span>Bank-Grade Security</span>
+            <div className="text-xs text-slate-500 leading-relaxed">
+              Lexora complies with SRA regulations, GDPR, and UK data protection laws. Your data is encrypted in transit and at rest, with regular third-party security audits.
             </div>
           </div>
         </div>
       </div>
 
       {/* Right side - Login form */}
-      <div className="flex-1 flex items-center justify-center px-6 py-12 bg-gray-50">
-        <div className="w-full max-w-md">
+      <div className="flex-1 flex items-center justify-center px-6 py-12 bg-gradient-to-br from-slate-50 to-slate-100">
+        <div className="w-full max-w-[480px]">
           {/* Mobile logo */}
-          <div className="lg:hidden flex items-center gap-3 mb-8">
-            <div className="bg-[#1e3a8a] rounded-lg p-2">
-              <Scale className="w-6 h-6 text-white" />
+          <div className="lg:hidden flex items-center gap-3 mb-10">
+            <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl p-2.5 shadow-lg">
+              <Scale className="w-7 h-7 text-white" />
             </div>
-            <span className="text-2xl font-bold text-gray-900">LEXORA</span>
+            <div>
+              <span className="text-2xl font-bold text-slate-900">LEXORA</span>
+              <div className="text-[10px] text-slate-500 font-medium tracking-wider">LEGAL TECHNOLOGIES</div>
+            </div>
           </div>
 
           {/* Header */}
           <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
-              Welcome back
+            <h2 className="text-3xl xl:text-4xl font-bold text-slate-900 mb-3 tracking-tight">
+              Sign in to your account
             </h2>
-            <p className="text-gray-600">
-              Sign in to your account to continue
+            <p className="text-slate-600 text-lg">
+              Access your legal practice management platform
             </p>
           </div>
 
           {/* Login card */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+          <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8 xl:p-10">
             <form onSubmit={handleSubmit} className="space-y-6">
               {error && (
-                <Alert variant="destructive" className="border-red-200 bg-red-50">
-                  <AlertDescription className="text-red-800 text-sm">{error}</AlertDescription>
+                <Alert variant="destructive" className="border-red-200 bg-red-50 rounded-xl">
+                  <AlertDescription className="text-red-800 text-sm font-medium">{error}</AlertDescription>
                 </Alert>
               )}
 
               <div>
-                <Label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                <Label htmlFor="email" className="block text-sm font-bold text-slate-700 mb-2.5">
                   Email address
                 </Label>
                 <Input
@@ -170,18 +215,18 @@ export default function LoginPage() {
                   disabled={loading}
                   autoComplete="email"
                   autoFocus
-                  className="h-12 text-base border-gray-300 focus:border-[#1e3a8a] focus:ring-[#1e3a8a]"
+                  className="h-14 text-base border-slate-300 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 bg-slate-50 transition-all"
                 />
               </div>
 
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <Label htmlFor="password" className="block text-sm font-semibold text-gray-700">
+                <div className="flex items-center justify-between mb-2.5">
+                  <Label htmlFor="password" className="block text-sm font-bold text-slate-700">
                     Password
                   </Label>
                   <Link
                     href="/forgot-password"
-                    className="text-sm font-medium text-[#1e3a8a] hover:text-[#1e40af] transition-colors"
+                    className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors"
                   >
                     Forgot password?
                   </Link>
@@ -195,13 +240,13 @@ export default function LoginPage() {
                   required
                   disabled={loading}
                   autoComplete="current-password"
-                  className="h-12 text-base border-gray-300 focus:border-[#1e3a8a] focus:ring-[#1e3a8a]"
+                  className="h-14 text-base border-slate-300 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 bg-slate-50 transition-all"
                 />
               </div>
 
               <Button
                 type="submit"
-                className="w-full h-12 bg-[#1e3a8a] hover:bg-[#1e40af] text-white font-semibold text-base shadow-sm transition-all"
+                className="w-full h-14 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-base shadow-lg hover:shadow-xl transition-all duration-200 rounded-xl"
                 disabled={loading || !email || !password}
               >
                 {loading ? (
@@ -211,7 +256,7 @@ export default function LoginPage() {
                   </>
                 ) : (
                   <>
-                    <Lock className="mr-2 h-4 w-4" />
+                    <Lock className="mr-2 h-5 w-5" />
                     Sign in securely
                   </>
                 )}
@@ -220,10 +265,10 @@ export default function LoginPage() {
               {/* Demo login separator */}
               <div className="relative my-6">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-200"></div>
+                  <div className="w-full border-t border-slate-300"></div>
                 </div>
                 <div className="relative flex justify-center text-xs">
-                  <span className="px-3 bg-white text-gray-500 font-medium uppercase tracking-wider">
+                  <span className="px-4 bg-white text-slate-500 font-bold uppercase tracking-widest">
                     Demo Access
                   </span>
                 </div>
@@ -232,7 +277,7 @@ export default function LoginPage() {
               <Button
                 type="button"
                 variant="outline"
-                className="w-full h-12 border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 font-medium text-base transition-all"
+                className="w-full h-14 border-2 border-slate-300 text-slate-700 hover:bg-slate-100 hover:border-slate-400 font-semibold text-base transition-all rounded-xl"
                 onClick={handleDemoLogin}
                 disabled={loading}
               >
@@ -241,30 +286,39 @@ export default function LoginPage() {
             </form>
           </div>
 
-          {/* Trust badges */}
-          <div className="mt-8 p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
-            <div className="flex items-center justify-center gap-6 text-xs text-gray-600">
-              <div className="flex items-center gap-1.5">
-                <Shield className="w-4 h-4 text-[#1e3a8a]" />
-                <span className="font-medium">SRA Compliant</span>
-              </div>
-              <div className="w-px h-4 bg-gray-300"></div>
-              <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-[#1e3a8a]" />
-                <span className="font-medium">ISO 27001</span>
-              </div>
-              <div className="w-px h-4 bg-gray-300"></div>
-              <div className="flex items-center gap-1.5">
-                <Lock className="w-4 h-4 text-[#1e3a8a]" />
-                <span className="font-medium">GDPR</span>
-              </div>
+          {/* Trust indicators */}
+          <div className="mt-8 bg-white rounded-xl border border-slate-200 shadow-md p-6">
+            <div className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-4">
+              Trusted & Secure
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              {[
+                { icon: Shield, label: "SRA Compliant" },
+                { icon: CheckCircle2, label: "ISO 27001" },
+                { icon: Lock, label: "GDPR Secure" }
+              ].map((badge, i) => (
+                <div key={i} className="flex flex-col items-center text-center gap-2">
+                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-3">
+                    <badge.icon className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <span className="text-xs font-semibold text-slate-700">{badge.label}</span>
+                </div>
+              ))}
             </div>
           </div>
 
           {/* Footer */}
-          <p className="mt-8 text-center text-sm text-gray-500">
-            © 2026 Lexora Legal Technologies Ltd. All rights reserved.
-          </p>
+          <div className="mt-8 text-center space-y-2">
+            <p className="text-sm text-slate-600">
+              Need help? Contact our support team at{" "}
+              <a href="mailto:support@lexora.com" className="font-semibold text-blue-600 hover:text-blue-700">
+                support@lexora.com
+              </a>
+            </p>
+            <p className="text-xs text-slate-500">
+              © 2026 Lexora Legal Technologies Ltd. All rights reserved.
+            </p>
+          </div>
         </div>
       </div>
     </div>
