@@ -5,6 +5,8 @@ import { ensureSession, serializeSessionCookie, serializeRememberCookie } from "
 import { logAuthEvent } from "@/lib/audit/logger";
 import { cookies } from "next/headers";
 
+export const runtime = 'nodejs';
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
