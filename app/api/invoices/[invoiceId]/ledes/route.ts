@@ -127,7 +127,7 @@ export async function POST(
       hours: entry.hours,
       activityCode: entry.activity_code || suggestUTBMSCode(entry.description),
       description: entry.description,
-      matterNumber: matterNumber || invoice.matter?.matter_number,
+      matterNumber: matterNumber || (invoice.matter as any)?.matter_number || "",
       invoiceNumber,
       lineNumber: index + 1,
     }));
@@ -136,8 +136,8 @@ export async function POST(
       format,
       lawFirmName: firmName,
       lawFirmTaxId: firmTaxId,
-      clientId: clientId || invoice.matter?.client?.id || "",
-      matterNumber: matterNumber || invoice.matter?.matter_number || "",
+      clientId: clientId || (invoice.matter as any)?.client?.id || "",
+      matterNumber: matterNumber || (invoice.matter as any)?.matter_number || "",
       invoiceNumber,
       invoiceDate: invoice.invoice_date,
     };
