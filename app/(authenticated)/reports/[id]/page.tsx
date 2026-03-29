@@ -4,8 +4,9 @@ import { use } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Download, FileSpreadsheet, FileText } from "lucide-react";
+import { Download, FileSpreadsheet, FileText, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { PageHeader } from "@/components/ui/page-header";
 
 interface ReportData {
   report: {
@@ -78,28 +79,36 @@ export default function ReportViewPage({ params }: { params: Promise<{ id: strin
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">{data.report.name}</h1>
-          {data.report.description && (
-            <p className="text-muted-foreground">{data.report.description}</p>
-          )}
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => handleExport("csv")}>
-            <Download className="mr-2 h-4 w-4" />
-            CSV
-          </Button>
-          <Button variant="outline" onClick={() => handleExport("excel")}>
-            <FileSpreadsheet className="mr-2 h-4 w-4" />
-            Excel
-          </Button>
-          <Button variant="outline" onClick={() => handleExport("pdf")}>
-            <FileText className="mr-2 h-4 w-4" />
+      <PageHeader
+        title={
+          <div className="flex items-center gap-3">
+            <Link href="/reports">
+              <Button variant="ghost" size="sm">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back
+              </Button>
+            </Link>
+            <span>{data.report.name}</span>
+          </div>
+        }
+        description={data.report.description || undefined}
+        action={
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => handleExport("csv")}>
+              <Download className="mr-2 h-4 w-4" />
+              CSV
+            </Button>
+            <Button variant="outline" onClick={() => handleExport("excel")}>
+              <FileSpreadsheet className="mr-2 h-4 w-4" />
+              Excel
+            </Button>
+            <Button variant="outline" onClick={() => handleExport("pdf")}>
+              <FileText className="mr-2 h-4 w-4" />
             PDF
           </Button>
         </div>
-      </div>
+        }
+      />
 
       {data.summary && (
         <div className="grid gap-4 md:grid-cols-4">
