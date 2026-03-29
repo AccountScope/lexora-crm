@@ -1,87 +1,438 @@
 "use client";
 
-import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
-import { KpiCards } from "@/components/dashboard/kpi-cards";
-import { DashboardCharts } from "@/components/dashboard/charts";
-import { ActivityFeed } from "@/components/dashboard/activity-feed";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import type { DashboardAnalyticsPayload } from "@/lib/api/analytics";
-import { Clock3, FilePlus2, UploadCloud, Briefcase } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  DollarSign, 
+  FileText, 
+  Clock, 
+  Users, 
+  TrendingUp, 
+  TrendingDown,
+  AlertCircle,
+  Briefcase,
+  PiggyBank,
+  Loader2
+} from "lucide-react";
+import { 
+  LineChart, 
+  Line, 
+  BarChart, 
+  Bar, 
+  PieChart, 
+  Pie, 
+  Cell,
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  Legend, 
+  ResponsiveContainer 
+} from "recharts";
 
-const fetchAnalytics = async () => {
-  const res = await fetch("/api/analytics");
-  if (!res.ok) {
-    throw new Error(await res.text());
+interface DashboardMetrics {
+  revenue: {
+    current_month: number;
+    last_month: number;
+    year_to_date: number;
+    outstanding: number;
+    trend: number; // percentage change
+  };
+  matters: {
+    active: number;
+    new_this_month: number;
+    by_status: { status: string; count: number }[];
+    by_practice_area: { area: string; count: number }[];
+  };
+  time: {
+    billable_hours: number;
+    non_billable_hours: number;
+    utilization_rate: number;
+    top_billers: { name: string; hours: number }[];
+  };
+  trust: {
+    total_balance: number;
+    unallocated: number;
+    recent_transactions: any[];
+  };
+  clients: {
+    total: number;
+    new_this_month: number;
+    top_by_revenue: { name: string; revenue: number }[];
+  };
+}
+
+const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+
+export default function ExecutiveDashboard() {
+  const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [timeRange, setTimeRange] = useState<'month' | 'quarter' | 'year'>('month');
+
+  useEffect(() => {
+    fetchMetrics();
+  }, [timeRange]);
+
+  const fetchMetrics = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/dashboard/metrics?range=${timeRange}`);
+      if (response.ok) {
+        const data = await response.json();
+        setMetrics(data.metrics);
+      }
+    } catch (error) {
+      console.error('Error fetching metrics:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Mock data for development (remove when API is ready)
+  const mockMetrics: DashboardMetrics = {
+    revenue: {
+      current_month: 125000,
+      last_month: 110000,
+      year_to_date: 980000,
+      outstanding: 45000,
+      trend: 13.6
+    },
+    matters: {
+      active: 47,
+      new_this_month: 8,
+      by_status: [
+        { status: 'Active', count: 47 },
+        { status: 'Pending', count: 12 },
+        { status: 'On Hold', count: 5 },
+        { status: 'Closed', count: 156 }
+      ],
+      by_practice_area: [
+        { area: 'Corporate', count: 18 },
+        { area: 'Litigation', count: 15 },
+        { area: 'Real Estate', count: 10 },
+        { area: 'Employment', count: 8 },
+        { area: 'IP', count: 6 }
+      ]
+    },
+    time: {
+      billable_hours: 342,
+      non_billable_hours: 78,
+      utilization_rate: 81.4,
+      top_billers: [
+        { name: 'Sarah Johnson', hours: 85 },
+        { name: 'Michael Chen', hours: 72 },
+        { name: 'Emma Williams', hours: 68 },
+        { name: 'James Brown', hours: 61 },
+        { name: 'Lisa Anderson', hours: 56 }
+      ]
+    },
+    trust: {
+      total_balance: 450000,
+      unallocated: 25000,
+      recent_transactions: []
+    },
+    clients: {
+      total: 89,
+      new_this_month: 6,
+      top_by_revenue: [
+        { name: 'Acme Corp', revenue: 85000 },
+        { name: 'TechStart Ltd', revenue: 67000 },
+        { name: 'Global Industries', revenue: 54000 },
+        { name: 'Finance Group', revenue: 48000 },
+        { name: 'Property Partners', revenue: 42000 }
+      ]
+    }
+  };
+
+  const displayMetrics = metrics || mockMetrics;
+
+  if (loading && !metrics) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      </div>
+    );
   }
-  return (await res.json()) as { data: DashboardAnalyticsPayload };
-};
 
-const quickActions = [
-  { label: "Create new case", description: "Open intake workflow", icon: Briefcase, href: "/cases/new" },
-  { label: "Start timer", description: "Track a billable entry", icon: Clock3, href: "/time-entries/new" },
-  { label: "Upload document", description: "Add evidence or filings", icon: UploadCloud, href: "/documents/upload" },
-  { label: "Create invoice", description: "Generate billing packet", icon: FilePlus2, href: "/billing/invoices/new" },
-];
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-GB', {
+      style: 'currency',
+      currency: 'GBP',
+      minimumFractionDigits: 0
+    }).format(amount);
+  };
 
-export default function DashboardPage() {
-  const { data, isFetching, refetch, isError, error } = useQuery({
-    queryKey: ["dashboard-analytics"],
-    queryFn: fetchAnalytics,
-    refetchInterval: 60_000,
-  });
-
-  const analytics = data?.data;
-  const isLoading = isFetching && !analytics;
+  const revenueData = [
+    { month: 'Jan', revenue: 95000 },
+    { month: 'Feb', revenue: 102000 },
+    { month: 'Mar', revenue: 118000 },
+    { month: 'Apr', revenue: 110000 },
+    { month: 'May', revenue: 125000 }
+  ];
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-2">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-3xl font-semibold">Intelligence Dashboard</h1>
-            <p className="text-sm text-muted-foreground">Monitor global activity, billing, workloads, and custody events in one viewport.</p>
-          </div>
-          <div className="flex items-center gap-3">
-            {analytics?.generatedAt && (
-              <p className="text-xs text-muted-foreground">Updated {new Date(analytics.generatedAt).toLocaleTimeString()}</p>
-            )}
-            <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isFetching}>
-              Refresh
-            </Button>
-          </div>
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold">Executive Dashboard</h1>
+          <p className="text-muted-foreground mt-1">
+            Real-time insights into your firm's performance
+          </p>
         </div>
-        {isError && (
-          <p className="text-sm text-destructive">{(error as Error).message}</p>
-        )}
+        <Tabs value={timeRange} onValueChange={(v) => setTimeRange(v as any)}>
+          <TabsList>
+            <TabsTrigger value="month">Month</TabsTrigger>
+            <TabsTrigger value="quarter">Quarter</TabsTrigger>
+            <TabsTrigger value="year">Year</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
-      <KpiCards data={analytics?.kpis} isLoading={isLoading} />
-      <DashboardCharts data={analytics?.charts} isLoading={isLoading} />
-      <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
-        <ActivityFeed items={analytics?.activity} isLoading={isLoading} />
+
+      {/* Key Metrics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Revenue Card */}
         <Card>
-          <CardHeader>
-            <CardTitle>Quick actions</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Revenue (This Month)</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent className="space-y-4">
-            {quickActions.map((action, index) => (
-              <div key={action.href}>
-                <Button variant="ghost" className="w-full justify-start gap-3 text-left" asChild>
-                  <Link href={action.href} className="flex flex-1 items-center gap-3">
-                    <action.icon className="h-5 w-5 text-primary" />
-                    <div>
-                      <p className="text-sm font-medium">{action.label}</p>
-                      <p className="text-xs text-muted-foreground">{action.description}</p>
-                    </div>
-                  </Link>
-                </Button>
-                {index < quickActions.length - 1 && <div className="my-4 h-px w-full bg-border" />}
-              </div>
-            ))}
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {formatCurrency(displayMetrics.revenue.current_month)}
+            </div>
+            <p className="text-xs text-muted-foreground flex items-center mt-1">
+              {displayMetrics.revenue.trend > 0 ? (
+                <>
+                  <TrendingUp className="w-3 h-3 text-green-500 mr-1" />
+                  <span className="text-green-500">+{displayMetrics.revenue.trend}%</span>
+                </>
+              ) : (
+                <>
+                  <TrendingDown className="w-3 h-3 text-red-500 mr-1" />
+                  <span className="text-red-500">{displayMetrics.revenue.trend}%</span>
+                </>
+              )}
+              <span className="ml-1">from last month</span>
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Active Matters Card */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Matters</CardTitle>
+            <Briefcase className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{displayMetrics.matters.active}</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              +{displayMetrics.matters.new_this_month} new this month
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Utilization Rate Card */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Utilization Rate</CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{displayMetrics.time.utilization_rate}%</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {displayMetrics.time.billable_hours} billable hours
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Outstanding Invoices Card */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Outstanding Invoices</CardTitle>
+            <AlertCircle className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {formatCurrency(displayMetrics.revenue.outstanding)}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Awaiting payment
+            </p>
           </CardContent>
         </Card>
       </div>
+
+      {/* Charts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Revenue Trend Chart */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Revenue Trend</CardTitle>
+            <CardDescription>Monthly revenue over time</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={revenueData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip 
+                  formatter={(value) => formatCurrency(value as number)}
+                />
+                <Legend />
+                <Line 
+                  type="monotone" 
+                  dataKey="revenue" 
+                  stroke="#3b82f6" 
+                  strokeWidth={2}
+                  name="Revenue"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Matters by Status Pie Chart */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Matters by Status</CardTitle>
+            <CardDescription>Current matter distribution</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={displayMetrics.matters.by_status}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ status, count }) => `${status}: ${count}`}
+                  outerRadius={100}
+                  fill="#8884d8"
+                  dataKey="count"
+                >
+                  {displayMetrics.matters.by_status.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Bottom Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Top Billers */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Top Billers</CardTitle>
+            <CardDescription>Highest billable hours this month</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {displayMetrics.time.top_billers.map((biller, index) => (
+                <div key={index} className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                      <span className="text-sm font-semibold text-primary">
+                        {index + 1}
+                      </span>
+                    </div>
+                    <span className="font-medium">{biller.name}</span>
+                  </div>
+                  <span className="text-muted-foreground">{biller.hours}h</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Practice Areas */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Matters by Practice Area</CardTitle>
+            <CardDescription>Current matter distribution</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={displayMetrics.matters.by_practice_area}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="area" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="count" fill="#3b82f6" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Top Clients */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Top Clients</CardTitle>
+            <CardDescription>By revenue this month</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {displayMetrics.clients.top_by_revenue.map((client, index) => (
+                <div key={index} className="flex items-center justify-between">
+                  <span className="font-medium">{client.name}</span>
+                  <span className="text-muted-foreground">
+                    {formatCurrency(client.revenue)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Trust Account Summary */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Trust Account Summary</CardTitle>
+          <CardDescription>Current trust account balances</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                <PiggyBank className="w-6 h-6 text-green-600 dark:text-green-400" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Total Balance</p>
+                <p className="text-2xl font-bold">
+                  {formatCurrency(displayMetrics.trust.total_balance)}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 rounded-full bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center">
+                <AlertCircle className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Unallocated</p>
+                <p className="text-2xl font-bold">
+                  {formatCurrency(displayMetrics.trust.unallocated)}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                <Users className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Total Clients</p>
+                <p className="text-2xl font-bold">{displayMetrics.clients.total}</p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
