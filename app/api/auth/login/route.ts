@@ -89,7 +89,8 @@ export async function POST(request: NextRequest) {
 
       // Set session cookie (15 min for 2FA)
       const sessionCookie = serializeSessionCookie(token, false);
-      cookies().set(sessionCookie.name, sessionCookie.value, {
+      const cookieStore = await cookies();
+      cookieStore.set(sessionCookie.name, sessionCookie.value, {
         ...sessionCookie.options,
         maxAge: 60 * 15, // Override to 15 minutes for 2FA completion
       });
@@ -119,8 +120,9 @@ export async function POST(request: NextRequest) {
     const sessionCookie = serializeSessionCookie(token, true);
     const rememberCookie = serializeRememberCookie(true);
     
-    cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.options);
-    cookies().set(rememberCookie.name, rememberCookie.value, rememberCookie.options);
+    const cookieStore = await cookies();
+    cookieStore.set(sessionCookie.name, sessionCookie.value, sessionCookie.options);
+    cookieStore.set(rememberCookie.name, rememberCookie.value, rememberCookie.options);
 
     await logAuthEvent({
       type: "auth.login",
