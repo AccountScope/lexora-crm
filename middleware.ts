@@ -36,6 +36,7 @@ const PUBLIC_ROUTES = new Set([
   "/api/webhooks/stripe",
   "/api/health",
   "/api/debug/db-test",
+  "/api/debug/login-test",
 ]);
 
 // Static file prefixes
