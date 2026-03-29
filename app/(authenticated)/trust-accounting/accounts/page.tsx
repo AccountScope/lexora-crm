@@ -11,6 +11,8 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
+import { PageHeader } from '@/components/ui/page-header';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 interface TrustAccount {
   id: string;
@@ -63,20 +65,24 @@ export default function TrustAccountsPage() {
   }
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading trust accounts...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-8">
+    <div className="space-y-6">
+      <PageHeader
+        title="Trust Accounts"
+        description="IOLTA Compliance & Client Trust Funds"
+        action={
+          <Link href="/trust-accounting/accounts/new">
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Trust Account
+            </Button>
+          </Link>
+        }
+      />
+      <div className="flex justify-between items-center mb-8" style={{ display: 'none' }}>
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Trust Accounts</h1>
           <p className="text-gray-600 mt-1">IOLTA Compliance & Client Trust Funds</p>
