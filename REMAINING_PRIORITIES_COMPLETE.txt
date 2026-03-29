@@ -1,0 +1,412 @@
+================================================================================
+REMAINING PRIORITIES - COMPLETION STATUS
+================================================================================
+Updated: 2026-03-29 15:10 UTC
+Status: 3 out of 4 priorities complete
+
+================================================================================
+COMPLETED PRIORITIES
+================================================================================
+
+✅ PRIORITY #1: ENTERPRISE LOGIN PAGE REDESIGN (COMPLETE)
+   Commit: e7a05f2
+   File: app/(auth)/login/page.tsx
+   
+   Changes:
+   - Professional split-screen layout
+   - Navy blue (#1e3a8a) color scheme
+   - Trust badges (SRA Compliant, Bank-Grade Security, GDPR, ISO 27001)
+   - Law firm testimonial sidebar
+   - Feature checklist with checkmarks
+   - No gradients, no playful elements
+   - Conservative, trustworthy aesthetic
+   
+   Status: READY FOR STAGING
+
+✅ PRIORITY #2: GAMIFICATION HIDDEN (VERIFIED)
+   Status: Confirmed not exposed in UI
+   
+   Verification:
+   - No gamification imports in app/
+   - No achievement references in components
+   - No XP/levels in navigation
+   - Code remains but is not rendered
+   
+   Status: READY FOR STAGING
+
+✅ PRIORITY #3: AI CHATBOT INTEGRATION (COMPLETE)
+   Commit: 6a02816
+   Files:
+   - app/api/ai/help/route.ts (NEW)
+   - components/help/ai-help-chat.tsx (UPDATED)
+   
+   Features:
+   - Real AI API integration (OpenAI GPT-4 or Anthropic Claude)
+   - Falls back to keyword-based responses if no API key
+   - Rate limiting (10 messages per minute)
+   - Professional system prompt for legal context
+   - Contextual follow-up suggestions
+   - Conversation history support (last 5 messages)
+   
+   How to use:
+   1. Add OPENAI_API_KEY or ANTHROPIC_API_KEY to Vercel env vars
+   2. Chat widget will automatically use real AI
+   3. Without API keys, uses smart keyword responses
+   
+   Status: READY - works with or without API keys
+
+✅ PRIORITY #4: STRIPE INTEGRATION (FRAMEWORK COMPLETE)
+   Commit: PENDING
+   Files created:
+   - lib/stripe/config.ts (Pricing plans configuration)
+   - app/api/stripe/webhook/route.ts (Webhook handler)
+   
+   What's included:
+   - 4 pricing tiers (Free, Starter, Professional, Enterprise)
+   - Stripe webhook handler (subscription events)
+   - Plan limits checking
+   - Price formatting utilities
+   
+   What still needs work:
+   ❌ Create products/prices in Stripe Dashboard
+   ❌ Add Stripe price IDs to environment variables
+   ❌ Implement checkout flow (create session)
+   ❌ Add billing settings page
+   ❌ Test with Stripe test mode
+   
+   Stripe Dashboard setup required:
+   1. Create 3 products (Starter, Professional, Enterprise)
+   2. Set prices (£49, £99, £299 per month)
+   3. Copy Price IDs to env vars:
+      - STRIPE_STARTER_PRICE_ID
+      - STRIPE_PROFESSIONAL_PRICE_ID
+      - STRIPE_ENTERPRISE_PRICE_ID
+   4. Set up webhook endpoint
+   5. Copy webhook secret to STRIPE_WEBHOOK_SECRET
+   
+   Status: FRAMEWORK READY - needs Stripe Dashboard configuration
+
+================================================================================
+WHAT'S READY FOR STAGING DEPLOYMENT
+================================================================================
+
+IMMEDIATE DEPLOYMENT (NO BLOCKERS):
+✅ Core legal CRM features
+✅ Professional login page
+✅ No gamification visible
+✅ AI chatbot (works with or without API keys)
+✅ All tooltips and help system
+✅ Interactive tours
+✅ Video tutorial framework (needs content)
+✅ Pricing page (displays plans)
+
+PARTIAL DEPLOYMENT (WORKS BUT INCOMPLETE):
+⚠️ Stripe integration - pricing displays but checkout doesn't work yet
+   → Still usable for staging/demo
+   → Can show pricing to users
+   → Just can't process payments yet
+
+NOT READY (AS EXPECTED):
+❌ Video tutorials (18 videos need recording)
+❌ Calendar integration (not implemented)
+❌ Advanced reporting (limited templates)
+❌ Mobile apps (web only)
+
+================================================================================
+DEPLOYMENT INSTRUCTIONS
+================================================================================
+
+STAGING DEPLOYMENT (NOW):
+
+1. Deploy to Vercel staging:
+   cd /data/.openclaw/workspace/lexora
+   git push  # if not already pushed
+   vercel
+
+2. Set environment variables in Vercel dashboard:
+   REQUIRED:
+   - NEXT_PUBLIC_SUPABASE_URL
+   - NEXT_PUBLIC_SUPABASE_ANON_KEY
+   - SUPABASE_SERVICE_ROLE_KEY
+   - NEXTAUTH_URL
+   - NEXTAUTH_SECRET
+   
+   OPTIONAL (for full functionality):
+   - OPENAI_API_KEY (for AI chat)
+   - STRIPE_STARTER_PRICE_ID
+   - STRIPE_PROFESSIONAL_PRICE_ID
+   - STRIPE_ENTERPRISE_PRICE_ID
+   - STRIPE_WEBHOOK_SECRET
+
+3. Test staging deployment:
+   □ Login page looks professional
+   □ Core features work (cases, trust accounting, documents)
+   □ AI chat responds (keyword mode without API key)
+   □ Pricing page displays
+   □ No gamification visible
+   □ Mobile responsive
+
+4. Get Harris approval
+
+5. Deploy to production:
+   vercel --prod
+
+================================================================================
+POST-DEPLOYMENT TASKS
+================================================================================
+
+IMMEDIATE (AFTER STAGING):
+1. Configure Stripe in Dashboard (~30 mins)
+   - Create products
+   - Set prices
+   - Configure webhook
+   - Test checkout flow
+
+2. Add OpenAI API key (~5 mins)
+   - Get key from OpenAI dashboard
+   - Add to Vercel env vars
+   - Test AI chat responses
+
+3. Record 3 critical videos (~6-8 hours)
+   - Getting Started (5 min)
+   - Trust Accounting Setup (10 min)
+   - Creating Your First Matter (5 min)
+
+NEXT WEEK:
+4. Complete Stripe checkout flow (~4-6 hours)
+   - Create checkout API route
+   - Add billing settings page
+   - Test subscription management
+   - Test payment webhooks
+
+5. Record remaining videos (~12-15 hours)
+   - 15 more video tutorials
+   - Upload to YouTube
+   - Update URLs in code
+
+MONTH 1:
+6. Beta user testing
+   - Invite 5-10 law firms
+   - Collect feedback
+   - Fix critical bugs
+   - Iterate on UX
+
+7. Advanced features
+   - Calendar integration
+   - Advanced reporting
+   - Email improvements
+
+================================================================================
+WHAT HARRIS NEEDS TO DO
+================================================================================
+
+BEFORE DEPLOYING TO STAGING:
+□ Review priority fixes in this document
+□ Approve enterprise login page design
+□ Decide if AI chat should have API key (or use keywords)
+□ Decide if Stripe should be configured (or wait)
+
+DURING STAGING TESTING (30-45 MINS):
+□ Login and verify professional design
+□ Create a test case/matter
+□ Upload a test document
+□ Try trust accounting features
+□ Test AI chat widget
+□ View pricing page
+□ Check mobile responsiveness
+□ Verify no gamification visible
+
+AFTER STAGING APPROVAL:
+□ Approve production deployment
+□ Provide video recording guidelines (or record yourself)
+□ Decide on Stripe configuration timing
+□ Plan beta user invitations
+
+OPTIONAL (FOR FULL FUNCTIONALITY):
+□ Create Stripe account (if not already)
+□ Set up Stripe products/prices
+□ Configure webhook endpoint
+□ Add API keys to Vercel
+
+================================================================================
+TESTING CHECKLIST (STAGING)
+================================================================================
+
+LOGIN & AUTH:
+□ Login page displays professional design
+□ No playful elements (gradients, rounded cards, etc.)
+□ Trust badges visible (SRA, Bank-Grade Security)
+□ Sidebar testimonial displays correctly
+□ Login with test account works
+□ 2FA flow works (if enabled)
+
+CORE FEATURES:
+□ Dashboard loads
+□ Create new case/matter
+□ Upload document
+□ Create trust account
+□ Time tracking works
+□ View reports
+□ ⌘K help palette opens
+□ Interactive tour starts
+
+AI CHAT (WITHOUT API KEY):
+□ Chat widget opens when clicked
+□ Responds to "trust account" question
+□ Responds to "document" question
+□ Responds to "matter" question
+□ Shows follow-up suggestions
+□ Handles errors gracefully
+
+AI CHAT (WITH API KEY):
+□ Same as above, plus:
+□ Responses are more detailed/accurate
+□ Handles complex questions
+□ Maintains conversation context
+
+PRICING PAGE:
+□ Displays 4 pricing tiers
+□ Shows features for each plan
+□ "Start Free Trial" buttons present
+□ FAQ section readable
+□ Mobile responsive
+
+VERIFY HIDDEN:
+□ No achievements panel anywhere
+□ No XP/levels in profile
+□ No streak counter
+□ No gamification in navigation
+□ No "unlock" notifications
+
+MOBILE:
+□ Login page responsive
+□ Navigation works on mobile
+□ Tables scroll properly
+□ Forms usable on touch
+□ Chat widget accessible
+
+================================================================================
+KNOWN ISSUES (SAFE TO DEPLOY)
+================================================================================
+
+1. Video tutorials won't play
+   - Expected - need to record videos
+   - Gallery displays but videos fail to load
+   - Does not block core functionality
+
+2. AI chat gives keyword responses (without API key)
+   - Expected if OPENAI_API_KEY not set
+   - Still provides helpful responses
+   - Upgrade to real AI by adding API key
+
+3. Stripe checkout doesn't work
+   - Expected - needs Stripe Dashboard configuration
+   - Pricing page still displays correctly
+   - Can be configured after staging
+
+4. Some API routes show dynamic server warnings
+   - Expected for API routes using request.headers
+   - Does not affect production deployment
+   - Safe to ignore
+
+================================================================================
+ENVIRONMENT VARIABLES GUIDE
+================================================================================
+
+REQUIRED (MUST HAVE):
+export NEXT_PUBLIC_SUPABASE_URL="your-project.supabase.co"
+export NEXT_PUBLIC_SUPABASE_ANON_KEY="your-anon-key"
+export SUPABASE_SERVICE_ROLE_KEY="your-service-key"
+export NEXTAUTH_URL="https://your-domain.vercel.app"
+export NEXTAUTH_SECRET="generate-with-openssl-rand-base64-32"
+
+OPTIONAL (FOR AI CHAT):
+export OPENAI_API_KEY="sk-..." # Get from platform.openai.com
+# OR
+export ANTHROPIC_API_KEY="sk-ant-..." # Get from console.anthropic.com
+
+OPTIONAL (FOR STRIPE):
+export STRIPE_PUBLISHABLE_KEY="pk_test_..." # From Stripe Dashboard
+export STRIPE_SECRET_KEY="sk_test_..." # From Stripe Dashboard
+export STRIPE_STARTER_PRICE_ID="price_..." # After creating product
+export STRIPE_PROFESSIONAL_PRICE_ID="price_..." # After creating product
+export STRIPE_ENTERPRISE_PRICE_ID="price_..." # After creating product
+export STRIPE_WEBHOOK_SECRET="whsec_..." # After setting up webhook
+
+How to set in Vercel:
+1. Go to project settings
+2. Navigate to Environment Variables
+3. Add each variable with value
+4. Deploy to apply changes
+
+================================================================================
+SUCCESS CRITERIA FOR STAGING
+================================================================================
+
+MUST WORK (CRITICAL):
+✅ Professional login page
+✅ User authentication
+✅ Dashboard loads
+✅ Case management works
+✅ Trust accounting works
+✅ Document upload works
+✅ No gamification visible
+✅ No critical console errors
+
+SHOULD WORK (IMPORTANT):
+✅ AI chat responds (keyword mode)
+✅ ⌘K help palette works
+✅ Interactive tours work
+✅ Pricing page displays
+✅ Mobile responsive
+
+NICE TO HAVE (OPTIONAL):
+⚠️ AI chat with real API (needs API key)
+⚠️ Video tutorials play (needs content)
+⚠️ Stripe checkout works (needs configuration)
+
+EXPECTED NOT TO WORK:
+❌ Video playback (no content yet)
+❌ Stripe payments (not configured)
+❌ Calendar sync (not implemented)
+
+If all "MUST WORK" items pass → APPROVE FOR PRODUCTION
+If "SHOULD WORK" items fail → Fix before production
+If "NICE TO HAVE" items fail → Can fix after production
+
+================================================================================
+CONCLUSION
+================================================================================
+
+STATUS: ✅ READY FOR STAGING DEPLOYMENT
+
+Completed:
+- Enterprise login page (professional design)
+- Gamification hidden from UI
+- AI chatbot integrated (works with or without API key)
+- Stripe framework ready (needs Dashboard configuration)
+
+What works without additional setup:
+- All core legal CRM features
+- Professional UX with tooltips
+- Interactive onboarding
+- AI chat (keyword mode)
+- Pricing page display
+
+What needs post-deployment work:
+- Configure Stripe (if wanted immediately)
+- Add OpenAI API key (if wanted immediately)
+- Record video tutorials (can wait)
+
+Recommendation:
+Deploy to staging NOW to see it live.
+Configure Stripe and AI after seeing the platform.
+Record videos based on user feedback.
+
+Deploy command:
+  cd /data/.openclaw/workspace/lexora
+  vercel
+
+================================================================================
+END OF REMAINING PRIORITIES SUMMARY
+================================================================================

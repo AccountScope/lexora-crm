@@ -1,244 +1,185 @@
 /**
  * Stripe Configuration
- * Centralized Stripe settings and pricing configuration
+ * Pricing plans and product IDs
  */
 
-import Stripe from 'stripe';
+export type PlanId = "free" | "starter" | "professional" | "enterprise";
 
-// Initialize Stripe with API key
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2026-03-25.dahlia',
-  typescript: true,
-});
+export interface PricingPlan {
+  name: string;
+  description: string;
+  price: number;
+  currency: string;
+  interval: "month" | "year";
+  stripeProductId?: string;
+  stripePriceId?: string;
+  features: string[];
+  limits: {
+    users: number;
+    matters: number;
+    storage: number; // GB
+    trustAccounts: number;
+  };
+}
 
-// Pricing Plans Configuration
-export const PRICING_PLANS = {
+export const PRICING_PLANS: Record<PlanId, PricingPlan> = {
   free: {
-    id: 'free',
-    name: 'Free',
+    name: "Free",
+    description: "For individual solicitors testing Lexora",
     price: 0,
-    currency: 'GBP',
-    interval: 'month',
-    stripePriceId: null, // No Stripe price for free plan
+    currency: "GBP",
+    interval: "month",
     features: [
-      'View-only access',
-      'Basic reports',
-      '1 user',
-      '1GB storage',
-      '100 API calls/month',
-      'Email support',
+      "1 user",
+      "5 active matters",
+      "1 trust account",
+      "1GB document storage",
+      "Basic reports",
+      "Email support",
     ],
     limits: {
       users: 1,
-      storageGB: 1,
-      apiCalls: 100,
-      emailSends: 50,
+      matters: 5,
+      storage: 1,
+      trustAccounts: 1,
     },
   },
-  essential: {
-    id: 'essential',
-    name: 'Essential',
-    price: 99,
-    currency: 'GBP',
-    interval: 'month',
-    stripePriceId: process.env.STRIPE_PRICE_ESSENTIAL!,
+  starter: {
+    name: "Starter",
+    description: "For small firms getting started",
+    price: 49,
+    currency: "GBP",
+    interval: "month",
+    stripeProductId: process.env.STRIPE_STARTER_PRODUCT_ID,
+    stripePriceId: process.env.STRIPE_STARTER_PRICE_ID,
     features: [
-      'Everything in Free',
-      '1 user',
-      'Basic features',
-      '10GB storage',
-      '1,000 API calls/month',
-      'Email support',
-      '14-day trial',
+      "Up to 3 users",
+      "25 active matters",
+      "3 trust accounts",
+      "10GB document storage",
+      "Standard reports",
+      "Email & chat support",
+      "Email integration",
+      "Client portal",
     ],
     limits: {
-      users: 1,
-      storageGB: 10,
-      apiCalls: 1000,
-      emailSends: 500,
+      users: 3,
+      matters: 25,
+      storage: 10,
+      trustAccounts: 3,
     },
   },
   professional: {
-    id: 'professional',
-    name: 'Professional',
-    price: 299,
-    currency: 'GBP',
-    interval: 'month',
-    stripePriceId: process.env.STRIPE_PRICE_PROFESSIONAL!,
+    name: "Professional",
+    description: "For growing firms",
+    price: 99,
+    currency: "GBP",
+    interval: "month",
+    stripeProductId: process.env.STRIPE_PROFESSIONAL_PRODUCT_ID,
+    stripePriceId: process.env.STRIPE_PROFESSIONAL_PRICE_ID,
     features: [
-      'Everything in Essential',
-      'Up to 5 users',
-      'All features',
-      'Advanced analytics',
-      'Trust accounting',
-      '50GB storage',
-      '10,000 API calls/month',
-      'Priority email support',
-      '14-day trial',
+      "Up to 10 users",
+      "Unlimited matters",
+      "10 trust accounts",
+      "100GB document storage",
+      "Advanced reports",
+      "Priority support",
+      "Email integration",
+      "Client portal",
+      "Time tracking & billing",
+      "Conflict checking",
+      "Interactive tours",
+      "Video tutorials",
     ],
     limits: {
-      users: 5,
-      storageGB: 50,
-      apiCalls: 10000,
-      emailSends: 5000,
+      users: 10,
+      matters: 999999,
+      storage: 100,
+      trustAccounts: 10,
     },
   },
   enterprise: {
-    id: 'enterprise',
-    name: 'Enterprise',
-    price: 999,
-    currency: 'GBP',
-    interval: 'month',
-    stripePriceId: process.env.STRIPE_PRICE_ENTERPRISE!,
+    name: "Enterprise",
+    description: "For established firms",
+    price: 299,
+    currency: "GBP",
+    interval: "month",
+    stripeProductId: process.env.STRIPE_ENTERPRISE_PRODUCT_ID,
+    stripePriceId: process.env.STRIPE_ENTERPRISE_PRICE_ID,
     features: [
-      'Everything in Professional',
-      'Unlimited users',
-      'White-label options',
-      'Custom integrations',
-      'Unlimited storage',
-      'Unlimited API calls',
-      'Unlimited email sends',
-      'Dedicated account manager',
-      'Priority phone support',
-      '14-day trial',
+      "Unlimited users",
+      "Unlimited matters",
+      "Unlimited trust accounts",
+      "500GB document storage",
+      "Custom reports",
+      "Dedicated account manager",
+      "Phone & priority support",
+      "All Professional features",
+      "API access",
+      "Custom integrations",
+      "White-label option",
+      "Onboarding assistance",
     ],
     limits: {
-      users: Infinity,
-      storageGB: Infinity,
-      apiCalls: Infinity,
-      emailSends: Infinity,
+      users: 999999,
+      matters: 999999,
+      storage: 500,
+      trustAccounts: 999999,
     },
   },
-} as const;
-
-export type PlanId = keyof typeof PRICING_PLANS;
-
-// Overage pricing (per unit beyond plan limits)
-export const OVERAGE_PRICING = {
-  perUser: 10, // £10/extra user
-  perGB: 5, // £5/extra 10GB (charged per GB)
-  per1000ApiCalls: 2, // £2/extra 1000 API calls
-  per1000Emails: 1, // £1/extra 1000 emails
 };
 
-// Trial period (in days)
-export const TRIAL_PERIOD_DAYS = 14;
+/**
+ * Format price for display
+ */
+export function formatPrice(price: number, currency: string = "GBP"): string {
+  if (price === 0) return "Free";
 
-// Webhook endpoint secret
-export const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET!;
+  return new Intl.NumberFormat("en-GB", {
+    style: "currency",
+    currency,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(price);
+}
 
-// Helper function to get plan by ID
-export function getPlan(planId: PlanId) {
+/**
+ * Get plan by ID
+ */
+export function getPlan(planId: PlanId): PricingPlan {
   return PRICING_PLANS[planId];
 }
 
-// Helper function to check if a feature is available in a plan
-export function hasFeature(planId: PlanId, feature: string): boolean {
-  return PRICING_PLANS[planId].features.some(f => 
-    f.toLowerCase().includes(feature.toLowerCase())
-  );
-}
-
-// Helper function to check if usage is within limits
+/**
+ * Check if user is within plan limits
+ */
 export function isWithinLimits(
   planId: PlanId,
   usage: {
     users?: number;
-    storageGB?: number;
-    apiCalls?: number;
-    emailSends?: number;
+    matters?: number;
+    storage?: number;
+    trustAccounts?: number;
   }
-): boolean {
-  const limits = PRICING_PLANS[planId].limits;
-  
-  if (usage.users !== undefined && usage.users > limits.users) return false;
-  if (usage.storageGB !== undefined && usage.storageGB > limits.storageGB) return false;
-  if (usage.apiCalls !== undefined && usage.apiCalls > limits.apiCalls) return false;
-  if (usage.emailSends !== undefined && usage.emailSends > limits.emailSends) return false;
-  
-  return true;
-}
+): { withinLimits: boolean; exceeded: string[] } {
+  const plan = getPlan(planId);
+  const exceeded: string[] = [];
 
-// Calculate overage charges
-export function calculateOverageCharges(
-  planId: PlanId,
-  usage: {
-    users: number;
-    storageGB: number;
-    apiCalls: number;
-    emailSends: number;
+  if (usage.users && usage.users > plan.limits.users) {
+    exceeded.push("users");
   }
-): number {
-  // Enterprise has no overages
-  if (planId === 'enterprise') return 0;
-  
-  const limits = PRICING_PLANS[planId].limits;
-  let overageTotal = 0;
-  
-  // User overage
-  if (usage.users > limits.users) {
-    overageTotal += (usage.users - limits.users) * OVERAGE_PRICING.perUser;
+  if (usage.matters && usage.matters > plan.limits.matters) {
+    exceeded.push("matters");
   }
-  
-  // Storage overage
-  if (usage.storageGB > limits.storageGB) {
-    overageTotal += (usage.storageGB - limits.storageGB) * OVERAGE_PRICING.perGB;
+  if (usage.storage && usage.storage > plan.limits.storage) {
+    exceeded.push("storage");
   }
-  
-  // API calls overage
-  if (usage.apiCalls > limits.apiCalls) {
-    const extraCalls = usage.apiCalls - limits.apiCalls;
-    overageTotal += Math.ceil(extraCalls / 1000) * OVERAGE_PRICING.per1000ApiCalls;
+  if (usage.trustAccounts && usage.trustAccounts > plan.limits.trustAccounts) {
+    exceeded.push("trust accounts");
   }
-  
-  // Email sends overage
-  if (usage.emailSends > limits.emailSends) {
-    const extraEmails = usage.emailSends - limits.emailSends;
-    overageTotal += Math.ceil(extraEmails / 1000) * OVERAGE_PRICING.per1000Emails;
-  }
-  
-  return overageTotal;
-}
 
-// Format price for display
-export function formatPrice(amount: number, currency: string = 'GBP'): string {
-  return new Intl.NumberFormat('en-GB', {
-    style: 'currency',
-    currency,
-  }).format(amount);
-}
-
-// Validate Stripe keys are configured
-export function validateStripeConfig(): { valid: boolean; errors: string[] } {
-  const errors: string[] = [];
-  
-  if (!process.env.STRIPE_SECRET_KEY) {
-    errors.push('STRIPE_SECRET_KEY is not configured');
-  }
-  
-  if (!process.env.STRIPE_WEBHOOK_SECRET) {
-    errors.push('STRIPE_WEBHOOK_SECRET is not configured');
-  }
-  
-  if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
-    errors.push('NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not configured');
-  }
-  
-  // Check price IDs for paid plans
-  if (!process.env.STRIPE_PRICE_ESSENTIAL) {
-    errors.push('STRIPE_PRICE_ESSENTIAL is not configured');
-  }
-  
-  if (!process.env.STRIPE_PRICE_PROFESSIONAL) {
-    errors.push('STRIPE_PRICE_PROFESSIONAL is not configured');
-  }
-  
-  if (!process.env.STRIPE_PRICE_ENTERPRISE) {
-    errors.push('STRIPE_PRICE_ENTERPRISE is not configured');
-  }
-  
   return {
-    valid: errors.length === 0,
-    errors,
+    withinLimits: exceeded.length === 0,
+    exceeded,
   };
 }
