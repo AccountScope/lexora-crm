@@ -4,8 +4,13 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Play, Edit, Trash2, Download } from "lucide-react";
+import { Plus, Play, Edit, Trash2, FileBarChart } from "lucide-react";
 import Link from "next/link";
+import { PageHeader } from "@/components/ui/page-header";
+import { EmptyState } from "@/components/ui/empty-state";
+import { CardSkeleton } from "@/components/ui/loading-skeleton";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 interface Report {
   id: string;
@@ -18,6 +23,8 @@ interface Report {
 
 export default function ReportsPage() {
   const queryClient = useQueryClient();
+  const router = useRouter();
+  const { toast } = useToast();
   const [deleting, setDeleting] = useState<string | null>(null);
 
   const { data: reports, isLoading } = useQuery<Report[]>({
@@ -37,6 +44,18 @@ export default function ReportsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["reports"] });
       setDeleting(null);
+      toast({
+        title: "Report deleted",
+        description: "The report has been removed successfully.",
+      });
+    },
+    onError: () => {
+      setDeleting(null);
+      toast({
+        title: "Error",
+        description: "Failed to delete report. Please try again.",
+        variant: "destructive",
+      });
     },
   });
 
@@ -49,30 +68,21 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Reports</h1>
-          <p className="text-muted-foreground">Create and manage custom reports</p>
-        </div>
-        <Link href="/reports/builder">
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Create Report
-          </Button>
-        </Link>
-      </div>
+      <PageHeader
+        title="Reports"
+        description="Create and manage custom reports for insights into your practice"
+        action={
+          <Link href="/reports/builder">
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Create Report
+            </Button>
+          </Link>
+        }
+      />
 
       {isLoading ? (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {[...Array(6)].map((_, i) => (
-            <Card key={i} className="animate-pulse">
-              <CardHeader>
-                <div className="h-6 bg-muted rounded w-2/3" />
-                <div className="h-4 bg-muted rounded w-full mt-2" />
-              </CardHeader>
-            </Card>
-          ))}
-        </div>
+        <CardSkeleton count={6} />
       ) : reports && reports.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {reports.map((report) => (
@@ -115,17 +125,15 @@ export default function ReportsPage() {
           ))}
         </div>
       ) : (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <p className="text-muted-foreground mb-4">No reports yet</p>
-            <Link href="/reports/builder">
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                Create Your First Report
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={FileBarChart}
+          title="No reports yet"
+          description="Create custom reports to analyze revenue, time tracking, case outcomes, and more."
+          action={{
+            label: "Create your first report",
+            onClick: () => router.push("/reports/builder"),
+          }}
+        />
       )}
     </div>
   );

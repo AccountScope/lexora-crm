@@ -5,22 +5,48 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useActiveSessions, useRevokeSession, useRevokeOtherSessions, useRememberPreference } from "@/lib/hooks/use-sessions";
+import { PageHeader } from "@/components/ui/page-header";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { useToast } from "@/hooks/use-toast";
 
 export default function SessionSettingsPage() {
   const { data, isLoading } = useActiveSessions();
   const revoke = useRevokeSession();
   const revokeOthers = useRevokeOtherSessions();
   const rememberToggle = useRememberPreference();
+  const { toast } = useToast();
 
   const sessions = data?.data ?? [];
   const remember = data?.meta.rememberMe ?? false;
 
+  const handleRevoke = (id: string) => {
+    revoke.mutate(id, {
+      onSuccess: () => {
+        toast({
+          title: "Session revoked",
+          description: "The session has been terminated successfully.",
+        });
+      },
+    });
+  };
+
+  const handleRevokeOthers = () => {
+    revokeOthers.mutate(undefined, {
+      onSuccess: () => {
+        toast({
+          title: "Sessions revoked",
+          description: "All other sessions have been terminated.",
+        });
+      },
+    });
+  };
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-semibold">Active sessions</h1>
-        <p className="text-sm text-muted-foreground">See every device logged into Lexora and revoke anything unfamiliar.</p>
-      </div>
+      <PageHeader
+        title="Active Sessions"
+        description="See every device logged into Lexora and revoke anything unfamiliar"
+      />
       <div className="grid gap-6 lg:grid-cols-2">
         <Card className="lg:col-span-2">
           <CardHeader>
@@ -29,7 +55,7 @@ export default function SessionSettingsPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             {isLoading ? (
-              <p className="text-sm text-muted-foreground">Loading sessions…</p>
+              <LoadingSpinner />
             ) : sessions.length === 0 ? (
               <p className="text-sm text-muted-foreground">No active sessions.</p>
             ) : (
@@ -47,8 +73,8 @@ export default function SessionSettingsPage() {
                       <p className="text-xs text-muted-foreground">IP {session.ipAddress ?? "N/A"} • Expires {new Date(session.expiresAt).toLocaleString()}</p>
                     </div>
                     {!session.current && (
-                      <Button variant="outline" size="sm" onClick={() => revoke.mutate(session.id)} disabled={revoke.isPending}>
-                        Revoke
+                      <Button variant="outline" size="sm" onClick={() => handleRevoke(session.id)} disabled={revoke.isPending}>
+                        {revoke.isPending ? "Revoking..." : "Revoke"}
                       </Button>
                     )}
                   </div>
@@ -66,8 +92,8 @@ export default function SessionSettingsPage() {
                 disabled={rememberToggle.isPending}
               />
             </div>
-            <Button variant="secondary" onClick={() => revokeOthers.mutate()} disabled={revokeOthers.isPending}>
-              Revoke all other sessions
+            <Button variant="secondary" onClick={handleRevokeOthers} disabled={revokeOthers.isPending}>
+              {revokeOthers.isPending ? "Revoking..." : "Revoke all other sessions"}
             </Button>
           </CardContent>
         </Card>
