@@ -110,7 +110,7 @@ export function LEDESExporter({ invoiceId, matterNumber, clientId }: LEDESExport
         {/* Format selection */}
         <div className="space-y-3">
           <Label>LEDES Format</Label>
-          <RadioGroup value={format} onValueChange={(v) => setFormat(v as any)}>
+          <RadioGroup value={format} onValueChange={(v: string) => setFormat(v as any)}>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="1998B" id="1998B" />
               <Label htmlFor="1998B" className="font-normal cursor-pointer">
