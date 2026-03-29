@@ -10,6 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Save, Eye } from "lucide-react";
+import { PageHeader } from "@/components/ui/page-header";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ReportBuilderPage() {
   const router = useRouter();
@@ -52,10 +54,10 @@ export default function ReportBuilderPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Report Builder</h1>
-        <p className="text-muted-foreground">Create a custom report</p>
-      </div>
+      <PageHeader
+        title="Report Builder"
+        description="Create a custom report"
+      />
 
       <Card>
         <CardHeader>
