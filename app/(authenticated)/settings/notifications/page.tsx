@@ -8,6 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useNotificationPreferences, useUpdateNotificationPreferences } from "@/lib/hooks/use-notifications";
+import { PageHeader } from "@/components/ui/page-header";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { useToast } from "@/hooks/use-toast";
 
 const notificationTypes = [
   { key: "DEADLINE_REMINDER", label: "Deadline reminders", description: "1, 3, and 7-day warning emails" },

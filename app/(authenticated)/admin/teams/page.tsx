@@ -4,6 +4,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useAdminTeams } from "@/lib/hooks/use-admin-teams";
+import { PageHeader } from "@/components/ui/page-header";
+import { Plus, Users } from "lucide-react";
+import { TableSkeleton } from "@/components/ui/loading-skeleton";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export default function TeamsPage() {
   const { data, isLoading } = useAdminTeams();
@@ -11,36 +15,46 @@ export default function TeamsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Teams</h1>
-          <p className="text-sm text-muted-foreground">Organize staff into practice groups and manage access together.</p>
-        </div>
-        <Button asChild>
-          <Link href="/admin/teams/create">Create team</Link>
-        </Button>
-      </div>
-      <div className="rounded-lg border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Team</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Members</TableHead>
-              <TableHead>Created by</TableHead>
-              <TableHead>Created on</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
+      <PageHeader
+        title="Teams"
+        description="Organize staff into practice groups and manage access together"
+        action={
+          <Button asChild>
+            <Link href="/admin/teams/create">
+              <Plus className="mr-2 h-4 w-4" />
+              Create Team
+            </Link>
+          </Button>
+        }
+      />
+      
+      {isLoading ? (
+        <TableSkeleton rows={5} />
+      ) : teams.length === 0 ? (
+        <EmptyState
+          icon={Users}
+          title="No teams yet"
+          description="Create teams to organize your staff into practice groups and manage permissions together."
+          action={{
+            label: "Create your first team",
+            onClick: () => window.location.href = "/admin/teams/create",
+          }}
+        />
+      ) : (
+        <div className="rounded-lg border">
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-sm text-muted-foreground">
-                  Loading teams…
-                </TableCell>
+                <TableHead>Team</TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead>Members</TableHead>
+                <TableHead>Created by</TableHead>
+                <TableHead>Created on</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
-            ) : teams.length ? (
-              teams.map((team) => (
+            </TableHeader>
+            <TableBody>
+              {teams.map((team) => (
                 <TableRow key={team.id}>
                   <TableCell className="font-medium">{team.name}</TableCell>
                   <TableCell className="text-sm text-muted-foreground">{team.description || "—"}</TableCell>
@@ -53,17 +67,11 @@ export default function TeamsPage() {
                     </Link>
                   </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center text-sm text-muted-foreground">
-                  No teams yet.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
     </div>
   );
 }
