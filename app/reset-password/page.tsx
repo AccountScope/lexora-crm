@@ -1,5 +1,8 @@
 "use client";
 
+// Prevent static generation for this dynamic page
+export const dynamic = 'force-dynamic';
+
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";

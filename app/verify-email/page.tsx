@@ -6,6 +6,9 @@ import { MailCheck } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
+// Prevent static generation for this dynamic page
+export const dynamic = 'force-dynamic';
+
 const fetchJson = async (url: string, init?: RequestInit) => {
   const res = await fetch(url, init);
   if (!res.ok) {

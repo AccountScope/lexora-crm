@@ -1,5 +1,8 @@
 "use client";
 
+// Prevent static generation for this dynamic page
+export const dynamic = 'force-dynamic';
+
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
