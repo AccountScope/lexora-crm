@@ -19,9 +19,9 @@ export async function POST(request: NextRequest) {
 
     // Get user from database
     const result = await query(
-      `SELECT id, email, password_hash, role, email_verified, two_factor_enabled
+      `SELECT id, email, password_hash, user_type as role, email_verified, two_factor_enabled
        FROM users 
-       WHERE email = $1 AND active = true`,
+       WHERE email = $1 AND deleted_at IS NULL AND status = 'ACTIVE'`,
       [email.toLowerCase()]
     );
 

@@ -1,5 +1,4 @@
--- FINAL CORRECT TEST USER CREATION
--- Based on actual schema (no 'active' column, uses 'status' instead)
+-- FIXED TEST USER CREATION (includes active flag)
 -- Run this in Supabase SQL Editor
 
 DO $$
@@ -38,7 +37,7 @@ BEGIN
     'authenticated'
   );
 
-  -- Step 2: Create public user record (matches actual schema)
+  -- Step 2: Create public user record (with ACTIVE flag)
   INSERT INTO public.users (
     id,
     email,
@@ -47,8 +46,8 @@ BEGIN
     password_hash,
     user_type,
     status,
+    active,
     email_verified,
-    two_factor_enabled,
     created_at,
     updated_at
   ) VALUES (
@@ -60,17 +59,16 @@ BEGIN
     'STAFF',
     'ACTIVE',
     TRUE,
-    FALSE,
+    TRUE,
     NOW(),
     NOW()
   );
 
-  RAISE NOTICE '✅ SUCCESS! Test user created (schema-correct):';
+  RAISE NOTICE '✅ SUCCESS! Test user created:';
   RAISE NOTICE 'Email: sabrina@test.com';
   RAISE NOTICE 'Password: TestPassword123!';
   RAISE NOTICE 'User ID: %', user_id;
-  RAISE NOTICE 'Status: ACTIVE';
+  RAISE NOTICE 'Active: TRUE';
   RAISE NOTICE 'Email Verified: TRUE';
-  RAISE NOTICE 'Two Factor: DISABLED';
   
 END $$;

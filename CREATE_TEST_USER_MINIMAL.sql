@@ -1,5 +1,5 @@
--- FINAL CORRECT TEST USER CREATION
--- Based on actual schema (no 'active' column, uses 'status' instead)
+-- MINIMAL TEST USER CREATION
+-- Just creates auth user + public user record
 -- Run this in Supabase SQL Editor
 
 DO $$
@@ -16,7 +16,6 @@ BEGIN
     email,
     encrypted_password,
     email_confirmed_at,
-    confirmed_at,
     created_at,
     updated_at,
     raw_app_meta_data,
@@ -31,24 +30,21 @@ BEGIN
     NOW(),
     NOW(),
     NOW(),
-    NOW(),
     '{"provider":"email","providers":["email"]}',
-    '{"first_name":"Sabrina","last_name":"Williams"}',
+    '{}',
     FALSE,
     'authenticated'
   );
 
-  -- Step 2: Create public user record (matches actual schema)
+  -- Step 2: Create public user record
   INSERT INTO public.users (
     id,
     email,
     first_name,
     last_name,
-    password_hash,
     user_type,
     status,
     email_verified,
-    two_factor_enabled,
     created_at,
     updated_at
   ) VALUES (
@@ -56,21 +52,16 @@ BEGIN
     'sabrina@test.com',
     'Sabrina',
     'Williams',
-    crypt('TestPassword123!', gen_salt('bf')),
     'STAFF',
     'ACTIVE',
     TRUE,
-    FALSE,
     NOW(),
     NOW()
   );
 
-  RAISE NOTICE '✅ SUCCESS! Test user created (schema-correct):';
+  RAISE NOTICE 'SUCCESS! Test user created:';
   RAISE NOTICE 'Email: sabrina@test.com';
   RAISE NOTICE 'Password: TestPassword123!';
   RAISE NOTICE 'User ID: %', user_id;
-  RAISE NOTICE 'Status: ACTIVE';
-  RAISE NOTICE 'Email Verified: TRUE';
-  RAISE NOTICE 'Two Factor: DISABLED';
   
 END $$;
