@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { InvoiceGenerator } from "@/components/billing/invoice-generator";
 import { format } from "date-fns";
+import { PageHeader } from "@/components/ui/page-header";
 
 ChartJS.register(ArcElement, BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
@@ -61,10 +62,10 @@ const BillingPage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-semibold">Billing intelligence</h1>
-        <p className="text-muted-foreground">Surface unbilled time, outstanding balances, and realization in one control tower.</p>
-      </div>
+      <PageHeader
+        title="Billing Intelligence"
+        description="Surface unbilled time, outstanding balances, and realization in one control tower"
+      />
 
       <div className="grid gap-4 md:grid-cols-4">
         <Card>

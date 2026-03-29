@@ -18,6 +18,8 @@ import {
   useUpcomingDeadlines,
 } from "@/lib/hooks/use-deadlines";
 import type { DeadlineRecord } from "@/types/domain";
+import { PageHeader } from "@/components/ui/page-header";
+import { Plus } from "lucide-react";
 
 const priorityColors: Record<string, string> = {
   HIGH: "bg-destructive/15 text-destructive border-destructive/40",
@@ -141,15 +143,17 @@ export default function DeadlinesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-3xl font-semibold">Critical deadlines</h1>
-          <p className="text-sm text-muted-foreground">Never miss a court filing or client promise again.</p>
-        </div>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button>Create deadline</Button>
-          </DialogTrigger>
+      <PageHeader
+        title="Critical Deadlines"
+        description="Never miss a court filing or client promise again"
+        action={
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Create Deadline
+              </Button>
+            </DialogTrigger>
           <DialogContent className="max-w-xl">
             <DialogHeader>
               <DialogTitle>Quick add deadline</DialogTitle>
@@ -157,7 +161,8 @@ export default function DeadlinesPage() {
             <DeadlineForm onSuccess={() => {}} templates={templates?.data ?? []} />
           </DialogContent>
         </Dialog>
-      </div>
+        }
+      />
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader>
