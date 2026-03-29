@@ -136,8 +136,8 @@ const createSessionRecord = async (options: EnsureSessionOptions) => {
   const profile = buildDeviceProfile(options.userAgent);
   const location = await lookupLocation(options.ipAddress);
   await query(
-    `INSERT INTO sessions (user_id, token, device, browser, os, user_agent, fingerprint, remember_me, ip_address, location, last_activity, expires_at)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,NOW(),$11)`,
+    `INSERT INTO sessions (user_id, token, device, browser, os, user_agent, fingerprint, remember_me, ip_address, location, last_activity, expires_at, created_at, updated_at)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,NOW(),$11,NOW(),NOW())`,
     [
       options.userId,
       tokenHash,
