@@ -17,6 +17,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Mail, Search, Filter, Link, Paperclip, ChevronLeft, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
+import { PageHeader } from '@/components/ui/page-header';
 
 type Email = {
   id: string;
@@ -70,19 +71,17 @@ export default function EmailsPage() {
   };
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Emails</h1>
-          <p className="text-muted-foreground mt-2">
-            View and manage synced emails
-          </p>
-        </div>
-        <Button onClick={() => router.push('/settings/email')}>
-          <Mail className="mr-2 h-4 w-4" />
-          Email Settings
-        </Button>
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        title="Emails"
+        description="View and manage synced emails"
+        action={
+          <Button onClick={() => router.push('/settings/email')}>
+            <Mail className="mr-2 h-4 w-4" />
+            Email Settings
+          </Button>
+        }
+      />
 
       {/* Filters */}
       <div className="flex gap-4">
