@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import zxcvbn from "zxcvbn";
 import type { PoolClient } from "pg";
 import { query, withDb } from "@/lib/api/db";

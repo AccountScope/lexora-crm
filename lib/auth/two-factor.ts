@@ -2,7 +2,7 @@
 import crypto from "crypto";
 // @ts-ignore - no type declarations for speakeasy
 import speakeasy from "speakeasy";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import type { Role } from "@/lib/rbac/roles";
 import { query, withDb } from "@/lib/api/db";
 import { ApiError } from "@/lib/api/errors";
