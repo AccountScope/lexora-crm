@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/ui/page-header";
+import { WelcomeCard } from "@/components/dashboard/welcome-card";
+import { OnboardingModal } from "@/components/onboarding/onboarding-modal";
 import { 
   DollarSign, 
   FileText, 
@@ -211,20 +213,26 @@ export default function ExecutiveDashboard() {
   ];
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Executive Dashboard"
-        description="Real-time insights into your firm's performance"
-        action={
-          <Tabs value={timeRange} onValueChange={(v) => setTimeRange(v as any)}>
-            <TabsList>
-              <TabsTrigger value="month">Month</TabsTrigger>
-              <TabsTrigger value="quarter">Quarter</TabsTrigger>
-              <TabsTrigger value="year">Year</TabsTrigger>
-          </TabsList>
-        </Tabs>
-        }
-      />
+    <>
+      <OnboardingModal />
+      
+      <div className="space-y-6">
+        <PageHeader
+          title="Executive Dashboard"
+          description="Real-time insights into your firm's performance"
+          action={
+            <Tabs value={timeRange} onValueChange={(v) => setTimeRange(v as any)}>
+              <TabsList>
+                <TabsTrigger value="month">Month</TabsTrigger>
+                <TabsTrigger value="quarter">Quarter</TabsTrigger>
+                <TabsTrigger value="year">Year</TabsTrigger>
+            </TabsList>
+          </Tabs>
+          }
+        />
+
+        {/* Welcome Card */}
+        <WelcomeCard />
 
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
