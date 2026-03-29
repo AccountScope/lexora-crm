@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { TwoFactorSetup } from "@/components/auth/two-factor-setup";
 import { BackupCodes } from "@/components/auth/backup-codes";
 import { useSecurityStatus } from "@/lib/hooks/use-security";
+import { PageHeader } from "@/components/ui/page-header";
 
 const fetchJson = async (url: string, init?: RequestInit) => {
   const res = await fetch(url, init);
@@ -143,13 +144,10 @@ export default function SecuritySettingsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <ShieldCheck className="h-8 w-8 text-primary" />
-        <div>
-          <h1 className="text-3xl font-semibold">Security controls</h1>
-          <p className="text-sm text-muted-foreground">Manage verification status, multi-factor auth, and account recovery.</p>
-        </div>
-      </div>
+      <PageHeader
+        title="Security Controls"
+        description="Manage verification status, multi-factor auth, and account recovery"
+      />
       {message && <p className="rounded-md border border-muted bg-muted/30 px-3 py-2 text-sm">{message}</p>}
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>

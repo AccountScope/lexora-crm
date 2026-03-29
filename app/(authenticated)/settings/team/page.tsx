@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PageHeader } from "@/components/ui/page-header";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import {
   Dialog,
   DialogContent,
@@ -150,16 +152,16 @@ export default function TeamManagementPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <PageHeader
+        title="Team Management"
+        description="Manage your team members and their roles"
+      />
+      <div className="flex justify-between items-center" style={{ display: 'none' }}>
         <div>
           <h1 className="text-3xl font-bold">Team Management</h1>
           <p className="text-muted-foreground mt-1">
