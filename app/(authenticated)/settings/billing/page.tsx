@@ -8,6 +8,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Loader2, CreditCard, Receipt, AlertCircle, CheckCircle, ExternalLink } from 'lucide-react';
+import { PageHeader } from '@/components/ui/page-header';
 import { SubscriptionCard } from '@/components/billing/subscription-card';
 import { UsageDisplay } from '@/components/billing/usage-display';
 import { PricingTable } from '@/components/billing/pricing-table';
@@ -200,14 +201,11 @@ export default function BillingSettingsPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-8">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold mb-2">Billing & Subscription</h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          Manage your subscription, view usage, and update payment methods
-        </p>
-      </div>
+    <div className="max-w-7xl mx-auto space-y-8">
+      <PageHeader
+        title="Billing & Subscription"
+        description="Manage your subscription, view usage, and update payment methods"
+      />
 
       {/* Alert */}
       {alert && (
