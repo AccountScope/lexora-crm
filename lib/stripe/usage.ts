@@ -257,20 +257,20 @@ export async function getUsageSummary(userId: string): Promise<{
         emailSends: 0,
       };
 
-  // Calculate percentages
+  // Calculate percentages (only for plan limits)
   const percentages = {
     users: limits.users === Infinity ? 0 : (usage.usersCount / limits.users) * 100,
-    storage: limits.storageGB === Infinity ? 0 : (usage.storageGB / limits.storageGB) * 100,
-    apiCalls: limits.apiCalls === Infinity ? 0 : (usage.apiCalls / limits.apiCalls) * 100,
-    emailSends: limits.emailSends === Infinity ? 0 : (usage.emailSends / limits.emailSends) * 100,
+    storage: limits.storage === Infinity ? 0 : (usage.storageGB / limits.storage) * 100,
+    apiCalls: 0, // Not a plan limit
+    emailSends: 0, // Not a plan limit
   };
 
-  // Calculate overages
+  // Calculate overages (only for plan limits)
   const overages = {
     users: Math.max(0, usage.usersCount - limits.users),
-    storage: Math.max(0, usage.storageGB - limits.storageGB),
-    apiCalls: Math.max(0, usage.apiCalls - limits.apiCalls),
-    emailSends: Math.max(0, usage.emailSends - limits.emailSends),
+    storage: Math.max(0, usage.storageGB - limits.storage),
+    apiCalls: 0, // Not a plan limit
+    emailSends: 0, // Not a plan limit
   };
 
   // Calculate overage charges
@@ -295,9 +295,8 @@ export async function isWithinPlanLimits(userId: string): Promise<boolean> {
 
   return (
     usage.usersCount <= limits.users &&
-    usage.storageGB <= limits.storageGB &&
-    usage.apiCalls <= limits.apiCalls &&
-    usage.emailSends <= limits.emailSends
+    usage.storageGB <= limits.storage
+    // apiCalls and emailSends are not plan limits
   );
 }
 

@@ -4,7 +4,7 @@
  */
 
 import Stripe from 'stripe';
-import { stripe, PRICING_PLANS, TRIAL_PERIOD_DAYS, type PlanId } from './config';
+import { getStripe, PRICING_PLANS, TRIAL_PERIOD_DAYS, type PlanId } from './config';
 
 export interface CreateCheckoutSessionParams {
   userId: string;
@@ -43,6 +43,8 @@ export async function createCheckoutSession(
   if (!plan.stripePriceId) {
     throw new Error(`No Stripe price ID configured for plan: ${planId}`);
   }
+
+  const stripe = getStripe();
 
   try {
     // Create checkout session
@@ -90,6 +92,7 @@ export async function getCheckoutSession(
   sessionId: string
 ): Promise<Stripe.Checkout.Session | null> {
   try {
+    const stripe = getStripe();
     const session = await stripe.checkout.sessions.retrieve(sessionId, {
       expand: ['subscription', 'customer'],
     });
@@ -107,6 +110,8 @@ export async function createBillingPortalSession(
   customerId: string,
   returnUrl: string
 ): Promise<Stripe.BillingPortal.Session> {
+  const stripe = getStripe();
+
   try {
     const session = await stripe.billingPortal.sessions.create({
       customer: customerId,
@@ -127,6 +132,7 @@ export async function previewPlanChange(
   newPriceId: string
 ): Promise<Stripe.Invoice | null> {
   try {
+    const stripe = getStripe();
     // Retrieve the subscription
     const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 

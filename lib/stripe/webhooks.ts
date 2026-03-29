@@ -4,7 +4,7 @@
  */
 
 import Stripe from 'stripe';
-import { stripe, STRIPE_WEBHOOK_SECRET } from './config';
+import { getStripe, STRIPE_WEBHOOK_SECRET } from './config';
 import { syncSubscriptionFromStripe } from './subscriptions';
 import { query } from '../api/db';
 import { sendEmail } from '../email/send';
@@ -17,7 +17,7 @@ export function verifyWebhookSignature(
   signature: string
 ): Stripe.Event {
   try {
-    return stripe.webhooks.constructEvent(payload, signature, STRIPE_WEBHOOK_SECRET);
+    return getStripe().webhooks.constructEvent(payload, signature, STRIPE_WEBHOOK_SECRET);
   } catch (error) {
     console.error('Webhook signature verification failed:', error);
     throw new Error('Invalid webhook signature');
@@ -78,7 +78,7 @@ async function handleCheckoutSessionCompleted(event: Stripe.Event): Promise<void
 
   // Get the subscription
   const subscriptionId = session.subscription as string;
-  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+  const subscription = await getStripe().subscriptions.retrieve(subscriptionId);
 
   // Sync subscription to database
   await syncSubscriptionFromStripe(subscription);
@@ -163,7 +163,7 @@ async function handleInvoicePaymentSucceeded(event: Stripe.Event): Promise<void>
 
   // If this is a subscription invoice, ensure subscription is active
   if ((invoice as any).subscription) {
-    const subscription = await stripe.subscriptions.retrieve((invoice as any).subscription as string);
+    const subscription = await getStripe().subscriptions.retrieve((invoice as any).subscription as string);
     await syncSubscriptionFromStripe(subscription);
   }
 
@@ -207,7 +207,7 @@ async function handleInvoicePaymentFailed(event: Stripe.Event): Promise<void> {
     );
 
     // Send payment failure email
-    const subscription = await stripe.subscriptions.retrieve((invoice as any).subscription as string);
+    const subscription = await getStripe().subscriptions.retrieve((invoice as any).subscription as string);
     const userId = subscription.metadata?.userId;
     
     if (userId) {

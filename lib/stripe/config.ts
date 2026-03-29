@@ -7,8 +7,19 @@ import Stripe from 'stripe';
 
 // Stripe client (stub - requires STRIPE_SECRET_KEY env var)
 export const stripe = process.env.STRIPE_SECRET_KEY
-  ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2024-12-18.acacia' })
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2026-03-25.dahlia' })
   : null;
+
+/**
+ * Get Stripe client or throw error if not configured
+ * Use this helper to avoid null checks everywhere
+ */
+export function getStripe(): Stripe {
+  if (!stripe) {
+    throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY in environment variables.');
+  }
+  return stripe;
+}
 
 // Stripe webhook secret
 export const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || '';

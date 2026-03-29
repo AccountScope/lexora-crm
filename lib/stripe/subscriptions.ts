@@ -4,7 +4,7 @@
  */
 
 import Stripe from 'stripe';
-import { stripe, type PlanId } from './config';
+import { getStripe, type PlanId } from './config';
 import { query } from '../api/db';
 
 export interface SubscriptionData {
@@ -174,9 +174,9 @@ export async function cancelSubscription(
 
   // Cancel in Stripe
   if (immediate) {
-    await stripe.subscriptions.cancel(subscription.stripeSubscriptionId);
+    await getStripe().subscriptions.cancel(subscription.stripeSubscriptionId);
   } else {
-    await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
+    await getStripe().subscriptions.update(subscription.stripeSubscriptionId, {
       cancel_at_period_end: true,
     });
   }
@@ -215,7 +215,7 @@ export async function resumeSubscription(userId: string): Promise<void> {
   }
 
   // Resume in Stripe
-  await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
+  await getStripe().subscriptions.update(subscription.stripeSubscriptionId, {
     cancel_at_period_end: false,
   });
 
@@ -243,12 +243,12 @@ export async function changeSubscriptionPlan(
   }
 
   // Get current Stripe subscription
-  const stripeSubscription = await stripe.subscriptions.retrieve(
+  const stripeSubscription = await getStripe().subscriptions.retrieve(
     subscription.stripeSubscriptionId
   );
 
   // Update subscription in Stripe
-  await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
+  await getStripe().subscriptions.update(subscription.stripeSubscriptionId, {
     items: [
       {
         id: stripeSubscription.items.data[0].id,
