@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PageHeader } from "@/components/ui/page-header";
 import { 
   DollarSign, 
   FileText, 
@@ -211,22 +212,19 @@ export default function ExecutiveDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Executive Dashboard</h1>
-          <p className="text-muted-foreground mt-1">
-            Real-time insights into your firm's performance
-          </p>
-        </div>
-        <Tabs value={timeRange} onValueChange={(v) => setTimeRange(v as any)}>
-          <TabsList>
-            <TabsTrigger value="month">Month</TabsTrigger>
-            <TabsTrigger value="quarter">Quarter</TabsTrigger>
-            <TabsTrigger value="year">Year</TabsTrigger>
+      <PageHeader
+        title="Executive Dashboard"
+        description="Real-time insights into your firm's performance"
+        action={
+          <Tabs value={timeRange} onValueChange={(v) => setTimeRange(v as any)}>
+            <TabsList>
+              <TabsTrigger value="month">Month</TabsTrigger>
+              <TabsTrigger value="quarter">Quarter</TabsTrigger>
+              <TabsTrigger value="year">Year</TabsTrigger>
           </TabsList>
         </Tabs>
-      </div>
+        }
+      />
 
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

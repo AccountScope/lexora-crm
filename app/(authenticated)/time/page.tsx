@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
+import { PageHeader } from "@/components/ui/page-header";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Timer } from "@/components/time/timer";
 import { useCases } from "@/lib/hooks/use-cases";
@@ -179,10 +180,10 @@ const TimeTrackingPage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-semibold">Time tracking &amp; billing</h1>
-        <p className="text-muted-foreground">Real-time capture, templates, and billing controls your partners will adopt on day one.</p>
-      </div>
+      <PageHeader
+        title="Time Tracking & Billing"
+        description="Real-time capture, templates, and billing controls your partners will adopt on day one"
+      />
 
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
