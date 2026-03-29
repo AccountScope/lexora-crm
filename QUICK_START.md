@@ -1,119 +1,191 @@
-# LEXORA - Quick Start Guide
+# ⚡ LEXORA CRM - QUICK START FOR HARRIS'S LAWYER
 
-## ✅ What's Done:
-- GitHub repo created: https://github.com/AccountScope/lexora-crm
-- Code pushed (106 files, 16K+ lines)
-- Dependencies installed locally
-- Environment configured (`.env.local`)
+**What is this?** Enterprise-grade legal case management system.  
+**Who made it?** Built for Harris by AI agents (OpenClaw).  
+**Ready to use?** Yes! Just deployed.
 
 ---
 
-## 🎯 What You Need to Do (10 minutes):
+## 🚀 GET STARTED (5 Minutes)
 
-### 1. Run Database Migrations
+### Step 1: Create Your Account
+1. Go to: **https://lexora-crm.vercel.app**
+2. Click **"Sign Up"**
+3. Enter your email + password
+4. Check your email for verification link
+5. Click link → You're in!
 
-Go to Supabase SQL Editor:
-https://supabase.com/dashboard/project/xrzlewoeryvsgbcasmor/sql/new
+### Step 2: Set Up Your Firm
+After login, you'll create your organization:
+- **Name:** Your law firm name
+- **Email:** Firm email address
+- **Phone:** Office number
+- **Address:** Physical office location
 
-**Run these 7 files in order** (copy/paste each):
-
-1. `database/migrations/001_enable_extensions.sql`
-2. `database/migrations/002_create_enums.sql`
-3. `database/migrations/003_rbac.sql`
-4. `database/migrations/004_users_and_clients.sql`
-5. `database/migrations/005_matters_and_documents.sql`
-6. `database/migrations/006_billing.sql`
-7. `database/migrations/007_audit_logs.sql`
-
-**OR** run them all at once (recommended):
-```bash
-# Copy the full schema file content
-cat database/schema.sql
-```
-Then paste into Supabase SQL Editor and click RUN.
+Click **"Create Organization"** → Done!
 
 ---
 
-### 2. Deploy to Vercel
+## 📋 WHAT CAN YOU DO?
 
-**Option A: Via Dashboard (Easiest - 5 mins)**
-1. Go to https://vercel.com/new
-2. Import: `AccountScope/lexora-crm`
-3. Add these environment variables:
-   ```
-   LEXORA_AUTH_MODE=supabase
-   LEXORA_DB_MODE=supabase
-   LEXORA_STORAGE_MODE=supabase
-   NEXT_PUBLIC_SUPABASE_URL=https://xrzlewoeryvsgbcasmor.supabase.co
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhyemxld29lcnl2c2diY2FzbW9yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NjE3MzksImV4cCI6MjA5MDIzNzczOX0.8AgkOCxjQheIfodOlvUopvQVSFASySXTm4Y1BmXxF5k
-   SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhyemxld29lcnl2c2diY2FzbW9yIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDY2MTczOSwiZXhwIjoyMDkwMjM3NzM5fQ.vV1NnXqBefBSsS-xLeyb26n8GAQ6WZB4NlTYkgi5iOg
-   DATABASE_URL=postgresql://postgres:pAtXU4vi2GaordyK@db.xrzlewoeryvsgbcasmor.supabase.co:5432/postgres
-   ```
-4. Click **Deploy**
+### 1. **Dashboard** (Home Page)
+See everything at a glance:
+- 💰 Revenue this month
+- 📁 Active cases
+- ⏰ Time utilization
+- 📊 Charts & graphs
 
-**Option B: Via CLI**
-```bash
-cd /data/.openclaw/workspace/lexora
-vercel link
-vercel env add LEXORA_AUTH_MODE=supabase
-# (add all env vars from above)
-vercel --prod
-```
+### 2. **Cases/Matters**
+- Create new cases
+- Assign to lawyers
+- Track status (Active/Pending/Closed)
+- Add notes & documents
+- Bill clients
 
----
+### 3. **Time Tracking**
+- Log billable hours
+- Track work on cases
+- Calculate billing amounts
+- Generate timesheets
 
-### 3. Test the App
+### 4. **Invoicing**
+- Create professional invoices
+- Auto-calculate from time entries
+- Download as PDF
+- Track payments
 
-Once deployed, Vercel will give you a URL like:
-```
-https://lexora-crm.vercel.app
-```
+### 5. **Trust Accounting**
+- Manage client funds
+- Track deposits & withdrawals
+- Run reconciliation
+- Stay compliant
 
-**Create your first user:**
-- Go to Supabase Auth > Users
-- Create a new user manually
-- Assign role: `admin`
+### 6. **Documents**
+- Upload case files
+- Organize by case/client
+- Chain-of-custody tracking
+- Secure storage
 
-Then log in and test:
-- Create a case
-- Upload a document
-- Check the timeline
+### 7. **Team Management**
+- Invite colleagues
+- Assign roles (Admin/Lawyer/Paralegal)
+- Control permissions
+- Track who did what
 
----
-
-## 🔥 You're Done!
-
-**What you have:**
-- Full legal CRM MVP
-- Case management with timeline
-- Document vault with chain-of-custody
-- Client portal (view-only)
-- Role-based access control
-- Audit logging
-- Dual-deployment ready (Supabase now, Docker later)
+### 8. **Reports & Analytics**
+- Matter profitability
+- Client revenue
+- Time & billing analysis
+- Export to Excel/PDF
 
 ---
 
-## 📝 Next Steps:
+## 🎯 QUICK TEST WORKFLOW
 
-1. **Add first client** (via SQL or build admin UI)
-2. **Test all features** (cases, documents, portal)
-3. **Deploy to custom domain** (via Vercel)
-4. **Add more features** (billing, AI assistant, etc.)
+**Try this to see how it works:**
+
+1. **Create a Test Case**
+   - Go to Cases → New Case
+   - Client: "Test Client Ltd"
+   - Matter: "Contract Review"
+   - Save
+
+2. **Log Some Time**
+   - Go to Time Tracking
+   - Select your test case
+   - Hours: 2.5
+   - Description: "Reviewed contract terms"
+   - Mark as Billable
+   - Save
+
+3. **Generate an Invoice**
+   - Go to Invoicing → New Invoice
+   - Select "Test Client Ltd"
+   - Add your time entry
+   - Generate PDF
+   - Download it
+
+4. **View Dashboard**
+   - Go to Dashboard
+   - See your stats update!
+   - Revenue should show your billable amount
+
+**That's it!** You just:
+- Created a case
+- Logged time
+- Billed a client
+- Saw it on the dashboard
 
 ---
 
-## 🐛 Issues?
+## 🔑 KEY FEATURES
 
-Ping me in Discord: `#lexora-crm-build`
+### Multi-User (Team Collaboration)
+- Invite your team
+- Everyone sees same data
+- Role-based permissions
+- Full audit trail
 
-Or check:
-- `ARCHITECTURE.md` - System design
-- `AUTH.md` - Authentication setup
-- `DEPLOYMENT_MODES.md` - How to switch modes
-- `database/SCHEMA.md` - Database docs
+### Secure & Compliant
+- Data encrypted
+- Audit logs (who did what, when)
+- Trust accounting compliant
+- Conflict checking
+
+### Professional Output
+- PDF invoices
+- Client reports
+- Timesheet exports
+- Financial statements
+
+### Mobile Friendly
+- Works on iPhone/Android
+- Responsive design
+- Full features on mobile
 
 ---
 
-**Built in:** ~4 hours (2026-03-27 18:00 - 22:00 UTC)
-**Status:** Production-ready MVP 🚀
+## 💡 TIPS
+
+**Best Practices:**
+1. **Set up your team first** (Settings → Team)
+2. **Create practice area categories** (Corporate, Litigation, etc.)
+3. **Log time daily** (don't wait till end of week!)
+4. **Review dashboard weekly** (spot trends early)
+5. **Run reports monthly** (profitability check)
+
+**Common Questions:**
+- **How do I invite my team?** Settings → Team → Invite Member
+- **Where are my invoices?** Invoices page (left sidebar)
+- **Can I export data?** Yes! Most pages have Export to CSV/Excel
+- **Is my data backed up?** Yes, automatically (Supabase)
+- **Can I use on mobile?** Yes, fully responsive
+
+---
+
+## 📞 NEED HELP?
+
+**If something doesn't work:**
+1. Take a screenshot
+2. Note what you were doing
+3. Message Harris on Discord (#lexora-crm-build)
+4. We'll fix it ASAP
+
+**Want a feature added?**
+Just tell Harris - we can build it fast!
+
+---
+
+## 🎓 LEARN MORE
+
+**Full documentation:** See `/docs` folder in repo  
+**Test checklist:** See `DEPLOY_CHECKLIST.md`  
+**Known issues:** Check GitHub Issues
+
+---
+
+**Ready?** Go to **https://lexora-crm.vercel.app** and sign up!
+
+**Questions?** Message Harris.
+
+**Enjoy! 🚀**
