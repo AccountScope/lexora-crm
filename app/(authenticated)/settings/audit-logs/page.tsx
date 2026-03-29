@@ -15,6 +15,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { FileText, Search, Download, Loader2, Eye, Edit, Trash2, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { PageHeader } from "@/components/ui/page-header";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 interface AuditLog {
   id: string;
@@ -144,16 +146,22 @@ export default function AuditLogsPage() {
   const uniqueEntityTypes = Array.from(new Set(logs.map(log => log.entity_type)));
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <PageHeader
+        title="Audit Logs"
+        description="Complete activity trail for compliance and security"
+        action={
+          <Button variant="outline" onClick={exportLogs}>
+            <Download className="mr-2 h-4 w-4" />
+            Export
+          </Button>
+        }
+      />
+      <div className="flex justify-between items-center" style={{ display: 'none' }}>
         <div>
           <h1 className="text-3xl font-bold">Audit Logs</h1>
           <p className="text-muted-foreground mt-1">
