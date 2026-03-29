@@ -3,6 +3,24 @@
  * Pricing plans and product IDs
  */
 
+import Stripe from 'stripe';
+
+// Stripe client (stub - requires STRIPE_SECRET_KEY env var)
+export const stripe = process.env.STRIPE_SECRET_KEY
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2024-12-18.acacia' })
+  : null;
+
+// Stripe webhook secret
+export const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || '';
+
+// Trial period in days
+export const TRIAL_PERIOD_DAYS = 14;
+
+// Overage calculation stub
+export function calculateOverageCharges(usage: any, limits: any): number {
+  return 0; // TODO: Implement overage logic
+}
+
 export type PlanId = "free" | "starter" | "professional" | "enterprise";
 
 export interface PricingPlan {
