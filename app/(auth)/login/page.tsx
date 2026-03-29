@@ -144,6 +144,28 @@ export default function LoginPage() {
                   "Sign in"
                 )}
               </Button>
+
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300"></div>
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="px-2 bg-white text-gray-500">Testing</span>
+                </div>
+              </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full h-11 border-gray-300 text-gray-700 font-medium hover:bg-gray-50"
+                onClick={() => {
+                  setEmail('sabrina@test.com');
+                  setPassword('TestPassword123!');
+                }}
+                disabled={loading}
+              >
+                Use Demo Account
+              </Button>
             </form>
 
             <p className="mt-6 text-sm text-gray-600 text-center">
