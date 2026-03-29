@@ -1,3 +1,5 @@
+import { ErrorBoundary } from "@/components/error-boundary";
+
 // Force all authenticated routes to be dynamic
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -7,5 +9,9 @@ export default function AuthenticatedLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return (
+    <ErrorBoundary>
+      {children}
+    </ErrorBoundary>
+  );
 }
