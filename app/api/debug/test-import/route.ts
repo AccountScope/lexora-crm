@@ -1,9 +1,21 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
+  return NextResponse.json({ message: "Use POST" });
+}
+
+export async function POST(request: NextRequest) {
   const results: Record<string, any> = { step: 0 };
+  
+  try {
+    const body = await request.json();
+    results.bodyReceived = !!body;
+  } catch {
+    results.bodyReceived = false;
+  }
   
   // Test 1: Import db
   try {
