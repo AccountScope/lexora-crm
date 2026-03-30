@@ -249,7 +249,7 @@ export default function DashboardPremium() {
                     borderRadius: '8px',
                     boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
                   }}
-                  formatter={(value: number) => formatCurrency(value)}
+                  formatter={(value: any) => formatCurrency(value as number)}
                 />
                 <Bar dataKey="revenue" fill={CHART_COLORS.primary} radius={[8, 8, 0, 0]} />
                 <Bar dataKey="target" fill="#e5e7eb" radius={[8, 8, 0, 0]} />
