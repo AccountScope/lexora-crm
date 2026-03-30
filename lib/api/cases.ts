@@ -80,6 +80,27 @@ export const createCase = async (
   userId: string
 ) => {
   const matterId = await withDb(async (client) => {
+    // If clientName is provided but no clientId, create a placeholder client
+    let finalClientId = input.clientId;
+    
+    if (!finalClientId && input.clientName) {
+      const newClient = await client.query(
+        `INSERT INTO clients (
+          organization_id,
+          legal_name,
+          display_name,
+          status
+        ) VALUES ($1, $2, $3, 'active')
+        RETURNING id`,
+        [organizationId, input.clientName, input.clientName]
+      );
+      finalClientId = newClient.rows[0].id;
+    }
+    
+    if (!finalClientId) {
+      throw new ApiError(400, "Either clientId or clientName must be provided");
+    }
+
     const matter = await client.query(
       `INSERT INTO matters (
         organization_id,
@@ -96,7 +117,7 @@ export const createCase = async (
       RETURNING *`,
       [
         organizationId,
-        input.clientId,
+        finalClientId,
         input.matterNumber,
         input.title,
         input.description ?? null,

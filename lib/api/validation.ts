@@ -3,7 +3,8 @@ import { z } from "zod";
 export const caseStatusEnum = z.enum(["OPEN", "PENDING", "ON_HOLD", "CLOSED"]);
 
 export const createCaseSchema = z.object({
-  clientId: z.string().uuid(),
+  clientId: z.string().uuid().optional(), // Made optional - will create placeholder client if needed
+  clientName: z.string().min(2).optional(), // Alternative: provide client name
   title: z.string().min(3),
   matterNumber: z.string().min(3),
   practiceArea: z.string().optional(),

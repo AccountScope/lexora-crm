@@ -23,7 +23,7 @@ import { MattersListSkeleton } from "@/components/ui/skeletons";
 const formSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
   matterNumber: z.string().min(2, "Matter number must be at least 2 characters"),
-  clientId: z.string().uuid("Invalid client ID"),
+  clientName: z.string().min(2, "Client name required"),
   practiceArea: z.string().optional(),
   description: z.string().optional(),
 });
@@ -35,7 +35,7 @@ export const CaseManagementPanel = () => {
   const { data, isFetching, isError } = useCases(filters);
   const cases = data?.data ?? [];
   const mutation = useCreateCase();
-  const form = useForm({ resolver: zodResolver(formSchema), defaultValues: { title: "", matterNumber: "", clientId: "" } });
+  const form = useForm({ resolver: zodResolver(formSchema), defaultValues: { title: "", matterNumber: "", clientName: "" } });
   const { toast } = useToast();
 
   const submit = form.handleSubmit(async (values) => {
@@ -154,10 +154,10 @@ export const CaseManagementPanel = () => {
                     )}
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Client ID</label>
-                    <Input placeholder="UUID format" {...form.register("clientId")} />
-                    {form.formState.errors.clientId && (
-                      <p className="text-sm text-destructive">{form.formState.errors.clientId.message}</p>
+                    <label className="text-sm font-medium">Client Name</label>
+                    <Input placeholder="e.g., Acme Corporation" {...form.register("clientName")} />
+                    {form.formState.errors.clientName && (
+                      <p className="text-sm text-destructive">{form.formState.errors.clientName.message}</p>
                     )}
                   </div>
                   <div className="space-y-2">
