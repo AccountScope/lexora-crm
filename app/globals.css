@@ -5,6 +5,10 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Enhanced Design System */
+@import '../styles/typography.css';
+@import '../styles/layout.css';
+
 /* ===== LIGHT THEME (Default) ===== */
 :root {
   /* Background & Surfaces */
