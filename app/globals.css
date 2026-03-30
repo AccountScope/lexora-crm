@@ -1,73 +1,198 @@
+/* ===== LEXORA CRM - PROFESSIONAL DESIGN SYSTEM ===== */
+/* Updated: 2026-03-30 - Enterprise-grade visual foundation */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===== LIGHT THEME (Default) ===== */
 :root {
+  /* Background & Surfaces */
   --background: 0 0% 100%;
-  --foreground: 20 14.3% 4.1%;
-  --muted: 60 4.8% 95.9%;
-  --muted-foreground: 25 5.3% 44.7%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 20 14.3% 4.1%;
+  --foreground: 222 47% 11%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 215 16% 47%;
+  
+  /* Cards & Popovers */
   --card: 0 0% 100%;
-  --card-foreground: 20 14.3% 4.1%;
-  --border: 20 5.9% 90%;
-  --input: 20 5.9% 90%;
-  --primary: 262 83% 57%;
-  --primary-foreground: 210 20% 98%;
-  --secondary: 240 4.8% 95.9%;
-  --secondary-foreground: 240 5.9% 10%;
-  --accent: 240 4.8% 95.9%;
-  --accent-foreground: 240 5.9% 10%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 210 20% 98%;
-  --ring: 262 83% 57%;
-  --radius: 0.75rem;
-  --sidebar-background: 240 10% 4%;
-  --sidebar-foreground: 0 0% 100%;
-  --sidebar-primary: 262 83% 57%;
-  --sidebar-primary-foreground: 210 20% 98%;
-  --sidebar-accent: 240 4.8% 16%;
-  --sidebar-accent-foreground: 0 0% 100%;
-  --sidebar-border: 240 3% 20%;
-  --sidebar-ring: 262 83% 57%;
+  --card-foreground: 222 47% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+  
+  /* Borders & Inputs */
+  --border: 214 32% 91%;
+  --input: 214 32% 91%;
+  
+  /* Primary (Legal Blue) - Professional & Trustworthy */
+  --primary: 221 83% 53%;
+  --primary-foreground: 210 40% 98%;
+  
+  /* Secondary (Neutral Gray) */
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222 47% 11%;
+  
+  /* Accent (Highlight) */
+  --accent: 210 40% 96%;
+  --accent-foreground: 222 47% 11%;
+  
+  /* Success (Legal Green) */
+  --success: 142 76% 36%;
+  --success-foreground: 210 40% 98%;
+  
+  /* Warning (Amber) */
+  --warning: 38 92% 50%;
+  --warning-foreground: 222 47% 11%;
+  
+  /* Destructive (Red) */
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 210 40% 98%;
+  
+  /* Ring (Focus) */
+  --ring: 221 83% 53%;
+  --radius: 0.5rem;
+  
+  /* Sidebar */
+  --sidebar-background: 222 47% 11%;
+  --sidebar-foreground: 210 40% 98%;
+  --sidebar-primary: 221 83% 53%;
+  --sidebar-primary-foreground: 210 40% 98%;
+  --sidebar-accent: 215 25% 27%;
+  --sidebar-accent-foreground: 210 40% 98%;
+  --sidebar-border: 215 25% 20%;
+  --sidebar-ring: 221 83% 53%;
 }
 
+/* ===== DARK THEME ===== */
 .dark {
-  --background: 20 14.3% 4.1%;
-  --foreground: 60 9.1% 97.8%;
-  --muted: 12 6.5% 15.1%;
-  --muted-foreground: 24 5.4% 63.9%;
-  --popover: 20 14.3% 4.1%;
-  --popover-foreground: 60 9.1% 97.8%;
-  --card: 24 9.8% 10%;
-  --card-foreground: 60 9.1% 97.8%;
-  --border: 12 6.5% 15.1%;
-  --input: 12 6.5% 15.1%;
-  --primary: 262 83% 63%;
-  --primary-foreground: 210 20% 98%;
-  --secondary: 240 3.7% 15.9%;
-  --secondary-foreground: 0 0% 98%;
-  --accent: 240 3.7% 15.9%;
-  --accent-foreground: 0 0% 98%;
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 60 9.1% 97.8%;
-  --ring: 262 83% 63%;
+  --background: 222 47% 11%;
+  --foreground: 210 40% 98%;
+  --muted: 217 33% 17%;
+  --muted-foreground: 215 20% 65%;
+  
+  --card: 222 47% 11%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222 47% 11%;
+  --popover-foreground: 210 40% 98%;
+  
+  --border: 217 33% 17%;
+  --input: 217 33% 17%;
+  
+  --primary: 217 91% 60%;
+  --primary-foreground: 222 47% 11%;
+  
+  --secondary: 217 33% 17%;
+  --secondary-foreground: 210 40% 98%;
+  
+  --accent: 217 33% 17%;
+  --accent-foreground: 210 40% 98%;
+  
+  --success: 142 76% 36%;
+  --success-foreground: 210 40% 98%;
+  
+  --warning: 38 92% 50%;
+  --warning-foreground: 222 47% 11%;
+  
+  --destructive: 0 63% 31%;
+  --destructive-foreground: 210 40% 98%;
+  
+  --ring: 217 91% 60%;
 }
 
+/* ===== BASE STYLES ===== */
 * {
   @apply border-border;
 }
 
 body {
   @apply bg-background text-foreground antialiased;
+  font-feature-settings: "rlig" 1, "calt" 1;
 }
 
-/* Professional Legal CRM Animations */
+/* ===== TYPOGRAPHY ===== */
+h1 {
+  @apply text-4xl font-bold tracking-tight;
+}
+
+h2 {
+  @apply text-3xl font-semibold tracking-tight;
+}
+
+h3 {
+  @apply text-2xl font-semibold tracking-tight;
+}
+
+h4 {
+  @apply text-xl font-semibold;
+}
+
+h5 {
+  @apply text-lg font-semibold;
+}
+
+h6 {
+  @apply text-base font-semibold;
+}
+
+/* ===== MODERN UI EFFECTS ===== */
+
+/* Glass Morphism for Cards */
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+.dark .glass-card {
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Gradient Background */
+.gradient-bg {
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%);
+}
+
+/* Subtle Grid Pattern */
+.grid-pattern {
+  background-image: 
+    linear-gradient(to right, hsl(var(--border)) 1px, transparent 1px),
+    linear-gradient(to bottom, hsl(var(--border)) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* ===== ANIMATIONS ===== */
 @keyframes slide-up {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-left {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
@@ -76,45 +201,243 @@ body {
   to { opacity: 1; }
 }
 
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+/* Animation Classes */
 .animate-slide-up {
-  animation: slide-up 0.2s ease-out;
+  animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-slide-down {
+  animation: slide-down 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-slide-left {
+  animation: slide-left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .animate-fade-in {
-  animation: fade-in 0.15s ease-in;
+  animation: fade-in 0.2s ease-out;
 }
 
-/* Smooth hover transitions */
+.animate-scale-in {
+  animation: scale-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ===== INTERACTIVE ELEMENTS ===== */
+
+/* Hover Lift Effect */
 .hover-lift {
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
+              box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .hover-lift:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
 }
 
-/* Professional tooltip styling */
-[data-radix-tooltip-content] {
-  animation: fade-in 0.12s ease-in;
-}
-
-/* Legal badge transitions */
-.legal-badge {
-  transition: all 0.15s ease;
-}
-
-.legal-badge:hover {
-  opacity: 0.9;
-  transform: scale(1.02);
-}
-
-/* Card hover effect */
+/* Card Interactive */
 .card-interactive {
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
 }
 
 .card-interactive:hover {
-  border-color: hsl(var(--primary) / 0.3);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-color: hsl(var(--primary) / 0.4);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+/* Button Ripple Effect */
+.button-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.button-ripple::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.button-ripple:active::after {
+  width: 300px;
+  height: 300px;
+}
+
+/* ===== STATUS BADGES ===== */
+.status-badge {
+  @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all;
+}
+
+.status-badge-active {
+  @apply bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400;
+}
+
+.status-badge-pending {
+  @apply bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400;
+}
+
+.status-badge-completed {
+  @apply bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400;
+}
+
+.status-badge-urgent {
+  @apply bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400;
+}
+
+/* ===== LOADING STATES ===== */
+.skeleton {
+  @apply animate-pulse bg-muted rounded;
+}
+
+.spinner {
+  @apply animate-spin rounded-full border-2 border-current border-t-transparent;
+}
+
+/* ===== METRIC CARDS ===== */
+.metric-card {
+  @apply relative overflow-hidden rounded-lg border bg-card p-6 shadow-sm transition-all hover:shadow-md;
+}
+
+.metric-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--primary) / 0.6));
+}
+
+.metric-card-success::before {
+  background: linear-gradient(90deg, hsl(var(--success)), hsl(var(--success) / 0.6));
+}
+
+.metric-card-warning::before {
+  background: linear-gradient(90deg, hsl(var(--warning)), hsl(var(--warning) / 0.6));
+}
+
+.metric-card-danger::before {
+  background: linear-gradient(90deg, hsl(var(--destructive)), hsl(var(--destructive) / 0.6));
+}
+
+/* ===== PROFESSIONAL SHADOWS ===== */
+.shadow-professional {
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.05),
+    0 10px 15px -3px rgba(0, 0, 0, 0.08);
+}
+
+.shadow-professional-lg {
+  box-shadow: 
+    0 4px 6px rgba(0, 0, 0, 0.05),
+    0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== FOCUS STATES ===== */
+.focus-professional {
+  @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background;
+}
+
+/* ===== TOOLTIP STYLING ===== */
+[data-radix-tooltip-content] {
+  @apply animate-fade-in;
+}
+
+/* ===== SMOOTH SCROLLING ===== */
+.smooth-scroll {
+  scroll-behavior: smooth;
+}
+
+/* ===== PROFESSIONAL FORM INPUTS ===== */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+textarea,
+select {
+  @apply transition-all duration-200;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+textarea:focus,
+select:focus {
+  @apply ring-2 ring-primary ring-offset-2;
+}
+
+/* ===== RESPONSIVE TABLE ===== */
+.table-responsive {
+  @apply w-full overflow-x-auto rounded-lg border;
+}
+
+.table-responsive table {
+  @apply w-full border-collapse text-sm;
+}
+
+.table-responsive thead {
+  @apply bg-muted/50;
+}
+
+.table-responsive th {
+  @apply px-4 py-3 text-left font-semibold text-muted-foreground;
+}
+
+.table-responsive td {
+  @apply border-t px-4 py-3;
+}
+
+.table-responsive tbody tr {
+  @apply transition-colors hover:bg-muted/30;
+}
+
+/* ===== UTILITY CLASSES ===== */
+.text-gradient {
+  @apply bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent;
+}
+
+.border-gradient {
+  border-image: linear-gradient(90deg, hsl(var(--primary)), transparent) 1;
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  body {
+    @apply bg-white text-black;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
 }
