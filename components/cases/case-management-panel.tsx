@@ -4,7 +4,7 @@ import { useState } from "react";
 import { CaseSummaryCards } from "@/components/cases/case-summary-cards";
 import { MatterFilters } from "@/components/cases/matter-filters";
 import { MatterCard } from "@/components/cases/matter-card";
-import { CasesTable } from "@/components/cases/cases-table";
+import { CasesTablePremium } from "@/components/cases/cases-table-premium";
 import { useCases, useCreateCase } from "@/lib/hooks/use-cases";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -220,7 +220,7 @@ export const CaseManagementPanel = () => {
                 ))}
               </div>
             ) : (
-              <CasesTable data={displayCases as any} loading={isFetching} />
+              <CasesTablePremium data={displayCases as any} loading={isFetching} onCreateMatter={() => setDialogOpen(true)} />
             )}
           </>
         )}
