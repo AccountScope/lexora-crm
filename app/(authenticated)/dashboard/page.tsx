@@ -135,7 +135,7 @@ export default function DashboardPremium() {
   ];
 
   return (
-    <div className="container-page space-y-8 animate-fade-in pb-12">
+    <div className="container-page space-y-8 page-transition pb-12">
       {/* Premium Header */}
       <DashboardHeader
         userName="Harris"
@@ -145,7 +145,7 @@ export default function DashboardPremium() {
       />
 
       {/* Key Metrics Grid - Premium Cards */}
-      <div className="metrics-grid grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="metrics-grid grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 stagger-children">
         {loading ? (
           <>
             <MetricCardSkeleton />

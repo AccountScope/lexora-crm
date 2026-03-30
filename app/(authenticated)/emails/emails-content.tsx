@@ -6,18 +6,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Mail, Search, Filter, Link, Paperclip, ChevronLeft, ChevronRight } from 'lucide-react';
-import { format } from 'date-fns';
-import { PageHeader } from '@/components/ui/page-header';
+import { EmailsTablePremium } from '@/components/email/emails-table-premium';
+import { Mail, Search } from 'lucide-react';
 
 type Email = {
   id: string;

@@ -59,8 +59,8 @@ export function MetricCardPremium({
   return (
     <Card 
       className={cn(
-        "group relative overflow-hidden rounded-2xl border-0 bg-gradient-to-br shadow-sm transition-all duration-300",
-        "hover:shadow-xl hover:scale-[1.02]",
+        "group relative overflow-hidden rounded-2xl border-0 bg-gradient-to-br shadow-sm transition-all duration-300 hover-lift-lg",
+        "hover:shadow-2xl hover:scale-[1.03]",
         variantGradients[variant],
         loading && "animate-pulse",
         className

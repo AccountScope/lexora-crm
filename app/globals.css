@@ -11,6 +11,7 @@
 @import '../styles/tables-premium.css';
 @import '../styles/buttons-premium.css';
 @import '../styles/mobile-premium.css';
+@import '../styles/animations-premium.css';
 
 /* ===== LIGHT THEME (Default) ===== */
 :root {
@@ -113,6 +114,9 @@
 body {
   @apply bg-background text-foreground antialiased;
   font-feature-settings: "rlig" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 /* ===== TYPOGRAPHY ===== */
