@@ -8,6 +8,8 @@
 /* Enhanced Design System */
 @import '../styles/typography.css';
 @import '../styles/layout.css';
+@import '../styles/tables-premium.css';
+@import '../styles/buttons-premium.css';
 
 /* ===== LIGHT THEME (Default) ===== */
 :root {

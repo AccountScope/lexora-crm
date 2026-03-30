@@ -1,0 +1,433 @@
+/**
+ * LEXORA PREMIUM TABLE SYSTEM
+ * Enterprise-grade data tables
+ */
+
+/* ===== BASE TABLE STYLES ===== */
+
+.table-premium {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* ===== TABLE HEADER ===== */
+
+.table-premium thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: hsl(var(--background));
+}
+
+.table-premium thead tr {
+  border-bottom: 2px solid hsl(var(--border));
+}
+
+.table-premium th {
+  padding: 1rem 1.5rem;
+  text-align: left;
+  font-size: 0.8125rem; /* 13px */
+  font-weight: 600;
+  color: hsl(var(--muted-foreground));
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  background: hsl(var(--muted) / 0.3);
+}
+
+.table-premium th:first-child {
+  border-top-left-radius: 0.75rem;
+  padding-left: 1.5rem;
+}
+
+.table-premium th:last-child {
+  border-top-right-radius: 0.75rem;
+  padding-right: 1.5rem;
+}
+
+/* ===== TABLE BODY ===== */
+
+.table-premium tbody tr {
+  border-bottom: 1px solid hsl(var(--border) / 0.5);
+  transition: all 0.2s ease;
+}
+
+.table-premium tbody tr:last-child {
+  border-bottom: none;
+}
+
+.table-premium tbody tr:hover {
+  background: hsl(var(--muted) / 0.3);
+  cursor: pointer;
+}
+
+.table-premium tbody tr:active {
+  background: hsl(var(--muted) / 0.5);
+}
+
+/* Zebra Striping (subtle) */
+.table-premium.table-striped tbody tr:nth-child(even) {
+  background: hsl(var(--muted) / 0.1);
+}
+
+.table-premium.table-striped tbody tr:nth-child(even):hover {
+  background: hsl(var(--muted) / 0.3);
+}
+
+/* ===== TABLE CELLS ===== */
+
+.table-premium td {
+  padding: 1.25rem 1.5rem;
+  font-size: 0.9375rem; /* 15px */
+  line-height: 1.5;
+  vertical-align: middle;
+}
+
+.table-premium td:first-child {
+  padding-left: 1.5rem;
+  font-weight: 500;
+}
+
+.table-premium td:last-child {
+  padding-right: 1.5rem;
+}
+
+/* ===== ROW HEIGHT VARIANTS ===== */
+
+.table-compact td {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.table-comfortable td {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.table-spacious td {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
+/* ===== COLUMN ALIGNMENT ===== */
+
+.table-premium .text-right {
+  text-align: right;
+}
+
+.table-premium .text-center {
+  text-align: center;
+}
+
+.table-premium .text-left {
+  text-align: left;
+}
+
+/* ===== CELL VARIANTS ===== */
+
+.table-cell-primary {
+  font-weight: 600;
+  color: hsl(var(--foreground));
+}
+
+.table-cell-secondary {
+  color: hsl(var(--muted-foreground));
+  font-size: 0.875rem;
+}
+
+.table-cell-muted {
+  color: hsl(var(--muted-foreground));
+  opacity: 0.7;
+}
+
+.table-cell-mono {
+  font-family: 'SF Mono', 'Roboto Mono', 'Fira Code', monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===== STICKY COLUMNS ===== */
+
+.table-premium .sticky-left {
+  position: sticky;
+  left: 0;
+  z-index: 5;
+  background: hsl(var(--background));
+}
+
+.table-premium tbody tr:hover .sticky-left {
+  background: hsl(var(--muted) / 0.3);
+}
+
+.table-premium .sticky-right {
+  position: sticky;
+  right: 0;
+  z-index: 5;
+  background: hsl(var(--background));
+}
+
+.table-premium tbody tr:hover .sticky-right {
+  background: hsl(var(--muted) / 0.3);
+}
+
+/* Shadow for sticky columns */
+.sticky-left::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -8px;
+  bottom: 0;
+  width: 8px;
+  background: linear-gradient(to right, rgba(0,0,0,0.05), transparent);
+  pointer-events: none;
+}
+
+.sticky-right::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -8px;
+  bottom: 0;
+  width: 8px;
+  background: linear-gradient(to left, rgba(0,0,0,0.05), transparent);
+  pointer-events: none;
+}
+
+/* ===== TABLE CONTAINER ===== */
+
+.table-container {
+  overflow-x: auto;
+  overflow-y: visible;
+  border-radius: 0.75rem;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--card));
+}
+
+.table-container-shadow {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== LOADING STATES ===== */
+
+.table-loading tbody tr {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* ===== SELECTION ===== */
+
+.table-premium tbody tr.selected {
+  background: hsl(var(--primary) / 0.1);
+  border-left: 3px solid hsl(var(--primary));
+}
+
+.table-premium tbody tr.selected:hover {
+  background: hsl(var(--primary) / 0.15);
+}
+
+/* ===== STATUS INDICATORS ===== */
+
+.status-dot {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+
+.status-dot-success {
+  background: hsl(var(--success));
+}
+
+.status-dot-warning {
+  background: hsl(var(--warning));
+}
+
+.status-dot-danger {
+  background: hsl(var(--destructive));
+}
+
+.status-dot-muted {
+  background: hsl(var(--muted-foreground));
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 768px) {
+  .table-premium th,
+  .table-premium td {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .table-premium th {
+    font-size: 0.75rem; /* 12px */
+  }
+
+  .table-premium td {
+    font-size: 0.875rem; /* 14px */
+  }
+
+  /* Hide less important columns on mobile */
+  .hide-mobile {
+    display: none;
+  }
+}
+
+/* ===== ACTIONS COLUMN ===== */
+
+.table-actions {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.table-premium tbody tr:hover .table-actions {
+  opacity: 1;
+}
+
+/* Always show on touch devices */
+@media (hover: none) {
+  .table-actions {
+    opacity: 1;
+  }
+}
+
+/* ===== BULK SELECTION ===== */
+
+.table-bulk-actions {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  padding: 1rem 1.5rem;
+  border-radius: 0.75rem 0.75rem 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ===== SORTABLE HEADERS ===== */
+
+.table-header-sortable {
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  padding-right: 2rem;
+}
+
+.table-header-sortable:hover {
+  color: hsl(var(--foreground));
+}
+
+.table-header-sortable::after {
+  content: '';
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid currentColor;
+  opacity: 0.3;
+}
+
+.table-header-sortable.sorted-asc::after {
+  opacity: 1;
+  border-top: 4px solid hsl(var(--primary));
+}
+
+.table-header-sortable.sorted-desc::after {
+  opacity: 1;
+  border-top: none;
+  border-bottom: 4px solid hsl(var(--primary));
+}
+
+/* ===== PAGINATION ===== */
+
+.table-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid hsl(var(--border));
+  background: hsl(var(--muted) / 0.2);
+  border-radius: 0 0 0.75rem 0.75rem;
+}
+
+.pagination-info {
+  font-size: 0.875rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.pagination-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* ===== EXPANDABLE ROWS ===== */
+
+.table-row-expandable {
+  cursor: pointer;
+}
+
+.table-row-expanded {
+  background: hsl(var(--muted) / 0.2);
+}
+
+.table-row-expansion {
+  background: hsl(var(--muted) / 0.1);
+  animation: expandRow 0.3s ease;
+}
+
+@keyframes expandRow {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 500px;
+  }
+}
+
+/* ===== DARK MODE ADJUSTMENTS ===== */
+
+.dark .table-premium thead {
+  background: hsl(var(--background));
+}
+
+.dark .table-premium th {
+  background: hsl(var(--muted) / 0.2);
+}
+
+.dark .sticky-left::after,
+.dark .sticky-right::before {
+  background: linear-gradient(to right, rgba(255,255,255,0.05), transparent);
+}
+
+.dark .table-container-shadow {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.4);
+}
