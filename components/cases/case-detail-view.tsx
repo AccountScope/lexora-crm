@@ -11,13 +11,47 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 export const CaseDetailView = ({ matterId }: { matterId: string }) => {
-  const { data } = useCaseDetail(matterId);
+  const { data, isLoading, error } = useCaseDetail(matterId);
   const detail = data?.data;
   const notes = useCaseNotes(matterId);
   const timeline = useCaseTimeline(matterId);
 
-  if (!detail) {
-    return <div className="text-muted-foreground">Loading case…</div>;
+  if (isLoading) {
+    return (
+      <div className="container-page space-y-6 page-transition pb-12">
+        <div className="skeleton-loader h-32 w-full" />
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="lg:col-span-2 space-y-6">
+            <div className="skeleton-loader h-64 w-full" />
+            <div className="skeleton-loader h-64 w-full" />
+          </div>
+          <div className="skeleton-loader h-96 w-full" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !detail) {
+    return (
+      <div className="container-page page-transition pb-12">
+        <Card className="border-red-200 dark:border-red-900/30">
+          <CardContent className="p-8 text-center">
+            <div className="text-red-600 dark:text-red-400 mb-4">
+              <p className="text-lg font-semibold">Failed to load case</p>
+              <p className="text-sm mt-2">
+                {error ? (error as Error).message : 'Case not found'}
+              </p>
+            </div>
+            <button 
+              onClick={() => window.location.href = '/cases'}
+              className="btn-premium btn-secondary-premium btn-md mt-4"
+            >
+              Back to Cases
+            </button>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   return (
