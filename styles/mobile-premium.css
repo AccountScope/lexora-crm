@@ -1,0 +1,524 @@
+/**
+ * LEXORA MOBILE UX OPTIMIZATION
+ * Premium mobile experience
+ */
+
+/* ===== MOBILE BREAKPOINTS ===== */
+
+/* Small phones: 320px - 480px */
+@media (max-width: 480px) {
+  /* Typography adjustments */
+  .text-h1 {
+    font-size: 2rem; /* 32px */
+  }
+  
+  .text-h2 {
+    font-size: 1.5rem; /* 24px */
+  }
+  
+  .text-h3 {
+    font-size: 1.25rem; /* 20px */
+  }
+  
+  /* Container padding */
+  .container-page {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  /* Card spacing */
+  .card-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  /* Metric cards */
+  .metric-card-mobile {
+    padding: 1rem;
+  }
+  
+  .metric-card-mobile h3 {
+    font-size: 0.75rem;
+  }
+  
+  .metric-card-mobile .value {
+    font-size: 1.5rem;
+  }
+}
+
+/* Tablets: 481px - 768px */
+@media (min-width: 481px) and (max-width: 768px) {
+  .container-page {
+    max-width: 100%;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+  
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* ===== TOUCH TARGETS ===== */
+
+@media (hover: none) and (pointer: coarse) {
+  /* Minimum 44px touch targets */
+  button,
+  a,
+  input[type="checkbox"],
+  input[type="radio"],
+  select {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Table row touch targets */
+  .table-premium tbody tr {
+    height: 56px;
+  }
+  
+  /* Larger tap areas for interactive elements */
+  .btn-premium {
+    padding: 0.75rem 1.5rem;
+  }
+  
+  .btn-sm {
+    padding: 0.625rem 1.25rem;
+  }
+  
+  /* Show actions always on touch devices */
+  .table-actions {
+    opacity: 1 !important;
+  }
+}
+
+/* ===== MOBILE NAVIGATION ===== */
+
+@media (max-width: 768px) {
+  /* Sticky mobile header */
+  .mobile-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: hsl(var(--background));
+    border-bottom: 1px solid hsl(var(--border));
+    padding: 1rem;
+  }
+  
+  /* Bottom navigation bar */
+  .mobile-nav-bottom {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: hsl(var(--background));
+    border-top: 1px solid hsl(var(--border));
+    padding: 0.75rem 1rem;
+    display: flex;
+    justify-content: space-around;
+    box-shadow: 0 -4px 6px -1px rgb(0 0 0 / 0.1);
+  }
+  
+  .mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem;
+    min-width: 60px;
+    color: hsl(var(--muted-foreground));
+    transition: color 0.2s ease;
+  }
+  
+  .mobile-nav-item.active {
+    color: hsl(var(--primary));
+  }
+  
+  .mobile-nav-item:active {
+    transform: scale(0.95);
+  }
+}
+
+/* ===== MOBILE TABLE OPTIMIZATION ===== */
+
+@media (max-width: 768px) {
+  /* Horizontal scroll with momentum */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+  }
+  
+  /* Compact table for mobile */
+  .table-premium.table-mobile-compact th,
+  .table-premium.table-mobile-compact td {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  /* Stack table cards on very small screens */
+  .table-as-cards {
+    display: none;
+  }
+  
+  .table-card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .table-card-item {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.75rem;
+    padding: 1rem;
+  }
+  
+  .table-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid hsl(var(--border));
+  }
+  
+  .table-card-body {
+    display: grid;
+    gap: 0.5rem;
+  }
+  
+  .table-card-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .table-card-label {
+    font-size: 0.75rem;
+    color: hsl(var(--muted-foreground));
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  .table-card-value {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: hsl(var(--foreground));
+  }
+}
+
+/* ===== MOBILE FORMS ===== */
+
+@media (max-width: 768px) {
+  /* Full-width inputs on mobile */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="number"],
+  select,
+  textarea {
+    width: 100%;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+  
+  /* Stack form fields */
+  .form-row {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .form-row > * {
+    width: 100%;
+  }
+  
+  /* Larger form buttons */
+  .form-submit-mobile {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1rem;
+  }
+}
+
+/* ===== MOBILE MODALS ===== */
+
+@media (max-width: 768px) {
+  /* Full-screen modals on mobile */
+  .modal-mobile-fullscreen {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 0;
+    margin: 0;
+  }
+  
+  /* Bottom sheet style */
+  .modal-bottom-sheet {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-height: 90vh;
+    border-radius: 1rem 1rem 0 0;
+    animation: slideUpMobile 0.3s ease;
+  }
+  
+  @keyframes slideUpMobile {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+}
+
+/* ===== MOBILE CHARTS ===== */
+
+@media (max-width: 768px) {
+  /* Smaller chart heights */
+  .chart-container-mobile {
+    height: 240px;
+  }
+  
+  /* Hide chart legends on very small screens */
+  .chart-legend-hide-mobile {
+    display: none;
+  }
+  
+  /* Stack charts vertically */
+  .charts-grid-mobile {
+    grid-template-columns: 1fr !important;
+    gap: 1rem;
+  }
+}
+
+/* ===== MOBILE METRIC CARDS ===== */
+
+@media (max-width: 640px) {
+  /* Single column on mobile */
+  .metrics-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem;
+  }
+  
+  /* Compact metric cards */
+  .metric-card-compact {
+    padding: 1rem;
+  }
+  
+  .metric-card-compact .icon {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+  
+  .metric-card-compact .value {
+    font-size: 2rem;
+  }
+}
+
+/* ===== MOBILE STICKY ELEMENTS ===== */
+
+@media (max-width: 768px) {
+  /* Sticky CTAs */
+  .sticky-cta-mobile {
+    position: sticky;
+    bottom: 1rem;
+    left: 1rem;
+    right: 1rem;
+    z-index: 40;
+    padding: 1rem;
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -1px rgb(0 0 0 / 0.06);
+  }
+  
+  /* Sticky filters */
+  .sticky-filters-mobile {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: hsl(var(--background));
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid hsl(var(--border));
+  }
+}
+
+/* ===== MOBILE SAFE AREAS (iOS) ===== */
+
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .mobile-safe-bottom {
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+  }
+  
+  .mobile-nav-bottom {
+    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+  }
+}
+
+/* ===== MOBILE GESTURES ===== */
+
+@media (max-width: 768px) {
+  /* Pull-to-refresh indicator space */
+  .pull-to-refresh-space {
+    padding-top: 3rem;
+  }
+  
+  /* Swipeable cards */
+  .swipeable-card {
+    touch-action: pan-x;
+  }
+  
+  /* Prevent text selection on double-tap */
+  .no-select-mobile {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+
+/* ===== MOBILE LOADING STATES ===== */
+
+@media (max-width: 768px) {
+  /* Skeleton loaders optimized for mobile */
+  .skeleton-mobile {
+    height: 3rem;
+    border-radius: 0.5rem;
+    background: linear-gradient(
+      90deg,
+      hsl(var(--muted)) 0%,
+      hsl(var(--muted) / 0.8) 50%,
+      hsl(var(--muted)) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+  
+  @keyframes shimmer {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+}
+
+/* ===== MOBILE ACCESSIBILITY ===== */
+
+@media (max-width: 768px) {
+  /* Larger focus indicators */
+  *:focus-visible {
+    outline: 3px solid hsl(var(--ring));
+    outline-offset: 3px;
+  }
+  
+  /* Skip to content link */
+  .skip-to-content {
+    position: fixed;
+    top: -100%;
+    left: 0;
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    padding: 1rem;
+    z-index: 9999;
+    transition: top 0.2s ease;
+  }
+  
+  .skip-to-content:focus {
+    top: 0;
+  }
+}
+
+/* ===== MOBILE PERFORMANCE ===== */
+
+@media (max-width: 768px) {
+  /* Reduce animations on low-end devices */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+  
+  /* Hardware acceleration */
+  .hw-accelerate {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+}
+
+/* ===== MOBILE UTILITY CLASSES ===== */
+
+@media (max-width: 768px) {
+  .text-mobile-center {
+    text-align: center;
+  }
+  
+  .flex-mobile-column {
+    flex-direction: column;
+  }
+  
+  .gap-mobile-sm {
+    gap: 0.5rem;
+  }
+  
+  .padding-mobile-compact {
+    padding: 1rem;
+  }
+  
+  .rounded-mobile-none {
+    border-radius: 0;
+  }
+  
+  .shadow-mobile-none {
+    box-shadow: none;
+  }
+}
+
+/* ===== LANDSCAPE PHONE OPTIMIZATION ===== */
+
+@media (max-width: 896px) and (orientation: landscape) {
+  /* Reduce vertical spacing in landscape */
+  .mobile-header {
+    padding: 0.5rem 1rem;
+  }
+  
+  .metric-card-compact {
+    padding: 0.75rem 1rem;
+  }
+  
+  /* Smaller charts in landscape */
+  .chart-container-mobile {
+    height: 200px;
+  }
+}
+
+/* ===== TABLET OPTIMIZATION ===== */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .container-page {
+    max-width: 768px;
+  }
+  
+  /* 2-column grid for tablets */
+  .tablet-2-col {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  /* Comfortable touch targets */
+  button,
+  a {
+    min-height: 40px;
+  }
+}

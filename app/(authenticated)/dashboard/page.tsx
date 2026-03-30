@@ -145,7 +145,7 @@ export default function DashboardPremium() {
       />
 
       {/* Key Metrics Grid - Premium Cards */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="metrics-grid grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {loading ? (
           <>
             <MetricCardSkeleton />
@@ -203,7 +203,7 @@ export default function DashboardPremium() {
       </div>
 
       {/* Charts Section */}
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="charts-grid-mobile grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-3">
         {/* Revenue Trend - Larger */}
         <Card className="lg:col-span-2 rounded-2xl border-0 shadow-lg">
           <CardHeader className="pb-4">
@@ -227,7 +227,8 @@ export default function DashboardPremium() {
             </div>
           </CardHeader>
           <CardContent className="px-2 pb-4">
-            <ResponsiveContainer width="100%" height={280}>
+            <div className="chart-container-mobile">
+            <ResponsiveContainer width="100%" height="100%">
               <BarChart data={revenueData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
                 <XAxis 
@@ -255,6 +256,7 @@ export default function DashboardPremium() {
                 <Bar dataKey="target" fill="#e5e7eb" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
+            </div>
           </CardContent>
         </Card>
 

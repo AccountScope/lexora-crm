@@ -10,6 +10,7 @@
 @import '../styles/layout.css';
 @import '../styles/tables-premium.css';
 @import '../styles/buttons-premium.css';
+@import '../styles/mobile-premium.css';
 
 /* ===== LIGHT THEME (Default) ===== */
 :root {
