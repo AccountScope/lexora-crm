@@ -1,43 +1,52 @@
 "use client"
 
-import { AlertCircle } from "lucide-react"
+import { AlertCircle, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 interface ErrorStateProps {
   title?: string
-  message?: string
+  message: string
   retry?: () => void
-  showIcon?: boolean
+  action?: {
+    label: string
+    onClick: () => void
+  }
 }
 
-export function ErrorState({ 
+export function ErrorState({
   title = "Something went wrong",
-  message = "An unexpected error occurred. Please try again.",
+  message,
   retry,
-  showIcon = true
+  action
 }: ErrorStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center p-8 text-center animate-in fade-in-50 duration-300">
-      <Alert variant="destructive" className="max-w-md">
-        <div className="flex items-start gap-3">
-          {showIcon && <AlertCircle className="h-5 w-5 mt-0.5" />}
-          <div className="flex-1 text-left">
-            <AlertTitle className="mb-1">{title}</AlertTitle>
-            <AlertDescription className="text-sm">{message}</AlertDescription>
-            {retry && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={retry}
-                className="mt-3"
-              >
-                Try again
-              </Button>
-            )}
-          </div>
+    <Alert variant="destructive" className="my-4">
+      <AlertCircle className="h-4 w-4" />
+      <AlertTitle>{title}</AlertTitle>
+      <AlertDescription className="mt-2">
+        {message}
+      </AlertDescription>
+      {(retry || action) && (
+        <div className="mt-4 flex gap-2">
+          {retry && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={retry}
+              className="gap-2"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Try Again
+            </Button>
+          )}
+          {action && (
+            <Button size="sm" onClick={action.onClick}>
+              {action.label}
+            </Button>
+          )}
         </div>
-      </Alert>
-    </div>
+      )}
+    </Alert>
   )
 }

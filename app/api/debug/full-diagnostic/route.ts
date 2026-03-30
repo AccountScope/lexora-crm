@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
 import { query } from "@/lib/api/db";
 import { verifyPassword } from "@/lib/auth/password";
+import { debugGuard } from "../middleware";
 
 export async function GET() {
+  // Block in production
+  const guard = debugGuard();
+  if (guard) return guard;
+  
   const results: any = {
     timestamp: new Date().toISOString(),
     checks: {},

@@ -36,7 +36,8 @@ export const CasesTable = ({ data, loading }: Props) => {
             <Skeleton className="h-10 w-full" />
           </div>
         ) : data && data.length > 0 ? (
-          <Table>
+          <div className="overflow-x-auto">
+            <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Matter</TableHead>
@@ -69,6 +70,7 @@ export const CasesTable = ({ data, loading }: Props) => {
               ))}
             </TableBody>
           </Table>
+          </div>
         ) : (
           <EmptyState
             icon={FolderOpen}

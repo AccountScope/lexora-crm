@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { requireUser } from "@/lib/auth";
+import { getOrganizationContext } from "@/lib/api/tenant";
 import { handleApiError, success } from "@/lib/api/response";
 import {
   timeEntrySchema,
@@ -23,8 +24,11 @@ const toBoolean = (value: string | null) => {
 export async function GET(request: NextRequest) {
   try {
     const user = await requireUser(request);
+    const context = await getOrganizationContext(user.id); // SECURITY FIX: Add organization context
+    
     const { searchParams } = new URL(request.url);
     const filters = {
+      organizationId: context.organizationId, // SECURITY FIX: Enforce organization scoping
       clientId: searchParams.get("clientId") ?? undefined,
       matterId: searchParams.get("matterId") ?? undefined,
       status: searchParams.get("status") ?? undefined,
@@ -50,6 +54,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const user = await requireUser(request);
+    const context = await getOrganizationContext(user.id); // SECURITY FIX: Add organization context
     const json = await request.json();
 
     if (json.mode === "template") {
@@ -58,14 +63,20 @@ export async function POST(request: NextRequest) {
       return success({ data: template }, { status: 201 });
     }
 
+    // SECURITY NOTE: Ensure entries inherit organization_id in createTimeEntries function
     if (Array.isArray(json.entries)) {
       const payload = bulkTimeEntrySchema.parse(json);
-      const ids = await createTimeEntries(payload.entries, user.id, { batchLabel: payload.batchLabel });
+      const ids = await createTimeEntries(payload.entries, user.id, { 
+        batchLabel: payload.batchLabel,
+        organizationId: context.organizationId // SECURITY FIX
+      });
       return success({ data: { ids } }, { status: 201 });
     }
 
     const payload = timeEntrySchema.parse(json);
-    const ids = await createTimeEntries([payload], user.id);
+    const ids = await createTimeEntries([payload], user.id, {
+      organizationId: context.organizationId // SECURITY FIX
+    });
     return success({ data: { ids } }, { status: 201 });
   } catch (error) {
     return handleApiError(error);

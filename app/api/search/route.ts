@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { requireUser } from "@/lib/auth";
+import { getOrganizationContext } from "@/lib/api/tenant";
 import { handleApiError, success } from "@/lib/api/response";
 import { performGlobalSearch, SearchEntityType } from "@/lib/api/search";
 
@@ -7,7 +8,9 @@ const ALLOWED_TYPES: SearchEntityType[] = ["case", "document", "client", "time_e
 
 export async function GET(request: NextRequest) {
   try {
-    await requireUser(request);
+    const user = await requireUser(request);
+    const context = await getOrganizationContext(user.id); // SECURITY FIX: CRITICAL
+    
     const { searchParams } = new URL(request.url);
     const term = searchParams.get("term") ?? "";
     const status = searchParams.get("status") ?? undefined;
@@ -24,6 +27,7 @@ export async function GET(request: NextRequest) {
       : undefined;
 
     const data = await performGlobalSearch({
+      organizationId: context.organizationId, // SECURITY FIX: CRITICAL - prevent cross-tenant search
       term,
       types,
       status,

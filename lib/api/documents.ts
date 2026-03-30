@@ -46,12 +46,13 @@ const getDocumentById = async (id: string): Promise<VaultDocument | undefined> =
 };
 
 export const listDocuments = async (params?: {
+  organizationId?: string;
   matterId?: string;
   clientId?: string;
   search?: string;
   limit?: number;
 }): Promise<VaultDocument[]> => {
-  const { matterId, clientId, search } = params ?? {};
+  const { organizationId, matterId, clientId, search } = params ?? {};
   const limit = params?.limit ?? 200;
   const result = await query<VaultDocument>(
     `SELECT
@@ -79,16 +80,17 @@ export const listDocuments = async (params?: {
     FROM documents d
     LEFT JOIN document_versions dv ON dv.id = d.latest_version_id
     WHERE d.deleted_at IS NULL
-      AND ($1::uuid IS NULL OR d.matter_id = $1)
-      AND ($2::uuid IS NULL OR d.client_id = $2)
+      AND ($1::uuid IS NULL OR d.organization_id = $1)
+      AND ($2::uuid IS NULL OR d.matter_id = $2)
+      AND ($3::uuid IS NULL OR d.client_id = $3)
       AND (
-        $3::text IS NULL
-        OR d.title ILIKE '%' || $3 || '%'
-        OR $3 = ANY(COALESCE(d.tags, ARRAY[]::text[]))
+        $4::text IS NULL
+        OR d.title ILIKE '%' || $4 || '%'
+        OR $4 = ANY(COALESCE(d.tags, ARRAY[]::text[]))
       )
     ORDER BY d.updated_at DESC
-    LIMIT $4`,
-    [matterId ?? null, clientId ?? null, search ?? null, limit]
+    LIMIT $5`,
+    [organizationId ?? null, matterId ?? null, clientId ?? null, search ?? null, limit]
   );
   return result.rows;
 };

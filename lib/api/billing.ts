@@ -242,7 +242,7 @@ const resolveBillingRate = async (
 export const createTimeEntries = async (
   entries: TimeEntryInput[],
   userId: string,
-  options?: { batchLabel?: string }
+  options?: { batchLabel?: string; organizationId?: string }
 ): Promise<string[]> => {
   if (!entries.length) {
     throw new ApiError(400, "No entries provided");
@@ -325,6 +325,7 @@ export const createTimeEntries = async (
 };
 
 interface InvoiceFilters {
+  organizationId?: string;
   status?: string;
   limit?: number;
   offset?: number;
@@ -462,11 +463,12 @@ export const listInvoicesWithMetrics = async (filters: InvoiceFilters = {}) => {
     INNER JOIN clients c ON c.id = i.client_id
     LEFT JOIN matters m ON m.id = i.matter_id
     WHERE i.deleted_at IS NULL
-      AND ($1::text IS NULL OR i.status = $1)
+      AND ($1::uuid IS NULL OR i.organization_id = $1)
+      AND ($2::text IS NULL OR i.status = $2)
     ORDER BY i.issue_date DESC
-    LIMIT $2 OFFSET $3
+    LIMIT $3 OFFSET $4
     `,
-    [filters.status ?? null, limit, offset]
+    [filters.organizationId ?? null, filters.status ?? null, limit, offset]
   );
 
   const invoices = invoicesResult.rows.map((row: any) => {
@@ -572,7 +574,7 @@ const calculateLineAmount = (line: InvoiceLineItemInput) => {
   return { base, net, discount: discountPortion };
 };
 
-export const createInvoice = async (input: CreateInvoiceInput, userId: string) => {
+export const createInvoice = async (input: CreateInvoiceInput, userId: string, organizationId?: string) => {
   const lineCalcs = input.lineItems.map((line) => ({ line, ...calculateLineAmount(line) }));
   const lineTotal = lineCalcs.reduce((sum, item) => sum + item.net, 0);
   const invoiceDiscount = lineTotal * ((input.discountPercent ?? 0) / 100);
@@ -584,6 +586,7 @@ export const createInvoice = async (input: CreateInvoiceInput, userId: string) =
     const invoiceInsert = await client.query<{ id: string }>(
       `
       INSERT INTO invoices (
+        organization_id,
         client_id,
         matter_id,
         status,
@@ -598,10 +601,11 @@ export const createInvoice = async (input: CreateInvoiceInput, userId: string) =
         issued_by,
         tax_rate,
         discount_amount
-      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
       RETURNING id
       `,
       [
+        organizationId,
         input.clientId,
         input.matterId ?? null,
         input.sendEmail ? "SENT" : "DRAFT",

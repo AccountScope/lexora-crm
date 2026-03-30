@@ -18,6 +18,7 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { Briefcase, Plus, Grid3x3, List, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MattersListSkeleton } from "@/components/ui/skeletons";
 
 const formSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
@@ -188,11 +189,7 @@ export const CaseManagementPanel = () => {
         
         {/* Content */}
         {isFetching ? (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-64 rounded-lg bg-muted animate-pulse" />
-            ))}
-          </div>
+          <MattersListSkeleton />
         ) : displayCases.length === 0 ? (
           <EmptyState
             icon={Briefcase}

@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import { query } from "@/lib/api/db";
+import { debugGuard } from "../middleware";
 
 export async function GET() {
+  // Block in production
+  const guard = debugGuard();
+  if (guard) return guard;
+  
   try {
     // Test basic connection
     const pingResult = await query("SELECT 1 as ping");

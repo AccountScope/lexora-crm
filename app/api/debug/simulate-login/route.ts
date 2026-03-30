@@ -1,3 +1,4 @@
+import { debugGuard } from "../middleware";
 import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/api/db";
 import { verifyPassword } from "@/lib/auth/password";
@@ -5,6 +6,8 @@ import { ensureSession, serializeSessionCookie, serializeRememberCookie } from "
 import { logAuthEvent } from "@/lib/audit/logger";
 
 export async function GET(request: NextRequest) {
+  const guard = debugGuard();
+  if (guard) return guard;
   const steps: any[] = [];
   
   try {

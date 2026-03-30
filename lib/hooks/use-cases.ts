@@ -53,7 +53,44 @@ export const useCreateCase = () => {
       if (!res.ok) throw new Error(await res.text());
       return res.json();
     },
-    onSuccess: () => {
+    // PHASE 1: Optimistic UI - Add matter instantly
+    onMutate: async (newCase) => {
+      // Cancel outgoing refetches
+      await client.cancelQueries({ queryKey: ["cases"] });
+      
+      // Snapshot previous value
+      const previousCases = client.getQueryData(["cases"]);
+      
+      // Optimistically update to the new value
+      client.setQueryData<{ data: CaseSummary[] }>(["cases"], (old) => {
+        if (!old) return old;
+        
+        // Create optimistic matter with temp ID
+        const optimisticMatter = ({
+          id: `temp-${Date.now()}`,
+          title: newCase.title as string,
+          matterNumber: (newCase.matterNumber as string) || "...",
+          status: "OPEN",
+          practiceArea: (newCase.practiceArea as string) || undefined,
+          client: { id: "temp-client", legalName: "...", displayName: "...", status: "active" },
+          opensOn: new Date().toISOString(),
+        } as unknown) as CaseSummary;
+        
+        return {
+          data: [optimisticMatter, ...old.data],
+        };
+      });
+      
+      return { previousCases };
+    },
+    // If mutation fails, rollback
+    onError: (err, newCase, context) => {
+      if (context?.previousCases) {
+        client.setQueryData(["cases"], context.previousCases);
+      }
+    },
+    // Always refetch after error or success
+    onSettled: () => {
       client.invalidateQueries({ queryKey: ["cases"] });
     },
   });

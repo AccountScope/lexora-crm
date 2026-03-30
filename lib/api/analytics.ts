@@ -45,24 +45,59 @@ const toNumber = (value: any): number => {
   return Number.isNaN(num) ? 0 : num;
 };
 
-export const getDashboardAnalytics = async (): Promise<DashboardAnalyticsPayload> => {
+export const getDashboardAnalytics = async (organizationId: string): Promise<DashboardAnalyticsPayload> => {
   const [activeCases, unbilledAmount, openTasks, recentActivityCount, casesByStatus, monthlyRevenue, timeByLawyer, caseTimeline, activity] =
     await Promise.all([
+      // Active cases count
       query<{ count: number }>(
-        `SELECT COUNT(*)::int as count FROM matters WHERE deleted_at IS NULL AND status != 'CLOSED'`
+        `SELECT COUNT(*)::int as count 
+         FROM matters 
+         WHERE deleted_at IS NULL 
+           AND status != 'CLOSED' 
+           AND organization_id = $1`,
+        [organizationId]
       ),
+      
+      // Unbilled amount
       query<{ total: string | null }>(
-        `SELECT COALESCE(SUM(amount), 0)::text as total FROM time_entries WHERE deleted_at IS NULL AND status = 'UNBILLED'`
+        `SELECT COALESCE(SUM(amount), 0)::text as total 
+         FROM time_entries 
+         WHERE deleted_at IS NULL 
+           AND status = 'UNBILLED' 
+           AND organization_id = $1`,
+        [organizationId]
       ),
+      
+      // Open tasks (documents with type=TASK)
       query<{ count: number }>(
-        `SELECT COUNT(*)::int as count FROM documents WHERE deleted_at IS NULL AND document_type = 'TASK' AND status != 'ARCHIVED'`
+        `SELECT COUNT(*)::int as count 
+         FROM documents 
+         WHERE deleted_at IS NULL 
+           AND document_type = 'TASK' 
+           AND status != 'ARCHIVED'
+           AND organization_id = $1`,
+        [organizationId]
       ),
+      
+      // Recent activity count (audit logs - may be global, keeping as-is)
       query<{ count: number }>(
-        `SELECT COUNT(*)::int as count FROM audit_logs WHERE occurred_at >= NOW() - INTERVAL '7 days'`
+        `SELECT COUNT(*)::int as count 
+         FROM audit_logs 
+         WHERE occurred_at >= NOW() - INTERVAL '7 days'`
       ),
+      
+      // Cases by status
       query<{ status: string; count: number }>(
-        `SELECT status, COUNT(*)::int as count FROM matters WHERE deleted_at IS NULL GROUP BY status ORDER BY status`
+        `SELECT status, COUNT(*)::int as count 
+         FROM matters 
+         WHERE deleted_at IS NULL 
+           AND organization_id = $1
+         GROUP BY status 
+         ORDER BY status`,
+        [organizationId]
       ),
+      
+      // Monthly revenue (last 6 months)
       query<{ label: string; value: string }>(
         `WITH months_series AS (
           SELECT generate_series(
@@ -74,21 +109,32 @@ export const getDashboardAnalytics = async (): Promise<DashboardAnalyticsPayload
         SELECT to_char(ms.bucket, 'Mon YYYY') as label,
                COALESCE(SUM(i.total_amount), 0)::text as value
         FROM months_series ms
-        LEFT JOIN invoices i ON date_trunc('month', i.issue_date) = ms.bucket AND i.deleted_at IS NULL AND i.status IN ('SENT','PARTIALLY_PAID','PAID')
+        LEFT JOIN invoices i ON date_trunc('month', i.issue_date) = ms.bucket 
+          AND i.deleted_at IS NULL 
+          AND i.organization_id = $1
+          AND i.status IN ('SENT','PARTIALLY_PAID','PAID')
         GROUP BY ms.bucket
-        ORDER BY ms.bucket`
+        ORDER BY ms.bucket`,
+        [organizationId]
       ),
+      
+      // Time by lawyer (last 30 days)
       query<{ lawyer: string; hours: string }>(
         `SELECT
           CONCAT(u.first_name, ' ', u.last_name) as lawyer,
           COALESCE(SUM(t.hours), 0)::text as hours
         FROM time_entries t
         INNER JOIN users u ON u.id = t.user_id
-        WHERE t.deleted_at IS NULL AND t.work_date >= CURRENT_DATE - INTERVAL '30 days'
+        WHERE t.deleted_at IS NULL 
+          AND t.organization_id = $1
+          AND t.work_date >= CURRENT_DATE - INTERVAL '30 days'
         GROUP BY lawyer
         ORDER BY SUM(t.hours) DESC
-        LIMIT 8`
+        LIMIT 8`,
+        [organizationId]
       ),
+      
+      // Case timeline (last 6 months)
       query<{ label: string; value: number }>(
         `WITH months_series AS (
           SELECT generate_series(
@@ -100,10 +146,15 @@ export const getDashboardAnalytics = async (): Promise<DashboardAnalyticsPayload
         SELECT to_char(ms.bucket, 'Mon') as label,
                COUNT(m.id)::int as value
         FROM months_series ms
-        LEFT JOIN matters m ON date_trunc('month', m.opens_on) = ms.bucket AND m.deleted_at IS NULL
+        LEFT JOIN matters m ON date_trunc('month', m.opens_on) = ms.bucket 
+          AND m.deleted_at IS NULL 
+          AND m.organization_id = $1
         GROUP BY ms.bucket
-        ORDER BY ms.bucket`
+        ORDER BY ms.bucket`,
+        [organizationId]
       ),
+      
+      // Activity feed (last 30 days)
       query<{
         id: string;
         type: ActivityType;
@@ -128,7 +179,10 @@ export const getDashboardAnalytics = async (): Promise<DashboardAnalyticsPayload
           INNER JOIN clients c ON c.id = m.client_id
           LEFT JOIN users u ON u.id = m.lead_attorney_id
           WHERE m.updated_at >= NOW() - INTERVAL '30 days'
+            AND m.organization_id = $1
+          
           UNION ALL
+          
           SELECT
             d.id::text,
             'document'::text,
@@ -140,8 +194,12 @@ export const getDashboardAnalytics = async (): Promise<DashboardAnalyticsPayload
             jsonb_build_object('matterId', d.matter_id, 'clientId', d.client_id) as metadata
           FROM documents d
           LEFT JOIN users u ON u.id = d.created_by
-          WHERE d.updated_at >= NOW() - INTERVAL '30 days' AND d.deleted_at IS NULL
+          WHERE d.updated_at >= NOW() - INTERVAL '30 days' 
+            AND d.deleted_at IS NULL
+            AND d.organization_id = $1
+          
           UNION ALL
+          
           SELECT
             t.id::text,
             'time_entry'::text,
@@ -153,8 +211,12 @@ export const getDashboardAnalytics = async (): Promise<DashboardAnalyticsPayload
             jsonb_build_object('matterId', t.matter_id, 'amount', t.amount) as metadata
           FROM time_entries t
           INNER JOIN users u ON u.id = t.user_id
-          WHERE t.updated_at >= NOW() - INTERVAL '30 days' AND t.deleted_at IS NULL
+          WHERE t.updated_at >= NOW() - INTERVAL '30 days' 
+            AND t.deleted_at IS NULL
+            AND t.organization_id = $1
+          
           UNION ALL
+          
           SELECT
             i.id::text,
             'invoice'::text,
@@ -166,10 +228,13 @@ export const getDashboardAnalytics = async (): Promise<DashboardAnalyticsPayload
             jsonb_build_object('clientId', i.client_id, 'matterId', i.matter_id) as metadata
           FROM invoices i
           LEFT JOIN users u ON u.id = i.issued_by
-          WHERE i.updated_at >= NOW() - INTERVAL '30 days' AND i.deleted_at IS NULL
+          WHERE i.updated_at >= NOW() - INTERVAL '30 days' 
+            AND i.deleted_at IS NULL
+            AND i.organization_id = $1
         ) AS feed
         ORDER BY "occurredAt" DESC
-        LIMIT 30`
+        LIMIT 30`,
+        [organizationId]
       ),
     ]);
 

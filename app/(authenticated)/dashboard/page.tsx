@@ -10,6 +10,8 @@ import { WelcomeCard } from "@/components/dashboard/welcome-card";
 import { OnboardingModal } from "@/components/onboarding/onboarding-modal";
 import { OnboardingTour } from "@/components/onboarding/onboarding-tour";
 import { OnboardingChecklist } from "@/components/onboarding/onboarding-checklist";
+import { DashboardSkeleton } from "@/components/ui/skeletons";
+import { QuickActionsPanel } from "@/components/dashboard/quick-actions-panel";
 import { 
   DollarSign, 
   FileText, 
@@ -216,6 +218,9 @@ export default function ExecutiveDashboard() {
 
         {/* Onboarding Checklist */}
         <OnboardingChecklist />
+
+        {/* Quick Actions Panel */}
+        <QuickActionsPanel />
 
         {/* Key Metrics Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">

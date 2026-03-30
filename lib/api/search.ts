@@ -3,6 +3,7 @@ import { query } from "@/lib/api/db";
 export type SearchEntityType = "case" | "document" | "client" | "time_entry" | "user";
 
 export interface GlobalSearchFilters {
+  organizationId?: string;
   term: string;
   types?: SearchEntityType[];
   status?: string;

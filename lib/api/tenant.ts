@@ -30,8 +30,8 @@ export async function getOrganizationContext(userId: string): Promise<Organizati
     `
     SELECT 
       organization_id,
-      role
-    FROM profiles
+      'member' as role
+    FROM users
     WHERE id = $1
     LIMIT 1
     `,
@@ -70,7 +70,7 @@ export async function verifyOrganizationAccess(
     `
     SELECT EXISTS(
       SELECT 1 
-      FROM profiles 
+      FROM users 
       WHERE id = $1 AND organization_id = $2
     ) as exists
     `,

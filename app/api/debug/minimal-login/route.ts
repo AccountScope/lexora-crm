@@ -1,3 +1,4 @@
+import { debugGuard } from "../middleware";
 import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/api/db";
 import { verifyPassword } from "@/lib/auth/password";

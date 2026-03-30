@@ -1,8 +1,11 @@
+import { debugGuard } from "../middleware";
 import { NextResponse } from "next/server";
 import { query } from "@/lib/api/db";
 import { verifyPassword } from "@/lib/auth/password";
 
 export async function GET() {
+  const guard = debugGuard();
+  if (guard) return guard;
   try {
     const email = 'sabrina@test.com';
     const password = 'TestPassword123!';
