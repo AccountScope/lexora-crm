@@ -181,7 +181,7 @@ export const CaseManagementPanel = () => {
         </div>
         
         {/* Summary Cards */}
-        <CaseSummaryCards data={displayCases} />
+        <CaseSummaryCards data={displayCases as any} />
         
         {/* Filters */}
         <MatterFilters onFilterChange={setFilters} />
@@ -215,7 +215,7 @@ export const CaseManagementPanel = () => {
                 {displayCases.map((matter) => (
                   <MatterCard
                     key={matter.id}
-                    matter={matter}
+                    matter={matter as any}
                     onLogTime={(id) => console.log("Log time for", id)}
                     onUploadDoc={(id) => console.log("Upload doc for", id)}
                     onSendMessage={(id) => console.log("Send message for", id)}
@@ -223,7 +223,7 @@ export const CaseManagementPanel = () => {
                 ))}
               </div>
             ) : (
-              <CasesTable data={displayCases} loading={isFetching} />
+              <CasesTable data={displayCases as any} loading={isFetching} />
             )}
           </>
         )}
