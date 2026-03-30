@@ -1,16 +1,31 @@
+/**
+ * Cases/Matters API - SECURED WITH MULTI-TENANT ISOLATION
+ * 
+ * This is the fixed version with proper organization scoping.
+ * ALL queries filter by organization_id to prevent data leakage.
+ */
+
 import { query, withDb } from "@/lib/api/db";
 import type { CaseDetail, CaseNote, CaseSummary, CaseTimelineEvent, CaseTeamMember } from "@/types";
 import type { CreateCaseInput, UpdateCaseInput, CaseNoteInput } from "@/lib/api/validation";
 import { ApiError, assertFound } from "@/lib/api/errors";
+import { verifyRecordOwnership } from "@/lib/api/tenant";
 
 const NOTE_DOCUMENT_TYPE = "CASE_NOTE";
 
-export const listCases = async (params?: {
-  search?: string;
-  status?: string;
-  limit?: number;
-  offset?: number;
-}): Promise<CaseSummary[]> => {
+/**
+ * List all matters for a specific organization.
+ * SECURED: Only returns matters belonging to the user's organization.
+ */
+export const listCases = async (
+  organizationId: string,
+  params?: {
+    search?: string;
+    status?: string;
+    limit?: number;
+    offset?: number;
+  }
+): Promise<CaseSummary[]> => {
   const { search, status } = params ?? {};
   const limit = params?.limit ?? 50;
   const offset = params?.offset ?? 0;
@@ -40,24 +55,34 @@ export const listCases = async (params?: {
     INNER JOIN clients c ON c.id = m.client_id
     LEFT JOIN users u ON u.id = m.lead_attorney_id
     WHERE m.deleted_at IS NULL
-      AND ($1::text IS NULL OR (
-        m.title ILIKE '%' || $1 || '%'
-        OR m.matter_number ILIKE '%' || $1 || '%'
+      AND m.organization_id = $1
+      AND ($2::text IS NULL OR (
+        m.title ILIKE '%' || $2 || '%'
+        OR m.matter_number ILIKE '%' || $2 || '%'
       ))
-      AND ($2::text IS NULL OR m.status = $2)
+      AND ($3::text IS NULL OR m.status = $3)
     ORDER BY m.created_at DESC
-    LIMIT $3 OFFSET $4
+    LIMIT $4 OFFSET $5
     `,
-    [search ?? null, status ?? null, limit, offset]
+    [organizationId, search ?? null, status ?? null, limit, offset]
   );
 
   return result.rows;
 };
 
-export const createCase = async (input: CreateCaseInput, userId: string) => {
+/**
+ * Create a new matter.
+ * SECURED: Automatically assigns the matter to the user's organization.
+ */
+export const createCase = async (
+  organizationId: string,
+  input: CreateCaseInput,
+  userId: string
+) => {
   const matterId = await withDb(async (client) => {
     const matter = await client.query(
       `INSERT INTO matters (
+        organization_id,
         client_id,
         matter_number,
         title,
@@ -67,9 +92,10 @@ export const createCase = async (input: CreateCaseInput, userId: string) => {
         lead_attorney_id,
         opens_on,
         closes_on
-      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
       RETURNING *`,
       [
+        organizationId,
         input.clientId,
         input.matterNumber,
         input.title,
@@ -92,10 +118,21 @@ export const createCase = async (input: CreateCaseInput, userId: string) => {
     return matter.rows[0].id;
   });
 
-  return getCaseById(matterId);
+  return getCaseById(organizationId, matterId);
 };
 
-export const updateCase = async (matterId: string, input: UpdateCaseInput) => {
+/**
+ * Update a matter.
+ * SECURED: Verifies matter belongs to organization before updating.
+ */
+export const updateCase = async (
+  organizationId: string,
+  matterId: string,
+  input: UpdateCaseInput
+) => {
+  // Verify ownership first
+  await verifyRecordOwnership('matters', matterId, organizationId);
+
   const updates: string[] = [];
   const values: any[] = [];
   let idx = 1;
@@ -123,15 +160,39 @@ export const updateCase = async (matterId: string, input: UpdateCaseInput) => {
     throw new ApiError(400, "No updates provided");
   }
 
+  values.push(organizationId);
   values.push(matterId);
 
-  await query(`UPDATE matters SET ${updates.join(", ")}, updated_at = NOW() WHERE id = $${idx}`, values);
-  return getCaseById(matterId);
+  await query(
+    `UPDATE matters 
+     SET ${updates.join(", ")}, updated_at = NOW() 
+     WHERE organization_id = $${idx} AND id = $${idx + 1}`,
+    values
+  );
+
+  return getCaseById(organizationId, matterId);
 };
 
-export const archiveCase = async (matterId: string, userId: string) => {
+/**
+ * Archive/close a matter.
+ * SECURED: Verifies matter belongs to organization before archiving.
+ */
+export const archiveCase = async (
+  organizationId: string,
+  matterId: string,
+  userId: string
+) => {
+  // Verify ownership first
+  await verifyRecordOwnership('matters', matterId, organizationId);
+
   await withDb(async (client) => {
-    await client.query(`UPDATE matters SET status = 'CLOSED', deleted_at = NOW() WHERE id = $1`, [matterId]);
+    await client.query(
+      `UPDATE matters 
+       SET status = 'CLOSED', deleted_at = NOW() 
+       WHERE id = $1 AND organization_id = $2`,
+      [matterId, organizationId]
+    );
+
     await client.query(
       `INSERT INTO matter_participants (matter_id, user_id, participant_role, is_primary)
        VALUES ($1,$2,$3,false)
@@ -141,7 +202,14 @@ export const archiveCase = async (matterId: string, userId: string) => {
   });
 };
 
-export const getCaseById = async (matterId: string): Promise<CaseDetail> => {
+/**
+ * Get matter by ID.
+ * SECURED: Only returns matter if it belongs to the user's organization.
+ */
+export const getCaseById = async (
+  organizationId: string,
+  matterId: string
+): Promise<CaseDetail> => {
   const base = await query<CaseSummary & { description: string | null }>(
     `SELECT
       m.id,
@@ -157,15 +225,18 @@ export const getCaseById = async (matterId: string): Promise<CaseDetail> => {
     FROM matters m
     INNER JOIN clients c ON c.id = m.client_id
     LEFT JOIN users u ON u.id = m.lead_attorney_id
-    WHERE m.id = $1 AND m.deleted_at IS NULL`,
-    [matterId]
+    WHERE m.id = $1 
+      AND m.organization_id = $2 
+      AND m.deleted_at IS NULL`,
+    [matterId, organizationId]
   );
+
   const record = assertFound(base.rows[0], "Matter not found");
 
   const [team, notes, timeline] = await Promise.all([
-    getCaseTeam(matterId),
-    listCaseNotes(matterId),
-    getCaseTimeline(matterId),
+    getCaseTeam(organizationId, matterId),
+    listCaseNotes(organizationId, matterId),
+    getCaseTimeline(organizationId, matterId),
   ]);
 
   const documentsResult = await query(
@@ -192,10 +263,12 @@ export const getCaseById = async (matterId: string): Promise<CaseDetail> => {
       ) as "latestVersion"
     FROM documents d
     LEFT JOIN document_versions dv ON dv.id = d.latest_version_id
-    WHERE d.matter_id = $1 AND d.deleted_at IS NULL
+    WHERE d.matter_id = $1 
+      AND d.organization_id = $2
+      AND d.deleted_at IS NULL
     ORDER BY d.updated_at DESC
     LIMIT 100`,
-    [matterId]
+    [matterId, organizationId]
   );
 
   return {
@@ -208,7 +281,10 @@ export const getCaseById = async (matterId: string): Promise<CaseDetail> => {
   };
 };
 
-const getCaseTeam = async (matterId: string): Promise<CaseTeamMember[]> => {
+const getCaseTeam = async (
+  organizationId: string,
+  matterId: string
+): Promise<CaseTeamMember[]> => {
   const result = await query<CaseTeamMember>(
     `SELECT
       mp.user_id as "userId",
@@ -218,14 +294,19 @@ const getCaseTeam = async (matterId: string): Promise<CaseTeamMember[]> => {
       mp.is_primary as "isPrimary"
     FROM matter_participants mp
     INNER JOIN users u ON u.id = mp.user_id
+    INNER JOIN matters m ON m.id = mp.matter_id
     WHERE mp.matter_id = $1
+      AND m.organization_id = $2
     ORDER BY mp.is_primary DESC, mp.created_at ASC`,
-    [matterId]
+    [matterId, organizationId]
   );
   return result.rows;
 };
 
-export const listCaseNotes = async (matterId: string): Promise<CaseNote[]> => {
+export const listCaseNotes = async (
+  organizationId: string,
+  matterId: string
+): Promise<CaseNote[]> => {
   const result = await query<CaseNote>(
     `SELECT
       d.id,
@@ -238,19 +319,29 @@ export const listCaseNotes = async (matterId: string): Promise<CaseNote[]> => {
     FROM documents d
     INNER JOIN users u ON u.id = d.created_by
     WHERE d.matter_id = $1
-      AND d.document_type = $2
+      AND d.organization_id = $2
+      AND d.document_type = $3
       AND d.deleted_at IS NULL
     ORDER BY d.created_at DESC
     LIMIT 200`,
-    [matterId, NOTE_DOCUMENT_TYPE]
+    [matterId, organizationId, NOTE_DOCUMENT_TYPE]
   );
   return result.rows;
 };
 
-export const addCaseNote = async (input: CaseNoteInput, userId: string) => {
+export const addCaseNote = async (
+  organizationId: string,
+  input: CaseNoteInput,
+  userId: string
+) => {
   const { matterId, note, visibility } = input;
+
+  // Verify matter belongs to organization
+  await verifyRecordOwnership('matters', matterId, organizationId);
+
   const insert = await query(
     `INSERT INTO documents (
+      organization_id,
       matter_id,
       title,
       document_type,
@@ -259,9 +350,10 @@ export const addCaseNote = async (input: CaseNoteInput, userId: string) => {
       created_by,
       data_classification,
       notes
-    ) VALUES ($1,$2,$3,'DRAFT',$4,$5,$6,$7)
+    ) VALUES ($1,$2,$3,$4,'DRAFT',$5,$6,$7,$8)
     RETURNING id`,
     [
+      organizationId,
       matterId,
       note.slice(0, 120),
       NOTE_DOCUMENT_TYPE,
@@ -271,11 +363,15 @@ export const addCaseNote = async (input: CaseNoteInput, userId: string) => {
       note,
     ]
   );
-  const [created] = await listCaseNotes(matterId);
+
+  const [created] = await listCaseNotes(organizationId, matterId);
   return created ?? { ...input, id: insert.rows[0].id, authorId: userId, authorName: "" };
 };
 
-export const getCaseTimeline = async (matterId: string): Promise<CaseTimelineEvent[]> => {
+export const getCaseTimeline = async (
+  organizationId: string,
+  matterId: string
+): Promise<CaseTimelineEvent[]> => {
   const result = await query<CaseTimelineEvent>(
     `SELECT * FROM (
       SELECT
@@ -288,7 +384,7 @@ export const getCaseTimeline = async (matterId: string): Promise<CaseTimelineEve
         CONCAT(u.first_name, ' ', u.last_name) as actor
       FROM matters m
       LEFT JOIN users u ON u.id = m.lead_attorney_id
-      WHERE m.id = $1
+      WHERE m.id = $1 AND m.organization_id = $2
       UNION ALL
       SELECT
         d.id,
@@ -300,7 +396,9 @@ export const getCaseTimeline = async (matterId: string): Promise<CaseTimelineEve
         CONCAT(u.first_name, ' ', u.last_name) as actor
       FROM documents d
       INNER JOIN users u ON u.id = d.created_by
-      WHERE d.matter_id = $1 AND d.document_type = $2
+      WHERE d.matter_id = $1 
+        AND d.organization_id = $2
+        AND d.document_type = $3
       UNION ALL
       SELECT
         coc.id,
@@ -314,7 +412,7 @@ export const getCaseTimeline = async (matterId: string): Promise<CaseTimelineEve
       INNER JOIN document_versions dv ON dv.id = coc.document_version_id
       LEFT JOIN users u ON u.id = coc.performed_by
       INNER JOIN documents d ON d.id = dv.document_id
-      WHERE d.matter_id = $1
+      WHERE d.matter_id = $1 AND d.organization_id = $2
       UNION ALL
       SELECT
         mp.user_id::text || '-' || mp.matter_id,
@@ -326,11 +424,12 @@ export const getCaseTimeline = async (matterId: string): Promise<CaseTimelineEve
         CONCAT(u.first_name, ' ', u.last_name) as actor
       FROM matter_participants mp
       INNER JOIN users u ON u.id = mp.user_id
-      WHERE mp.matter_id = $1
+      INNER JOIN matters m ON m.id = mp.matter_id
+      WHERE mp.matter_id = $1 AND m.organization_id = $2
     ) AS events
     ORDER BY "occurredAt" DESC
     LIMIT 200`,
-    [matterId, NOTE_DOCUMENT_TYPE]
+    [matterId, organizationId, NOTE_DOCUMENT_TYPE]
   );
   return result.rows;
 };
