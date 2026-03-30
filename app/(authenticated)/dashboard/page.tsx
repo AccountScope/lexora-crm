@@ -8,6 +8,8 @@ import { MetricCard } from "@/components/dashboard/metric-card";
 import { ActivityFeed } from "@/components/dashboard/activity-feed";
 import { WelcomeCard } from "@/components/dashboard/welcome-card";
 import { OnboardingModal } from "@/components/onboarding/onboarding-modal";
+import { OnboardingTour } from "@/components/onboarding/onboarding-tour";
+import { OnboardingChecklist } from "@/components/onboarding/onboarding-checklist";
 import { 
   DollarSign, 
   FileText, 
@@ -178,9 +180,12 @@ export default function ExecutiveDashboard() {
     { month: 'May', revenue: 125000, target: 120000 }
   ];
 
+  const [showTour, setShowTour] = useState(false);
+
   return (
     <>
       <OnboardingModal />
+      {showTour && <OnboardingTour onComplete={() => setShowTour(false)} onSkip={() => setShowTour(false)} />}
       
       <div className="space-y-8 animate-fade-in">
         {/* Header Section */}
@@ -208,6 +213,9 @@ export default function ExecutiveDashboard() {
 
         {/* Welcome Card (only show for new users) */}
         <WelcomeCard />
+
+        {/* Onboarding Checklist */}
+        <OnboardingChecklist />
 
         {/* Key Metrics Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
