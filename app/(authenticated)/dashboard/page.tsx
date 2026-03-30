@@ -282,7 +282,7 @@ export default function DashboardPremium() {
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value: number) => `${value} matters`} />
+                <Tooltip formatter={(value: any) => `${value} matters`} />
               </PieChart>
             </ResponsiveContainer>
             <div className="mt-4 flex flex-wrap items-center justify-center gap-4">
