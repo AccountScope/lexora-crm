@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * Billing Settings Page
  * Manage subscription, view usage, and access billing portal
