@@ -16,7 +16,7 @@ import { UsageDisplay } from '@/components/billing/usage-display';
 import { PricingTable } from '@/components/billing/pricing-table';
 import { type PlanId } from '@/lib/stripe/config';
 
-export default function BillingSettingsPage() {
+export function BillingPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
